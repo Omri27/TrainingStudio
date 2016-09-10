@@ -7,14 +7,11 @@ public class BEResponse {
 
     BEResponseStatusEnum status;
     BEBaseEntity entity;
+    private String message;
+
 
     public BEResponse(){
 
-    }
-
-    public BEResponse(BEResponseStatusEnum status, BEBaseEntity entity) {
-        this.status = status;
-        this.entity = entity;
     }
 
     public BEResponseStatusEnum getStatus() {
@@ -31,5 +28,13 @@ public class BEResponse {
 
     public void setEntity(BEBaseEntity entity) {
         this.entity = entity;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 }

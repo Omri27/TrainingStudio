@@ -99,7 +99,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
                     //validate registration & write to shared preferences
                     if (registerResult != null && registerResult.getStatus() == BEResponseStatusEnum.success) {
                         user = (BEUser) registerResult.getEntity();
-                        writeToSharedPreferences("userId", user.getId());
+                        writeToSharedPreferences("userId", user.getId().toString());
 
                         Toast.makeText(this, "Registration succeed! please check your email and insert your verification code.", Toast.LENGTH_LONG).show();
 

@@ -14,7 +14,7 @@ public class LobbyActivity extends BaseActivity {
         if (isVerified()) {
             onCreateUI();
         } else {
-            //navigateToActivity(this, RegisterActivity.class, false);
+            navigateToActivity(this, RegisterActivity.class, false);
         }
 
     }

@@ -6,6 +6,8 @@ import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import com.firebase.client.Firebase;
+
 public class BaseActivity extends AppCompatActivity {
 
     //create shared preferences scope for all activities
@@ -16,6 +18,7 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Firebase.setAndroidContext(this);
 
         //create the Shared Preferences read/write objects
         preferences = getSharedPreferences(appPreferences, 0);

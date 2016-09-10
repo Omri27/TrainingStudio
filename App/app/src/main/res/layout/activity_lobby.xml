@@ -2,9 +2,70 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0099cc"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="@drawable/app_bg2"
     android:layoutDirection="ltr"
     tools:context="zina_eliran.app.LobbyActivity">
+
+    <ImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="top"
+        android:background="@drawable/app_logo"/>
+
+    <TableLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center">
+
+        <TableRow
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <Button
+                android:id="@+id/lobby_create_training_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="100dp">
+            </Button>
+
+            <Button
+                android:id="@+id/lobby_public_trainings_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="100dp" >
+            </Button>
+        </TableRow>
+
+        <TableRow
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <Button
+                android:id="@+id/lobby_my_profile_settings_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="100dp" >
+            </Button>
+
+            <Button
+                android:id="@+id/lobby_my_trainings_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="100dp" >
+            </Button>
+        </TableRow>
+
+        <TableRow
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <Button
+                android:id="@+id/lobby_statistics_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="100dp"
+                android:enabled="false" >
+            </Button>
+
+        </TableRow>
+    </TableLayout>
 
 
 </LinearLayout>

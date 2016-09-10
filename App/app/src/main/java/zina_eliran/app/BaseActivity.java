@@ -68,11 +68,21 @@ public class BaseActivity extends AppCompatActivity {
         return false;
     }
 
-    public static void navigateToActivity(Activity current, java.lang.Class<?> nextClass){
-        Intent openActivity= new Intent(current, nextClass);
-        openActivity.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-        current.startActivity(openActivity);
-        current.finish(); // finish the current activity
+    public static void navigateToActivity(Activity current, java.lang.Class<?> nextClass,boolean isFinishCurrentActivity) {
+        try {
+            Intent openActivity = new Intent(current, nextClass);
+            if(isFinishCurrentActivity){
+                openActivity.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            }
+            current.startActivity(openActivity);
+
+            if(isFinishCurrentActivity){
+                current.finish();
+            }
+
+        } catch (Exception e) {
+            CMNLogHelper.logError("BaseActivity", e.getMessage());
+        }
     }
 
     //endregion

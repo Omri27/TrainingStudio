@@ -5,10 +5,10 @@ public class BEUser extends BEBaseEntity {
 
     private String name;
     private String email;
+    private String verificationCode;
 
-    public BEUser(String name, String email) {
-        this.name = name;
-        this.email = email;
+    public BEUser() {
+        super();
     }
 
     public String getName() {
@@ -26,4 +26,13 @@ public class BEUser extends BEBaseEntity {
     public void setEmail(String email) {
         this.email = email;
     }
+
+    public String getVerificationCode() {
+        return verificationCode;
+    }
+
+    public void setVerificationCode(String verificationCode) {
+        this.verificationCode = verificationCode;
+    }
+
 }

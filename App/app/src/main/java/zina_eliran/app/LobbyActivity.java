@@ -14,7 +14,7 @@ public class LobbyActivity extends BaseActivity {
         if (isVerified()) {
             onCreateUI();
         } else {
-            navigateToActivity(this, RegisterActivity.class);
+            //navigateToActivity(this, RegisterActivity.class, false);
         }
 
     }
@@ -33,7 +33,7 @@ public class LobbyActivity extends BaseActivity {
     }
 
     public boolean isVerified() {
-        return !readFromSharedPreferences("isVerified").isEmpty();
+        return !readFromSharedPreferences("userVerification").isEmpty();
     }
 
 }

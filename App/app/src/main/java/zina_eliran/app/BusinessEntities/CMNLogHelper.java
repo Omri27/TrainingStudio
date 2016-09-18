@@ -1,4 +1,4 @@
-package zina_eliran.app;
+package zina_eliran.app.BusinessEntities;
 
 import android.util.Log;
 

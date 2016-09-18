@@ -1,8 +1,9 @@
-package zina_eliran.app;
+package zina_eliran.app.API;
 
 import com.firebase.client.Firebase;
 
-import java.util.UUID;
+import zina_eliran.app.BusinessEntities.BEUser;
+import zina_eliran.app.BusinessEntities.CMNLogHelper;
 
 /**
  * Created by Zina K on 9/10/2016.

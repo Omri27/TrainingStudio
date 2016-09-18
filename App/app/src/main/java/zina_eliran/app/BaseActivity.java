@@ -5,11 +5,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.style.ForegroundColorSpan;
 
 import com.firebase.client.Firebase;
 
 import java.util.Map;
+
+import zina_eliran.app.BusinessEntities.CMNLogHelper;
 
 public class BaseActivity extends AppCompatActivity {
 

@@ -1,4 +1,8 @@
-package zina_eliran.app;
+package zina_eliran.app.API;
+
+import zina_eliran.app.API.BL;
+import zina_eliran.app.BusinessEntities.BEResponse;
+import zina_eliran.app.BusinessEntities.BEUser;
 
 /**
  * Created by Zina K on 9/10/2016.

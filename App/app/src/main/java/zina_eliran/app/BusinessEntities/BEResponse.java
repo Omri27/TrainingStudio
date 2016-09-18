@@ -1,4 +1,4 @@
-package zina_eliran.app;
+package zina_eliran.app.BusinessEntities;
 
 /**
  * Created by eli on 10/09/2016.

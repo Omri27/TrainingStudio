@@ -7,6 +7,12 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import zina_eliran.app.API.ServerAPI;
+import zina_eliran.app.BusinessEntities.BEResponse;
+import zina_eliran.app.BusinessEntities.BEResponseStatusEnum;
+import zina_eliran.app.BusinessEntities.BEUser;
+import zina_eliran.app.BusinessEntities.CMNLogHelper;
+
 
 //the first activity, unless the user already registered & verified.
 public class RegisterActivity extends BaseActivity implements View.OnClickListener {

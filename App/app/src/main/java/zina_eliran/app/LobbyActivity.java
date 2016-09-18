@@ -7,6 +7,8 @@ import android.widget.Button;
 import java.util.HashMap;
 import java.util.Map;
 
+import zina_eliran.app.BusinessEntities.CMNLogHelper;
+
 public class LobbyActivity extends BaseActivity implements View.OnClickListener {
 
     Button createTrainingBtn;

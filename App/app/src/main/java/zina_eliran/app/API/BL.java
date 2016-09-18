@@ -1,6 +1,7 @@
-package zina_eliran.app;
+package zina_eliran.app.API;
 
-import java.util.UUID;
+import zina_eliran.app.BusinessEntities.BEResponse;
+import zina_eliran.app.BusinessEntities.BEUser;
 
 public class BL {
 

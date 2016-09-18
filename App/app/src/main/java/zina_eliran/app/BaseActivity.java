@@ -5,8 +5,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.style.ForegroundColorSpan;
 
 import com.firebase.client.Firebase;
+
+import java.util.Map;
 
 public class BaseActivity extends AppCompatActivity {
 
@@ -71,11 +74,18 @@ public class BaseActivity extends AppCompatActivity {
         return false;
     }
 
-    public static void navigateToActivity(Activity current, java.lang.Class<?> nextClass,boolean isFinishCurrentActivity) {
+    public static void navigateToActivity(Activity current, java.lang.Class<?> nextClass,boolean isFinishCurrentActivity, Map<String, String> intentParams) {
         try {
             Intent openActivity = new Intent(current, nextClass);
             if(isFinishCurrentActivity){
                 openActivity.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            }
+
+            //add intent params
+            if(intentParams != null){
+                for (String k: intentParams.keySet()) {
+                    openActivity.putExtra(k, intentParams.get(k));
+                }
             }
             current.startActivity(openActivity);
 

@@ -94,7 +94,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
                     user.setName(nameEditText.getText().toString());
                     user.setEmail(emailEditText.getText().toString());
 
-                    BEResponse registerResult = BL.registerUser(user);
+                    BEResponse registerResult = ServerAPI.registerUser(user);
 
                     //validate registration & write to shared preferences
                     if (registerResult != null && registerResult.getStatus() == BEResponseStatusEnum.success) {
@@ -115,7 +115,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
                     if (user != null) {
                         user.setVerificationCode(verificationCodeEditText.getText().toString());
 
-                        BEResponse verificationResult = BL.registerUser(user);
+                        BEResponse verificationResult = ServerAPI.registerUser(user);
 
                         //validate verification & write to shared preferences
                         if (verificationResult != null && verificationResult.getStatus() == BEResponseStatusEnum.success) {
@@ -123,7 +123,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
                             writeToSharedPreferences("userVerification", user.getVerificationCode());
 
                             //navigate to lobby when user verified his account
-                            navigateToActivity(this, LobbyActivity.class, true);
+                            navigateToActivity(this, LobbyActivity.class, true, null);
                         }
                     } else {
                         Toast.makeText(this, "We can't verify your registration, please try again.", Toast.LENGTH_LONG).show();
@@ -137,7 +137,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
     }
 
     public BEUser getUser() {
-        BEResponse result = BL.getUser(readFromSharedPreferences("userId"));
+        BEResponse result = ServerAPI.getUser(readFromSharedPreferences("userId"));
         if (result.getStatus() == BEResponseStatusEnum.success) {
             return (BEUser) result.getEntity();
         }

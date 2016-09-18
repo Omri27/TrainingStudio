@@ -2,70 +2,99 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
     android:background="@drawable/app_bg2"
+    android:gravity="center"
     android:layoutDirection="ltr"
+    android:orientation="vertical"
     tools:context="zina_eliran.app.LobbyActivity">
 
-    <ImageView
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_gravity="top"
-        android:background="@drawable/app_logo"/>
 
-    <TableLayout
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center">
+        android:paddingLeft="20dp"
+        android:paddingTop="20dp">
 
-        <TableRow
+        <ImageView
+            android:layout_width="60dp"
+            android:layout_height="40dp"
+            android:background="@drawable/app_logo" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center">
+
+        <TableLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
 
-            <Button
-                android:id="@+id/lobby_create_training_btn"
+            <TableRow
                 android:layout_width="wrap_content"
-                android:layout_height="100dp">
-            </Button>
+                android:layout_height="wrap_content">
 
-            <Button
-                android:id="@+id/lobby_public_trainings_btn"
+                <Button
+                    android:id="@+id/lobby_create_training_btn"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_marginRight="20dp"
+                    android:text="create\ntraining"
+                    android:elevation="2dp"
+                    android:background="@drawable/app_rect_buttons_shape"></Button>
+
+                <Button
+                    android:id="@+id/lobby_public_trainings_btn"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:text="public\ntrainings"
+                    android:elevation="2dp"
+                    android:background="@drawable/app_rect_buttons_shape"></Button>
+            </TableRow>
+
+            <TableRow
                 android:layout_width="wrap_content"
-                android:layout_height="100dp" >
-            </Button>
-        </TableRow>
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp">
 
-        <TableRow
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
+                <Button
+                    android:id="@+id/lobby_my_profile_settings_btn"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_marginRight="20dp"
+                    android:text="profile\nsettings"
+                    android:elevation="2dp"
+                    android:background="@drawable/app_rect_buttons_shape"></Button>
 
-            <Button
-                android:id="@+id/lobby_my_profile_settings_btn"
+                <Button
+                    android:id="@+id/lobby_my_trainings_btn"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:text="my\ntrainings"
+                    android:elevation="2dp"
+                    android:background="@drawable/app_rect_buttons_shape"></Button>
+            </TableRow>
+
+            <TableRow
                 android:layout_width="wrap_content"
-                android:layout_height="100dp" >
-            </Button>
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp">
 
-            <Button
-                android:id="@+id/lobby_my_trainings_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="100dp" >
-            </Button>
-        </TableRow>
+                <Button
+                    android:id="@+id/lobby_my_progress_btn"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_marginRight="20dp"
+                    android:text="my\nprogress"
+                    android:elevation="2dp"
+                    android:background="@drawable/app_rect_disabled_buttons_shape"
+                    android:enabled="false"></Button>
 
-        <TableRow
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
+            </TableRow>
+        </TableLayout>
 
-            <Button
-                android:id="@+id/lobby_statistics_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="100dp"
-                android:enabled="false" >
-            </Button>
-
-        </TableRow>
-    </TableLayout>
-
+    </LinearLayout>
 
 </LinearLayout>

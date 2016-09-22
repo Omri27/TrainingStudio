@@ -1,3 +1,35 @@
 <resources>
-    <string name="app_name">App</string>
+    <string name="app_name">Training Studio</string>
+    <!--app common values-->
+    <string name="user_id">user_id</string>
+    <string name="general_error_message"></string>
+    <string name="manage_training_permission">manage_training_permission</string>
+
+
+
+    <!--********************************************************************************************-->
+    <!--registration/verification values-->
+    <string name="user_registration_permission">user_registration_permission</string>
+    <string name="user_verification_permission">user_verification_permission</string>
+    <string name="user_verification_code">user_verification_code</string>
+    <string name="registration_success_message">Registration succeed! please check your email and insert your verification code.</string>
+    <string name="registration_error_message">We can\'t register your profile, please try again.</string>
+    <string name="verification_success_message">Hi %s, Welcome!</string>
+    <string name="verification_error_message">We can\'t verify your registration, please try again.</string>
+
+
+    <!--********************************************************************************************-->
+    <!--lobby values-->
+    <string name="training_list_title">training_list_title</string>
+    <string name="public_training_list_title">Public Trainings</string>
+    <string name="my_training_list_title">My Trainings</string>
+
+
+    <!--********************************************************************************************-->
+    <!--training list values-->
+    <string name="training_list_mode">training_list_mode</string>
+    <string name="training_list_public_mode">training_list_public_mode</string>
+    <string name="training_list_my_trainings_mode">training_list_my_trainings_mode</string>
+
+
 </resources>

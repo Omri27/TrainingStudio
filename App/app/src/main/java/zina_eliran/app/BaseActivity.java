@@ -5,8 +5,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.content.Context;
 
 import com.firebase.client.Firebase;
+
 
 import java.util.Map;
 
@@ -18,10 +20,13 @@ public class BaseActivity extends AppCompatActivity {
     final String appPreferences = "trainingStudioPreferences";
     SharedPreferences preferences;
     SharedPreferences.Editor editor;
+    static Context appContext;
+    Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        appContext = this;
         Firebase.setAndroidContext(this);
 
         //create the Shared Preferences read/write objects
@@ -75,22 +80,22 @@ public class BaseActivity extends AppCompatActivity {
         return false;
     }
 
-    public static void navigateToActivity(Activity current, java.lang.Class<?> nextClass,boolean isFinishCurrentActivity, Map<String, String> intentParams) {
+    public static void navigateToActivity(Activity current, java.lang.Class<?> nextClass, boolean isFinishCurrentActivity, Map<String, String> intentParams) {
         try {
             Intent openActivity = new Intent(current, nextClass);
-            if(isFinishCurrentActivity){
+            if (isFinishCurrentActivity) {
                 openActivity.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             }
 
             //add intent params
-            if(intentParams != null){
-                for (String k: intentParams.keySet()) {
+            if (intentParams != null) {
+                for (String k : intentParams.keySet()) {
                     openActivity.putExtra(k, intentParams.get(k));
                 }
             }
             current.startActivity(openActivity);
 
-            if(isFinishCurrentActivity){
+            if (isFinishCurrentActivity) {
                 current.finish();
             }
 
@@ -100,5 +105,23 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     //endregion
+
+    public static Context _getAppContext() {
+        return appContext;
+    }
+
+    public static String getIntentParam(Intent intent, String key) {
+        if (intent != null) {
+            Bundle extras = intent.getExtras();
+            if (extras != null) {
+                return extras.getString(key);
+            }
+        }
+        return null;
+    }
+
+    public static String _getString(int key) {
+        return appContext.getString(key);
+    }
 
 }

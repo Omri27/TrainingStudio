@@ -1,61 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout  xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/app_bg1"
+    android:background="@drawable/app_intro_bg"
     android:layoutDirection="ltr"
     android:orientation="vertical"
     tools:context="zina_eliran.app.RegisterActivity">
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="2">
-
-        <ImageView
-            android:id="@+id/register_logo_image"
-            android:layout_width="300dp"
-            android:layout_height="190dp"
-            android:layout_gravity="center|center_horizontal"
-            android:background="@drawable/app_logo"/>
-
-    </FrameLayout>
+    <include layout="@layout/app_header_icon"></include>
 
 
     <LinearLayout
         android:id="@+id/register_register_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="4"
-        android:paddingLeft="20dp"
-        android:paddingRight="20dp"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:paddingLeft="50dp"
+        android:paddingRight="50dp"
+        android:gravity="bottom"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="50dp"
+        android:orientation="vertical"
+        android:visibility="gone">
 
         <EditText
             android:id="@+id/register_name_et"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:hint="Name..."
-            android:textColorHint="#808080"
+            android:hint="|  Full Name"
+            android:textColorHint="#555555"
             android:textColor="#000000"
-            android:paddingLeft="10dp"/>
+            android:background="#ffffff"
+            android:paddingLeft="20dp"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:background="#ddFFA330"/>
 
         <EditText
             android:id="@+id/register_email_et"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:hint="Email..."
-            android:textColorHint="#808080"
+            android:hint="|  Email"
+            android:textColorHint="#555555"
             android:textColor="#000000"
-            android:paddingLeft="10dp"/>
+            android:background="#ffffff"
+            android:paddingLeft="20dp"
+            android:layout_marginTop="5dp"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:background="#ddFFA330"/>
 
         <Button
             android:id="@+id/register_register_btn"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:text="Register"
-            android:textSize="18dp"
+            android:textSize="17dp"
+            android:layout_marginTop="20dp"
             android:elevation="2dp"
             android:background="@drawable/app_rect_buttons_shape"/>
     </LinearLayout>
@@ -63,14 +66,15 @@
     <LinearLayout
         android:id="@+id/register_verification_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="4"
-        android:paddingLeft="20dp"
-        android:paddingRight="20dp"
+        android:layout_height="wrap_content"
+        android:paddingLeft="50dp"
+        android:paddingRight="50dp"
         android:orientation="vertical"
-        android:visibility="gone">
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="50dp"
+        android:visibility="visible">
 
-        <ImageView
+        <View
             android:layout_width="match_parent"
             android:layout_height="50dp"/>
 
@@ -78,19 +82,27 @@
             android:id="@+id/register_verification_code_et"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:hint="Name..."
-            android:textColorHint="#808080"
-            android:textColor="#000000"
-            android:paddingLeft="10dp"/>
+            android:hint="|   Verification Code"
+            android:textColorHint="#555555"
+            android:textColor="#333333"
+            android:background="#ffffff"
+            android:paddingLeft="20dp"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:background="#ddFFA330"/>
 
         <Button
             android:id="@+id/register_verify_btn"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:textSize="18dp"
+            android:textSize="17dp"
             android:text="complete registration"
+            android:layout_marginTop="20dp"
+            android:textStyle="bold"
             android:elevation="2dp"
             android:background="@drawable/app_rect_buttons_shape"/>
     </LinearLayout>
 
-</LinearLayout>
+</RelativeLayout >

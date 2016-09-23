@@ -8,13 +8,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import zina_eliran.app.BusinessEntities.CMNLogHelper;
+import zina_eliran.app.Utils.AppConstsEnum;
 
 public class LobbyActivity extends BaseActivity implements View.OnClickListener {
 
     Button createTrainingBtn;
     Button publicTrainingsBtn;
     Button myProfileSettingsBtn;
-    Button myTrainings;
+    Button myTrainingsBtn;
+    Button startTrainingBtn;
     Button myProgressBtn;
 
 
@@ -24,15 +26,15 @@ public class LobbyActivity extends BaseActivity implements View.OnClickListener 
 
         setContentView(R.layout.activity_lobby);
 
-        //navigate to Lobby if the user is verified
-
-        onCreateUI();
-
-       /* if (!isVerified()) {
+/*        if (isVerified()) {
             onCreateUI();
-        } else {
+        }
+         //navigate to Lobby if the user is verified
+         else {
             navigateToActivity(this, RegisterActivity.class, false, null);
         }*/
+
+        onCreateUI();
 
     }
 
@@ -40,16 +42,19 @@ public class LobbyActivity extends BaseActivity implements View.OnClickListener 
         try {
 
             //bind ui
-            createTrainingBtn = (Button)findViewById(R.id.lobby_create_training_btn);
-            publicTrainingsBtn = (Button)findViewById(R.id.lobby_public_trainings_btn);
-            myProfileSettingsBtn = (Button)findViewById(R.id.lobby_my_profile_settings_btn);
-            myTrainings = (Button)findViewById(R.id.lobby_my_trainings_btn);
-            myProgressBtn = (Button)findViewById(R.id.lobby_my_progress_btn);
+            createTrainingBtn = (Button) findViewById(R.id.lobby_create_training_btn);
+            publicTrainingsBtn = (Button) findViewById(R.id.lobby_public_trainings_btn);
+            myProfileSettingsBtn = (Button) findViewById(R.id.lobby_my_profile_settings_btn);
+            myTrainingsBtn = (Button) findViewById(R.id.lobby_my_trainings_btn);
+            startTrainingBtn = (Button) findViewById(R.id.lobby_start_training_btn);
+            myProgressBtn = (Button) findViewById(R.id.lobby_my_progress_btn);
 
+            //add events
             createTrainingBtn.setOnClickListener(this);
             publicTrainingsBtn.setOnClickListener(this);
             myProfileSettingsBtn.setOnClickListener(this);
-            myTrainings.setOnClickListener(this);
+            myTrainingsBtn.setOnClickListener(this);
+            startTrainingBtn.setOnClickListener(this);
             myProgressBtn.setOnClickListener(this);
 
         } catch (Exception e) {
@@ -58,31 +63,38 @@ public class LobbyActivity extends BaseActivity implements View.OnClickListener 
     }
 
     public boolean isVerified() {
-        return !readFromSharedPreferences("userVerification").isEmpty();
+        return !readFromSharedPreferences(AppConstsEnum.userVerificationPermission.toString()).isEmpty();
     }
 
     @Override
     public void onClick(View v) {
         try {
-            Map<String, String>  intentParams = new HashMap<>();
+            Map<String, String> intentParams = new HashMap<>();
             switch (v.getId()) {
                 case R.id.lobby_create_training_btn:
-                    intentParams.put("hasCreateButton","true");
-                    navigateToActivity(this, TrainingsListActivity.class, false, intentParams);
+                    //go to edit activity.
+                    //navigateToActivity(this, TrainingsListActivity.class, false, intentParams);
                     break;
 
                 case R.id.lobby_public_trainings_btn:
-                    intentParams.put("isCreateButton","false");
+                    intentParams.put(_getString(R.string.training_list_title), _getString(R.string.public_training_list_title));
+                    intentParams.put(_getString(R.string.training_list_public_mode), "true");
                     navigateToActivity(this, TrainingsListActivity.class, false, intentParams);
                     break;
 
                 case R.id.lobby_my_profile_settings_btn:
-                    navigateToActivity(this, TrainingsListActivity.class, false, null);
+                    //navigateToActivity(this, TrainingsListActivity.class, false, null);
                     break;
 
                 case R.id.lobby_my_trainings_btn:
-                    intentParams.put("isCreateButton","false");
+                    intentParams.put(_getString(R.string.training_list_title), _getString(R.string.my_training_list_title));
+                    intentParams.put(AppConstsEnum.manageTrainingPermission.toString(), "true");
+                    intentParams.put(_getString(R.string.training_list_my_trainings_mode), "true");
                     navigateToActivity(this, TrainingsListActivity.class, false, intentParams);
+                    break;
+
+                case R.id.lobby_start_training_btn:
+                    //disables in phase 1
                     break;
 
                 case R.id.lobby_my_progress_btn:

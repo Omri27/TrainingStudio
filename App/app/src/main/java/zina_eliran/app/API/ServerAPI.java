@@ -1,6 +1,8 @@
 package zina_eliran.app.API;
 
 import java.util.ArrayList;
+import java.util.Random;
+
 import zina_eliran.app.BusinessEntities.BEResponse;
 import zina_eliran.app.BusinessEntities.BETraining;
 import zina_eliran.app.BusinessEntities.BEUser;
@@ -91,5 +93,17 @@ public class ServerAPI {
     public void updateTraining(BETraining training){} //num of participants and status can be changed
 
     public void joinTraining(String trainingId, String userId){}
+
+
+    //extra functions
+    //**************
+
+    public static String generateVerificationCode(){
+        Random rand = new Random();
+        Integer num = rand.nextInt(900000) + 100000;
+        return num.toString();
+    }
+
+
 
 }

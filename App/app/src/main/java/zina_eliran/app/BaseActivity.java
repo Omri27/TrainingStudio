@@ -10,8 +10,10 @@ import android.content.Context;
 import com.firebase.client.Firebase;
 
 import java.util.Map;
+
 import zina_eliran.app.API.DAL;
 import zina_eliran.app.API.ServerAPI;
+import zina_eliran.app.BusinessEntities.BEResponse;
 import zina_eliran.app.BusinessEntities.CMNLogHelper;
 
 
@@ -113,6 +115,20 @@ public class BaseActivity extends AppCompatActivity {
 
     public boolean isVerified() {
         return !readFromSharedPreferences(_getString(R.string.user_verification_permission)).isEmpty();
+    }
+
+    public BEResponse getActionResponse(int delay, int retries) {
+        try {
+            for (int i = 0; i < retries; i++) {
+                Thread.sleep(delay);
+                if (sApi.getActionResponse() != null) {
+                    return sApi.getActionResponse();
+                }
+            }
+        } catch (Exception e) {
+            CMNLogHelper.logError("RegisterActivity", e.getMessage());
+        }
+        return null;
     }
 
     public Context _getAppContext() {

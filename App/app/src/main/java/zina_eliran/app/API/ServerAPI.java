@@ -11,6 +11,7 @@ public class ServerAPI {
     private static ServerAPI instance = null;
 
     private BEResponse actionResponse;
+
     private BEUser appUser;
     private ArrayList<BEUser> trainingUsers;
     private ArrayList<BETraining> myTrainings;

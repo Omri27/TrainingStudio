@@ -161,7 +161,7 @@ public class DAL{
     /////////////////////////////////////////////////////////////////
     //callbacks
 
-    public void setActionResult(BEResponse response) {
+    public void setActionResponse(BEResponse response) {
 
         //use this to update App entities when need
         ServerAPI sApi = ServerAPI.getInstance();
@@ -169,49 +169,5 @@ public class DAL{
         //set here response with error message which will get from firebase error if need
         sApi.setActionResponse(response);
     }
-
-    public void onUpdateUserCallback(BEResponse response) {
-
-        //use this to update App entities when need
-        ServerAPI sApi = ServerAPI.getInstance();
-
-        //updates the local logged in user, in local storage & view
-        if(response.getStatus() == BEResponseStatusEnum.success){
-            sApi.updateUser((BEUser) response.getEntity().get(0));
-        }
-    }
-
-    public void onGetUsersByTrainingCallback(BEResponse response) {
-
-        //use this to update App entities when need
-        ServerAPI sApi = ServerAPI.getInstance();
-
-        //update the...
-        if(response.getStatus() == BEResponseStatusEnum.success){
-
-        }
-    }
-
-    public void onGetTrainingsCallback(BEResponse response , BETrainingListTypeEnum type) {
-
-        //use this to update App entities when need
-        ServerAPI sApi = ServerAPI.getInstance();
-
-        //updates the...
-        if(response.getStatus() == BEResponseStatusEnum.success){
-            switch (type){
-
-                case myTrainings:
-                    break;
-
-                case publicTrainings:
-                    break;
-            }
-        }
-    }
-
-
-
-
 
 }

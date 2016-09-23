@@ -4,17 +4,17 @@ import java.util.UUID;
 
 public class BEBaseEntity {
 
-    private UUID id;
+    private String id;
 
     public BEBaseEntity() {
 
     }
 
-    public UUID getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
 }

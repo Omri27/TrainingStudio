@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "121126911583",
+    "firebase_url": "https://trainingstudiofb.firebaseio.com",
+    "project_id": "trainingstudiofb",
+    "storage_bucket": "trainingstudiofb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:121126911583:android:7d0fddb93298b6a9",
+        "android_client_info": {
+          "package_name": "zina_eliran.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "121126911583-9b5qeqesjuhjqio8iflckcecq4h89atp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAA4cc3zTaF-p0xUeDYBjnek0c-WfW4RLQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

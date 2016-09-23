@@ -10,6 +10,7 @@ import com.firebase.client.Firebase;
 
 import java.util.Map;
 
+import zina_eliran.app.API.DAL;
 import zina_eliran.app.BusinessEntities.CMNLogHelper;
 
 public class BaseActivity extends AppCompatActivity {
@@ -23,6 +24,7 @@ public class BaseActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Firebase.setAndroidContext(this);
+        DAL d = new DAL();
 
         //create the Shared Preferences read/write objects
         preferences = getSharedPreferences(appPreferences, 0);

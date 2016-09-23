@@ -9,11 +9,11 @@ import android.content.Context;
 
 import com.firebase.client.Firebase;
 
-
 import java.util.Map;
-
 import zina_eliran.app.API.DAL;
+import zina_eliran.app.API.ServerAPI;
 import zina_eliran.app.BusinessEntities.CMNLogHelper;
+
 
 public class BaseActivity extends AppCompatActivity {
 
@@ -21,12 +21,14 @@ public class BaseActivity extends AppCompatActivity {
     final String appPreferences = "trainingStudioPreferences";
     SharedPreferences preferences;
     SharedPreferences.Editor editor;
-    static Context appContext;
+    ServerAPI sApi;
+    Context appContext;
     Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        sApi = ServerAPI.getInstance();
         appContext = this;
         Firebase.setAndroidContext(this);
         DAL d = new DAL();
@@ -36,7 +38,6 @@ public class BaseActivity extends AppCompatActivity {
         editor = preferences.edit();
     }
 
-    //region SHARED METHODS
 
     public String readFromSharedPreferences(String key) {
         String returnedValue = "";
@@ -82,7 +83,7 @@ public class BaseActivity extends AppCompatActivity {
         return false;
     }
 
-    public static void navigateToActivity(Activity current, java.lang.Class<?> nextClass, boolean isFinishCurrentActivity, Map<String, String> intentParams) {
+    public void navigateToActivity(Activity current, java.lang.Class<?> nextClass, boolean isFinishCurrentActivity, Map<String, String> intentParams) {
         try {
             Intent openActivity = new Intent(current, nextClass);
             if (isFinishCurrentActivity) {
@@ -106,13 +107,19 @@ public class BaseActivity extends AppCompatActivity {
         }
     }
 
-    //endregion
+    public boolean isRegistered() {
+        return !readFromSharedPreferences(_getString(R.string.user_registration_permission)).isEmpty();
+    }
 
-    public static Context _getAppContext() {
+    public boolean isVerified() {
+        return !readFromSharedPreferences(_getString(R.string.user_verification_permission)).isEmpty();
+    }
+
+    public Context _getAppContext() {
         return appContext;
     }
 
-    public static String getIntentParam(Intent intent, String key) {
+    public String getIntentParam(Intent intent, String key) {
         if (intent != null) {
             Bundle extras = intent.getExtras();
             if (extras != null) {
@@ -122,8 +129,9 @@ public class BaseActivity extends AppCompatActivity {
         return null;
     }
 
-    public static String _getString(int key) {
+    public String _getString(int key) {
         return appContext.getString(key);
     }
+
 
 }

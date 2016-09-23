@@ -6,13 +6,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
-
-import zina_eliran.app.API.ServerAPI;
-import zina_eliran.app.BusinessEntities.BEResponse;
-import zina_eliran.app.BusinessEntities.BEResponseStatusEnum;
 import zina_eliran.app.BusinessEntities.BEUser;
 import zina_eliran.app.BusinessEntities.CMNLogHelper;
-import zina_eliran.app.Utils.AppConstsEnum;
+
 
 
 //the first activity, unless the user already registered & verified.
@@ -27,7 +23,6 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
     EditText verificationCodeEditText;
     Button registerBtn;
     Button verifyBtn;
-    BEUser user;
 
 
     @Override
@@ -37,29 +32,13 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
         //in debug mode: set to true, on release - set to false!
         CMNLogHelper.logTraffic = true;
         setContentView(R.layout.activity_register);
-
-        //set the key edit text if the user is already registered
-        if (!isRegistered()) {
-            /*user = getUser();
-            if(user != null){
-                onCreateUI(true);
-            }
-            else {
-                //toast here
-
-                onCreateUI(false);
-            }
-*/
-
-            onCreateUI(true);
-        } else {
-            onCreateUI(false);
-        }
+        onCreateUI();
 
     }
 
-    private void onCreateUI(boolean isRegistered) {
+    private void onCreateUI() {
         try {
+            boolean isRegistered = isRegistered();
 
             //bind ui
             registrationLayout = (LinearLayout) findViewById(R.id.register_register_layout);
@@ -91,14 +70,6 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
         }
     }
 
-    public boolean isRegistered() {
-
-        return !readFromSharedPreferences(AppConstsEnum.userRegistrationPermission.toString()).isEmpty();
-    }
-
-    public boolean isVerified() {
-        return !readFromSharedPreferences(AppConstsEnum.userVerificationPermission.toString()).isEmpty();
-    }
 
 
     @Override
@@ -108,15 +79,16 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
             switch (v.getId()) {
                 case R.id.register_register_btn:
                     //validate email
-                    user = new BEUser();
+                    BEUser user = new BEUser();
                     user.setName(nameEditText.getText().toString());
                     user.setEmail(emailEditText.getText().toString());
 
-                    BEResponse registerResult = ServerAPI.registerUser(user);
+                    //register user into db. a user update call back will fire from BaseActivity
+                    sApi.registerUser(user);
 
-                    //validate registration & write to shared preferences
+                   /* //validate registration & write to shared preferences
                     if (registerResult != null && registerResult.getStatus() == BEResponseStatusEnum.success) {
-                        user = (BEUser) registerResult.getEntity();
+                        //user = (BEUser) registerResult.getEntity();
                         writeToSharedPreferences(AppConstsEnum.userId.toString(), user.getId().toString());
 
                         Toast.makeText(this, _getString(R.string.registration_success_message), Toast.LENGTH_LONG).show();
@@ -126,16 +98,16 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
                     } else {
                         Toast.makeText(this, _getString(R.string.registration_error_message), Toast.LENGTH_LONG).show();
                     }
-
+*/
                     break;
 
                 case R.id.register_verify_btn:
-                    if (user != null) {
-                        user.setVerificationCode(verificationCodeEditText.getText().toString());
+                    if (sApi.getAppUser() != null &&
+                            verificationCodeEditText.getText().toString().equals(sApi.getAppUser().getVerificationCode())) {
 
-                        BEResponse verificationResult = ServerAPI.registerUser(user);
+                        //BEResponse verificationResult = ServerAPI.registerUser(user);
 
-                        //validate verification & write to shared preferences
+                      /*  //validate verification & write to shared preferences
                         if (verificationResult != null && verificationResult.getStatus() == BEResponseStatusEnum.success) {
                             user = (BEUser) verificationResult.getEntity();
                             writeToSharedPreferences(AppConstsEnum.userVerificationCode.toString(), user.getVerificationCode());
@@ -145,7 +117,8 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
 
                             //navigate to lobby when user verified his account
                             navigateToActivity(this, LobbyActivity.class, true, null);
-                        }
+                        }*/
+
                     } else {
                         Toast.makeText(this, _getString(R.string.verification_error_message), Toast.LENGTH_LONG).show();
                     }
@@ -157,11 +130,27 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
         }
     }
 
-    public BEUser getUser() {
-        BEResponse result = ServerAPI.getUser(readFromSharedPreferences(AppConstsEnum.userId.toString()));
-        if (result.getStatus() == BEResponseStatusEnum.success) {
-            return (BEUser) result.getEntity();
+    public void updateUser(BEUser _user, boolean isRegisterCallback) {
+        try {
+
+
+            if(isRegisterCallback){
+                writeToSharedPreferences(_getString(R.string.user_id), _user.getId().toString());
+                writeToSharedPreferences(_getString(R.string.user_verification_code), _user.getVerificationCode());
+                writeToSharedPreferences(_getString(R.string.user_registration_permission),"true");
+                Toast.makeText(_getAppContext(), _getString(R.string.registration_success_message), Toast.LENGTH_LONG).show();
+
+                //set layout
+            }
+            else {
+                //verification callback
+                writeToSharedPreferences(_getString(R.string.user_verification_permission), "true");
+            }
+
+        } catch (Exception e) {
+            CMNLogHelper.logError("BaseActivity", e.getMessage());
         }
-        return null;
     }
+
+
 }

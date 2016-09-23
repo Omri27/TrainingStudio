@@ -3,12 +3,9 @@ package zina_eliran.app;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-
 import java.util.HashMap;
 import java.util.Map;
-
 import zina_eliran.app.BusinessEntities.CMNLogHelper;
-import zina_eliran.app.Utils.AppConstsEnum;
 
 public class LobbyActivity extends BaseActivity implements View.OnClickListener {
 
@@ -26,15 +23,13 @@ public class LobbyActivity extends BaseActivity implements View.OnClickListener 
 
         setContentView(R.layout.activity_lobby);
 
-/*        if (isVerified()) {
+        if (isVerified()) {
             onCreateUI();
         }
          //navigate to Lobby if the user is verified
          else {
             navigateToActivity(this, RegisterActivity.class, false, null);
-        }*/
-
-        onCreateUI();
+        }
 
     }
 
@@ -62,9 +57,6 @@ public class LobbyActivity extends BaseActivity implements View.OnClickListener 
         }
     }
 
-    public boolean isVerified() {
-        return !readFromSharedPreferences(AppConstsEnum.userVerificationPermission.toString()).isEmpty();
-    }
 
     @Override
     public void onClick(View v) {
@@ -88,7 +80,7 @@ public class LobbyActivity extends BaseActivity implements View.OnClickListener 
 
                 case R.id.lobby_my_trainings_btn:
                     intentParams.put(_getString(R.string.training_list_title), _getString(R.string.my_training_list_title));
-                    intentParams.put(AppConstsEnum.manageTrainingPermission.toString(), "true");
+                    intentParams.put(_getString(R.string.manage_training_permission), "true");
                     intentParams.put(_getString(R.string.training_list_my_trainings_mode), "true");
                     navigateToActivity(this, TrainingsListActivity.class, false, intentParams);
                     break;

@@ -1,10 +1,12 @@
-package zina_eliran.app.Utils;
+package zina_eliran.app.Utils.Listeners;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+
+import zina_eliran.app.Utils.Listeners.ClickListener;
 
 public class RecyclerTouchListener implements RecyclerView.OnItemTouchListener {
 

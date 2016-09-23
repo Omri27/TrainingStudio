@@ -1,55 +1,94 @@
 package zina_eliran.app.API;
 
 import java.util.ArrayList;
-
-import zina_eliran.app.API.BL;
 import zina_eliran.app.BusinessEntities.BEResponse;
 import zina_eliran.app.BusinessEntities.BETraining;
-import zina_eliran.app.BusinessEntities.BETrainingListTypeEnum;
 import zina_eliran.app.BusinessEntities.BEUser;
 
-/**
- * Created by Zina K on 9/10/2016.
- */
+//singleton class
 public class ServerAPI {
 
-    public static void registerUser(BEUser user){} //onUpdateUserCallback
+    private static ServerAPI instance = null;
 
-    public static BEResponse verifyUser(BEUser user){
-        return BL.verifyUser(user);
-    } //? onUpdateUserCallback
+    private BEResponse actionResponse;
+    private BEUser appUser;
+    private ArrayList<BEUser> trainingUsers;
+    private ArrayList<BETraining> myTrainings;
+    private ArrayList<BETraining> publicTrainings;
 
-    public static void getUser(String userId){} //onUpdateUserCallback
+    protected ServerAPI() {
+        // Exists only to defeat instantiation.
+    }
 
-    public static void updateUser(BEUser user){} //onUpdateUserCallback
+    public static ServerAPI getInstance() {
+        if(instance == null) {
+            instance = new ServerAPI();
+        }
+        return instance;
+    }
 
-    public static void getUsersByTraining(String trainingId){} //onGetUsersByTrainingCallback
+    public BEUser getAppUser() {
+        return appUser;
+    }
 
-    public static void getTraining(String trainingId){} //?
+    public void setAppUser(BEUser currentUser) {
+        this.appUser = currentUser;
+    }
 
-    public static void getPublicTrainings(ArrayList<String> excludeTrainingIds){} //onGetTrainingsCallback
+    public ArrayList<BEUser> getTrainingUsers() {
+        return trainingUsers;
+    }
 
-    public static void getTrainingsByUser(String userId){} //onGetTrainingsCallback
+    public void setTrainingUsers(ArrayList<BEUser> trainingUsers) {
+        this.trainingUsers = trainingUsers;
+    }
 
-    public static void createTraining(BETraining training){} //onGetTrainingsCallback
+    public ArrayList<BETraining> getMyTrainings() {
+        return myTrainings;
+    }
 
-    public static void updateTraining(BETraining training){} //num of participants and status can be changed
+    public void setMyTrainings(ArrayList<BETraining> myTrainings) {
+        this.myTrainings = myTrainings;
+    }
 
-    public static void joinTraining(String trainingId, String userId){}
+    public ArrayList<BETraining> getPublicTrainings() {
+        return publicTrainings;
+    }
+
+    public void setPublicTrainings(ArrayList<BETraining> publicTrainings) {
+        this.publicTrainings = publicTrainings;
+    }
+
+    public BEResponse getActionResponse() {
+        return actionResponse;
+    }
+
+    public void setActionResponse(BEResponse actionResponse) {
+        this.actionResponse = actionResponse;
+    }
+
+//business logic
+    //**************
 
 
+    public void registerUser(BEUser user){} //onUpdateUserCallback
 
+    public void getUser(String userId){} //onUpdateUserCallback
 
-    /////////////////////////////////////////////////////////////////
-    //callbacks
+    public void updateUser(BEUser user){} //onUpdateUserCallback
 
-    public void actionResult(BEResponse response) {}
+    public void getUsersByTraining(String trainingId){} //onGetUsersByTrainingCallback
 
-    public void onUpdateUserCallback(BEResponse response) {}
+    public void getTraining(String trainingId){} //?
 
-    public void onGetUsersByTrainingCallback(BEResponse response) {}
+    public void getPublicTrainings(ArrayList<String> excludeTrainingIds){} //onGetTrainingsCallback
 
-    public void onGetTrainingsCallback(BEResponse response , BETrainingListTypeEnum type) {}
+    public void getTrainingsByUser(String userId){} //onGetTrainingsCallback
 
+    public void createTraining(BETraining training){} //onGetTrainingsCallback
+
+    public void updateTraining(BETraining training){} //num of participants and status can be changed
+
+    public void joinTraining(String trainingId, String userId){}
 
 }

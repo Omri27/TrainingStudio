@@ -1,9 +1,7 @@
 package zina_eliran.app;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.widget.ButtonBarLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,8 +19,8 @@ import zina_eliran.app.BusinessEntities.BETraining;
 import zina_eliran.app.BusinessEntities.BETrainingAdapter;
 import zina_eliran.app.BusinessEntities.BETrainingLevelEnum;
 import zina_eliran.app.BusinessEntities.CMNLogHelper;
-import zina_eliran.app.Utils.ClickListener;
-import zina_eliran.app.Utils.RecyclerTouchListener;
+import zina_eliran.app.Utils.Listeners.ClickListener;
+import zina_eliran.app.Utils.Listeners.RecyclerTouchListener;
 
 public class TrainingsListActivity extends BaseActivity implements View.OnClickListener {
 
@@ -204,7 +202,7 @@ public class TrainingsListActivity extends BaseActivity implements View.OnClickL
         tr.setDuration(55);
         tr.setName("111111111111111");
         tr.setTrainingDate(new Date());
-        tr.setLevel(BETrainingLevelEnum.mazeRunner);
+        tr.setLevel(BETrainingLevelEnum.Pro);
         trainingsList.add(tr);
 
         tr = new BETraining();
@@ -225,7 +223,7 @@ public class TrainingsListActivity extends BaseActivity implements View.OnClickL
         tr.setDuration(55);
         tr.setName("111111111111111");
         tr.setTrainingDate(new Date());
-        tr.setLevel(BETrainingLevelEnum.mazeRunner);
+        tr.setLevel(BETrainingLevelEnum.Pro);
         trainingsList.add(tr);
 
         tr = new BETraining();
@@ -246,7 +244,7 @@ public class TrainingsListActivity extends BaseActivity implements View.OnClickL
         tr.setDuration(55);
         tr.setName("111111111111111");
         tr.setTrainingDate(new Date());
-        tr.setLevel(BETrainingLevelEnum.mazeRunner);
+        tr.setLevel(BETrainingLevelEnum.Pro);
         trainingsList.add(tr);
 
         tr = new BETraining();
@@ -267,7 +265,7 @@ public class TrainingsListActivity extends BaseActivity implements View.OnClickL
         tr.setDuration(55);
         tr.setName("111111111111111");
         tr.setTrainingDate(new Date());
-        tr.setLevel(BETrainingLevelEnum.mazeRunner);
+        tr.setLevel(BETrainingLevelEnum.Pro);
         trainingsList.add(tr);
 
         tr = new BETraining();
@@ -288,7 +286,7 @@ public class TrainingsListActivity extends BaseActivity implements View.OnClickL
         tr.setDuration(55);
         tr.setName("111111111111111");
         tr.setTrainingDate(new Date());
-        tr.setLevel(BETrainingLevelEnum.mazeRunner);
+        tr.setLevel(BETrainingLevelEnum.Beginner);
         trainingsList.add(tr);
 
         tr = new BETraining();
@@ -309,7 +307,7 @@ public class TrainingsListActivity extends BaseActivity implements View.OnClickL
         tr.setDuration(55);
         tr.setName("111111111111111");
         tr.setTrainingDate(new Date());
-        tr.setLevel(BETrainingLevelEnum.mazeRunner);
+        tr.setLevel(BETrainingLevelEnum.Beginner);
         trainingsList.add(tr);
 
         tr = new BETraining();

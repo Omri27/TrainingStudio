@@ -33,11 +33,11 @@ public class GetUserEventListener implements ValueEventListener {
     public void onDataChange(DataSnapshot dataSnapshot) {
         BEUser user = dataSnapshot.getValue(BEUser.class);
         BEResponse res = new BEResponse();
-        res.setEntity(user);
+/*        res.setEntity(user);
         res.setStatus(BEResponseStatusEnum.success);
         Log.e("DAL", "Listener Zina");
         Log.e("DAL", user.getName());
         Log.e("DAL", ((BEUser)res.getEntity()).getEmail());
-        BaseActivity.updateUser(res);
+        BaseActivity.updateUser(res);*/
     }
 }

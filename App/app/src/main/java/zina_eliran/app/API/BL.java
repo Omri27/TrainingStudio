@@ -6,25 +6,7 @@ import zina_eliran.app.BusinessEntities.BEUser;
 public class BL {
 
     public static BEResponse registerUser(BEUser user){
-//        BEResponse res = new BEResponse();
-//
-//        try{
-//
-//            user.setId(UUID.randomUUID());
-//            user.setVerificationCode("123");
-//            DAL.registerUser(user);
-//            res.setStatus(BEResponseStatusEnum.success);
-//            res.setEntity(user);
-//
-//
-//        } catch (Exception e) {
-//            res.setStatus(BEResponseStatusEnum.error);
-//            res.setMessage(e.getMessage());
-//            CMNLogHelper.logError("BL", e.getMessage());
-//
-//
-//        }
-//        return res;
+      DAL.registerUser(user);
     return null;
 
     }

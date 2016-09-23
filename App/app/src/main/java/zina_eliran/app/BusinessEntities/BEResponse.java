@@ -1,12 +1,14 @@
 package zina_eliran.app.BusinessEntities;
 
+import java.util.ArrayList;
+
 /**
  * Created by eli on 10/09/2016.
  */
 public class BEResponse {
 
     BEResponseStatusEnum status;
-    BEBaseEntity entity;
+    ArrayList<BEBaseEntity> entity;
     private String message;
 
 
@@ -22,11 +24,11 @@ public class BEResponse {
         this.status = status;
     }
 
-    public BEBaseEntity getEntity() {
+    public ArrayList<BEBaseEntity> getEntity() {
         return entity;
     }
 
-    public void setEntity(BEBaseEntity entity) {
+    public void setEntity(ArrayList<BEBaseEntity> entity) {
         this.entity = entity;
     }
 

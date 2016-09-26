@@ -23,6 +23,7 @@ import zina_eliran.app.BusinessEntities.BEResponseStatusEnum;
 import zina_eliran.app.BusinessEntities.BETraining;
 import zina_eliran.app.BusinessEntities.BEUser;
 import zina_eliran.app.BusinessEntities.CMNLogHelper;
+import zina_eliran.app.Utils.FireBaseHandler;
 
 /**
  * Created by Zina K on 9/10/2016.
@@ -35,10 +36,10 @@ public class DAL{
     private static Firebase trainingsRef = rootRef.child("Trainings");
 
     public DAL(){
-        tests();
+        //tests();
     }
 
-    public static void registerUser(BEUser user) {
+    public static void registerUser(BEUser user, FireBaseHandler fbHandler) {
         if (user != null){
             user.setVerificationCode(ServerAPI.generateVerificationCode());
 
@@ -52,10 +53,13 @@ public class DAL{
                 user.setId(generatedUniqueID);
 
                 //Save user including UUID
-                newUserRef.setValue(user);
+                ArrayList<BEBaseEntity> entities = new ArrayList<>();
+                entities.add(user);
+                OnSetValueCompleteListener listener = new OnSetValueCompleteListener(fbHandler,entities);
+                newUserRef.setValue(user, listener);
 
                 //Get user by generated UID - response sent via setActionResponse
-                getUserByUID(user.getId());
+//                getUserByUID(user.getId());
                 CMNLogHelper.logError("DALUserCreated", user.getName());
             }
             catch (Exception e) {
@@ -74,7 +78,7 @@ public class DAL{
         try{
             if (!userId.isEmpty()) {
                 Firebase singleUserRef = usersRef.child(userId);
-                GetBEObjectEventListener listener = new GetBEObjectEventListener(ReadDataTypeEnum.user,true);
+                GetBEObjectEventListener listener = new GetBEObjectEventListener(ReadDataTypeEnum.user,true, null);
                 singleUserRef.addListenerForSingleValueEvent(listener);
             }
         }
@@ -374,7 +378,7 @@ public class DAL{
         BEUser user = new BEUser();
         user.setEmail("blabla@whatever.com");
         user.setName("user");
-        registerUser(user);
+        registerUser(user, null);
 
         //Find user by id test
         getUserByUID(user.getId());

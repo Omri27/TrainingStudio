@@ -101,7 +101,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
                     user.setName(nameEditText.getText().toString());
                     user.setEmail(emailEditText.getText().toString());
 
-                    sApi.registerUser(user);
+                    sApi.registerUser(user, this);
 
                     break;
 

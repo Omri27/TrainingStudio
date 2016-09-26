@@ -17,6 +17,7 @@ import zina_eliran.app.BusinessEntities.BEResponseStatusEnum;
 import zina_eliran.app.BusinessEntities.BETraining;
 import zina_eliran.app.BusinessEntities.BEUser;
 import zina_eliran.app.BusinessEntities.CMNLogHelper;
+import zina_eliran.app.Utils.FireBaseHandler;
 
 /**
  * Created by Zina K on 9/22/2016.
@@ -26,17 +27,25 @@ public class GetBEObjectEventListener implements ValueEventListener {
     private ReadDataTypeEnum readDataType;
     private BEBaseEntity object;
     private boolean shouldForwardResponse; //if flag is false, no response sent to setActionResponse
+    private FireBaseHandler fbHandler;
 
 
     public BEBaseEntity getObject() {
         return object;
     }
 
-    //Required expected Object Type to read
     public GetBEObjectEventListener(ReadDataTypeEnum readType, boolean shouldForwardResponse){
         this.readDataType = readType;
         this.object = new BEBaseEntity();
         this.shouldForwardResponse = shouldForwardResponse;
+    }
+
+    //Required expected Object Type to read
+    public GetBEObjectEventListener(ReadDataTypeEnum readType, boolean shouldForwardResponse, FireBaseHandler fbHandler){
+        this.readDataType = readType;
+        this.object = new BEBaseEntity();
+        this.shouldForwardResponse = shouldForwardResponse;
+        this.fbHandler = fbHandler;
     }
 
     @Override
@@ -82,6 +91,7 @@ public class GetBEObjectEventListener implements ValueEventListener {
         res.setStatus(isActionSucceeded);
         if (errorMessage != null)
             res.setMessage(errorMessage);
-        DAL.setActionResponse(res);
+        fbHandler.onActionCallback(res);
+//        DAL.setActionResponse(res);
     }
 }

@@ -6,6 +6,7 @@ import java.util.Random;
 import zina_eliran.app.BusinessEntities.BEResponse;
 import zina_eliran.app.BusinessEntities.BETraining;
 import zina_eliran.app.BusinessEntities.BEUser;
+import zina_eliran.app.Utils.FireBaseHandler;
 
 //singleton class
 public class ServerAPI {
@@ -74,8 +75,8 @@ public class ServerAPI {
     //**************
 
     //Get response via getActionResponse
-    public void registerUser(BEUser user){
-        DAL.registerUser(user);
+    public void registerUser(BEUser user, FireBaseHandler fbHandler){
+        DAL.registerUser(user, fbHandler);
     }
 
     //Get response via getActionResponse

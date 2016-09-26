@@ -7,9 +7,12 @@ import java.util.ArrayList;
  */
 public class BEResponse {
 
-    BEResponseStatusEnum status;
+
     ArrayList<BEBaseEntity> entity;
-    private String message;
+    BETypesEnum entityType;
+    DALActionTypeEnum actionType;
+    String message;
+    BEResponseStatusEnum status;
 
 
     public BEResponse(){
@@ -38,5 +41,21 @@ public class BEResponse {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public DALActionTypeEnum getActionType() {
+        return actionType;
+    }
+
+    public void setActionType(DALActionTypeEnum actionType) {
+        this.actionType = actionType;
+    }
+
+    public BETypesEnum getEntityType() {
+        return entityType;
+    }
+
+    public void setEntityType(BETypesEnum entityType) {
+        this.entityType = entityType;
     }
 }

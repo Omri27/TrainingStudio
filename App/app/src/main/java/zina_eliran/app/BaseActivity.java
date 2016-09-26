@@ -33,7 +33,7 @@ public class BaseActivity extends AppCompatActivity {
         sApi = ServerAPI.getInstance();
         appContext = this;
         Firebase.setAndroidContext(this);
-        DAL d = new DAL();
+        //DAL d = new DAL();
 
         //create the Shared Preferences read/write objects
         preferences = getSharedPreferences(appPreferences, 0);
@@ -115,20 +115,6 @@ public class BaseActivity extends AppCompatActivity {
 
     public boolean isVerified() {
         return !readFromSharedPreferences(_getString(R.string.user_verification_permission)).isEmpty();
-    }
-
-    public BEResponse getActionResponse(int delay, int retries) {
-        try {
-            for (int i = 0; i < retries; i++) {
-                Thread.sleep(delay);
-                if (sApi.getActionResponse() != null) {
-                    return sApi.getActionResponse();
-                }
-            }
-        } catch (Exception e) {
-            CMNLogHelper.logError("RegisterActivity", e.getMessage());
-        }
-        return null;
     }
 
     public Context _getAppContext() {

@@ -1,5 +1,6 @@
 package zina_eliran.app;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -12,12 +13,15 @@ import android.widget.Toast;
 
 import zina_eliran.app.API.ServerAPI;
 import zina_eliran.app.BusinessEntities.BEResponse;
+import zina_eliran.app.BusinessEntities.BEResponseStatusEnum;
 import zina_eliran.app.BusinessEntities.BEUser;
 import zina_eliran.app.BusinessEntities.CMNLogHelper;
+import zina_eliran.app.BusinessEntities.DALActionTypeEnum;
+import zina_eliran.app.Utils.FireBaseHandler;
 
 
 //the first activity, unless the user already registered & verified.
-public class RegisterActivity extends BaseActivity implements View.OnClickListener {
+public class RegisterActivity extends BaseActivity implements View.OnClickListener, FireBaseHandler {
 
     //region ACTIVITY MEMBERS
 
@@ -85,46 +89,19 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
 
                 case R.id.register_register_btn:
 
-                    new Handler(Looper.getMainLooper()).post(new Runnable() {
-                        @Override
-                        public void run() {
-                            registerBtn.setEnabled(false);
-                            //set spinner on
-                            pBar.setVisibility(View.VISIBLE);
+                    registerBtn.setEnabled(false);
+                    //set spinner on
+                    //TODO Eiran - add async task here
+                    pBar.setVisibility(View.VISIBLE);
 
-                            //validate email
-                            BEUser user = new BEUser();
-                            user.setName(nameEditText.getText().toString());
-                            user.setEmail(emailEditText.getText().toString());
+                    sApi.setActionResponse(null);
 
-                            sApi.setActionResponse(null);
+                    //register user into db. a user update view
+                    BEUser user = new BEUser();
+                    user.setName(nameEditText.getText().toString());
+                    user.setEmail(emailEditText.getText().toString());
 
-                            //register user into db. a user update view
-                            sApi.registerUser(user);
-                            BEResponse response = getActionResponse(1000, 5);
-
-                            if (response != null) {
-                                writeToSharedPreferences(_getString(R.string.user_id), sApi.getAppUser().getId().toString());
-                                writeToSharedPreferences(_getString(R.string.user_verification_code), sApi.getAppUser().getVerificationCode());
-                                writeToSharedPreferences(_getString(R.string.user_registration_permission), "true");
-                                Toast.makeText(_getAppContext(), _getString(R.string.registration_success_message), Toast.LENGTH_LONG).show();
-
-                                //set layout
-                                setLayoutMode(true);
-
-                                //set spinner off
-                                //pBar.setVisibility(View.GONE);
-                            } else {
-                                //set spinner off
-                                pBar.setVisibility(View.GONE);
-                                registerBtn.setEnabled(true);
-                                Toast.makeText(_getAppContext(), _getString(R.string.registration_error_message), Toast.LENGTH_LONG).show();
-                            }
-
-                        }
-                    });
-
-
+                    sApi.registerUser(user);
 
                     break;
 
@@ -181,6 +158,40 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
 
         } catch (Exception e) {
             CMNLogHelper.logError("BaseActivity", e.getMessage());
+        }
+    }
+
+    @Override
+    public void onActionCallback(BEResponse response) {
+        //handle async response.
+        if(response!=null && response.getStatus() == BEResponseStatusEnum.success){
+            if(response.getActionType() == DALActionTypeEnum.registerUser){
+                //bla bal
+
+                writeToSharedPreferences(_getString(R.string.user_id), sApi.getAppUser().getId().toString());
+                writeToSharedPreferences(_getString(R.string.user_verification_code), sApi.getAppUser().getVerificationCode());
+                writeToSharedPreferences(_getString(R.string.user_registration_permission), "true");
+                Toast.makeText(_getAppContext(), _getString(R.string.registration_success_message), Toast.LENGTH_LONG).show();
+
+                //set spinner off
+                pBar.setVisibility(View.GONE);
+
+                //set layout
+                setLayoutMode(true);
+
+            }
+        }
+        else {
+            //handle error
+
+            registerBtn.setEnabled(true);
+
+            //set spinner off
+            pBar.setVisibility(View.GONE);
+
+            Toast.makeText(_getAppContext(), _getString(R.string.registration_error_message), Toast.LENGTH_LONG).show();
+
+
         }
     }
 

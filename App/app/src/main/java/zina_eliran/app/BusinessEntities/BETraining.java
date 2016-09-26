@@ -123,4 +123,18 @@ public class BETraining extends BEBaseEntity{
     public void setTrainingFullNotificationFlag(boolean trainingFullNotificationFlag) {
         isTrainingFullNotificationFlag = trainingFullNotificationFlag;
     }
+
+    @Override
+    public String toString() {
+        return super.toString() + "BETraining{" +
+                "creatorId='" + creatorId + '\'' +
+                ", name='" + name + '\'' +
+                ", duration=" + duration +
+                ", trainingDate=" + trainingDate +
+                '}';
+    }
+
+    public void addUserToUsersList(String userId){
+        this.patricipatedUserIds.add(userId);
+    }
 }

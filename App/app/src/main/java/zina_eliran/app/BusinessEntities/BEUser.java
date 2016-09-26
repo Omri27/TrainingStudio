@@ -131,4 +131,19 @@ public class BEUser extends BEBaseEntity {
     public void setTrainingCancelledNotification(boolean trainingCancelledNotification) {
         isTrainingCancelledNotification = trainingCancelledNotification;
     }
+
+    @Override
+    public String toString() {
+        return "BEUser{" +
+                "name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", verificationCode='" + verificationCode + '\'' +
+                ", isActive=" + isActive +
+                '}';
+    }
+
+
+    public void addTrainingToTrainingList(String trainingId){
+        this.myTrainingIds.add(trainingId);
+    }
 }

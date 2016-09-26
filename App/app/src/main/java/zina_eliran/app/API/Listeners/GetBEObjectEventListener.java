@@ -16,6 +16,7 @@ import zina_eliran.app.BusinessEntities.BEResponse;
 import zina_eliran.app.BusinessEntities.BEResponseStatusEnum;
 import zina_eliran.app.BusinessEntities.BETraining;
 import zina_eliran.app.BusinessEntities.BEUser;
+import zina_eliran.app.BusinessEntities.CMNLogHelper;
 
 /**
  * Created by Zina K on 9/22/2016.
@@ -23,52 +24,64 @@ import zina_eliran.app.BusinessEntities.BEUser;
 
 public class GetBEObjectEventListener implements ValueEventListener {
     private ReadDataTypeEnum readDataType;
+    private BEBaseEntity object;
+    private boolean shouldForwardResponse; //if flag is false, no response sent to setActionResponse
 
-//    public GetBEObjectEventListener(){
-//
-//    }
 
-    //Required expected Object Type to read
-    public GetBEObjectEventListener(ReadDataTypeEnum readType){
-        this.readDataType = readType;
+    public BEBaseEntity getObject() {
+        return object;
     }
 
+    //Required expected Object Type to read
+    public GetBEObjectEventListener(ReadDataTypeEnum readType, boolean shouldForwardResponse){
+        this.readDataType = readType;
+        this.object = new BEBaseEntity();
+        this.shouldForwardResponse = shouldForwardResponse;
+    }
 
     @Override
     public void onCancelled(FirebaseError firebaseError) {
-
+        if (shouldForwardResponse){
+            forwardResponse(null, BEResponseStatusEnum.error, firebaseError.toString());
+        }
     }
 
     @Override
     public void onDataChange(DataSnapshot dataSnapshot) {
-        BEResponse res = new BEResponse();
-        BEBaseEntity object = new BEBaseEntity();
-        ArrayList<BEBaseEntity> arr = new ArrayList<>();
+        BEResponseStatusEnum status = BEResponseStatusEnum.success;
+        String errorMessage = null;
 
         if (readDataType == ReadDataTypeEnum.training)
             object = dataSnapshot.getValue(BETraining.class);
         else if (readDataType == ReadDataTypeEnum.user)
             object = dataSnapshot.getValue(BEUser.class);
         else {
-            res.setStatus(BEResponseStatusEnum.error);
-            res.setMessage("Unknown data type");
+            status = BEResponseStatusEnum.error;
+            errorMessage = "Unknown data type";
         }
-
-        arr.add(object);
-        res.setEntity(arr);
 
         //Use for tests - Zina
         Log.e("DAL", "ObjectListener");
-        if( object instanceof BEUser){
-            Log.e("GetUser", ((BEUser)object).getEmail());
+        if( object instanceof BEUser)
+            CMNLogHelper.logError("GetUser", ((BEUser)object).getEmail());
+        else if (object instanceof BETraining)
+            CMNLogHelper.logError("GetTraining", ((BETraining)object).getName());
+
+        if (shouldForwardResponse)
+            forwardResponse(object, status, errorMessage);
+
+
+    }
+
+    private void forwardResponse(BEBaseEntity object, BEResponseStatusEnum isActionSucceeded, String errorMessage){
+        BEResponse res = new BEResponse();
+        if (object != null) {
+            ArrayList<BEBaseEntity> arr = new ArrayList<>();
+            arr.add(object);
         }
-        else if (object instanceof BETraining){
-            Log.e("GetTraining", ((BETraining)object).getName());
-        }
-
-        DAL.setActionResult(res);
-
-
-
+        res.setStatus(isActionSucceeded);
+        if (errorMessage != null)
+            res.setMessage(errorMessage);
+        DAL.setActionResponse(res);
     }
 }

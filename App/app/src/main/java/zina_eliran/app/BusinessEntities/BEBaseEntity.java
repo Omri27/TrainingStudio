@@ -19,4 +19,11 @@ public class BEBaseEntity implements Serializable {
     public void setId(String id) {
         this.id = id;
     }
+
+    @Override
+    public String toString() {
+        return "BEBaseEntity{" +
+                "id='" + id + '\'' +
+                '}';
+    }
 }

@@ -2,16 +2,22 @@ package zina_eliran.app.API;
 
 import android.util.Log;
 
+import com.firebase.client.ChildEventListener;
+import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
+import com.firebase.client.GenericTypeIndicator;
 import com.firebase.client.Query;
+import com.firebase.client.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Date;
 
-import zina_eliran.app.API.Listeners.DALFBOnCompleteListener;
+import zina_eliran.app.API.Listeners.GetAllTrainingsListener;
+import zina_eliran.app.API.Listeners.OnSetValueCompleteListener;
 import zina_eliran.app.API.Listeners.GetBEObjectEventListener;
 import zina_eliran.app.API.Listeners.ReadDataTypeEnum;
+import zina_eliran.app.BusinessEntities.BEBaseEntity;
 import zina_eliran.app.BusinessEntities.BEResponse;
 import zina_eliran.app.BusinessEntities.BEResponseStatusEnum;
 import zina_eliran.app.BusinessEntities.BETraining;
@@ -36,7 +42,7 @@ public class DAL{
         if (user != null){
             user.setVerificationCode(ServerAPI.generateVerificationCode());
 
-            try{
+            try {
                 usersRef = rootRef.child("Users");
                 //Set location to push
                 Firebase newUserRef = usersRef.push();
@@ -47,8 +53,12 @@ public class DAL{
 
                 //Save user including UUID
                 newUserRef.setValue(user);
-                Log.e("DALUserCreated", user.getName());
-            } catch (Exception e) {
+
+                //Get user by generated UID - response sent via setActionResponse
+                getUserByUID(user.getId());
+                CMNLogHelper.logError("DALUserCreated", user.getName());
+            }
+            catch (Exception e) {
                 CMNLogHelper.logError("DAL", e.getMessage());
             }
         }
@@ -60,63 +70,136 @@ public class DAL{
     }
 
     //GetBEObjectEventListener should callback setActionResult with requested object
-    private static void getUserByUID(String userId){
-        if (!userId.isEmpty()) {
-            Firebase singleUserRef = usersRef.child(userId);
-            GetBEObjectEventListener listener = new GetBEObjectEventListener(ReadDataTypeEnum.user);
-            singleUserRef.addListenerForSingleValueEvent(listener);
+    public static void getUserByUID(String userId){
+        try{
+            if (!userId.isEmpty()) {
+                Firebase singleUserRef = usersRef.child(userId);
+                GetBEObjectEventListener listener = new GetBEObjectEventListener(ReadDataTypeEnum.user,true);
+                singleUserRef.addListenerForSingleValueEvent(listener);
+            }
         }
+        catch (Exception e){
+            CMNLogHelper.logError("GetUserByUID", e.getMessage());
+        }
+
     }
 
-    //DALFBOnCompleteListener called on setValue() which calls setActionResult() with result
+    //OnSetValueCompleteListener called on setValue() which calls setActionResult() with result
     public static void updateUser(BEUser user){
         //Check and update object if it exists in database, otherwise send error in response
-        if (!user.getId().isEmpty()){
+        if (user != null && !user.getId().isEmpty()){
             try{
                 Firebase specificUser = usersRef.child(user.getId());
-                DALFBOnCompleteListener listener = new DALFBOnCompleteListener();
+                OnSetValueCompleteListener listener = new OnSetValueCompleteListener();
                 specificUser.setValue(user, listener);
             }
             catch (Exception e){
-                Log.e("DAL", e.getMessage());
+                CMNLogHelper.logError("DAL", e.getMessage());
             }
         }
         else
             objectDoesNotExistsResponse();
     }
 
+
     public static void getUsersByTraining(String trainingId){
         if (!trainingId.isEmpty()){
+
             try {
 
             }
             catch (Exception e){
-                Log.e("DAL", e.getMessage());
+                CMNLogHelper.logError("DAL", e.getMessage());
             }
 
         }
     }
 
     //GetBEObjectEventListener should callback setActionResult with requested object
-    public static void getTraining(String trainingId){
-        if (!trainingId.isEmpty()){
-            try {
+    public static void getTraining(String trainingId) {
+        try {
+            if (trainingId != null && !trainingId.isEmpty()) {
                 Firebase specificTraining = trainingsRef.child(trainingId);
-                GetBEObjectEventListener listener = new GetBEObjectEventListener(ReadDataTypeEnum.training);
+                GetBEObjectEventListener listener = new GetBEObjectEventListener(ReadDataTypeEnum.training, true );
                 specificTraining.addListenerForSingleValueEvent(listener);
+            } else
+                objectDoesNotExistsResponse();
 
-            }
-            catch (Exception e){
-                Log.e("DAL", e.getMessage());
-            }
-
+        } catch (Exception e) {
+            CMNLogHelper.logError("DAL", e.getMessage());
         }
 
     }
 
-    public static void getPublicTrainings(ArrayList<String> excludeTrainingIds){} //onGetTrainingsCallback
+    //Get all trainings, exclude not relevant trainings according to input list
+    public static void getPublicTrainings(final ArrayList<String> excludeTrainingIds){
+        BEResponse response = new BEResponse();
 
+        try{//should be childrenEvetListener
+            GetAllTrainingsListener listener = new GetAllTrainingsListener();
+            trainingsRef.addListenerForSingleValueEvent(listener);
+
+            //Get list of all existing trainings from listener
+            ArrayList<BETraining> arr = listener.getAllTrainings();
+            ArrayList<BEBaseEntity> filteredArr = new ArrayList<>();
+
+            //filter trainings accoring to exclude list
+            if (!arr.isEmpty()){
+                for (int i = 0; i < arr.size(); i++){
+                    if (!excludeTrainingIds.contains(arr.get(i).getId())){
+                        filteredArr.add(arr.get(i));
+                        CMNLogHelper.logError("publicTrainings", arr.get(i).toString());
+                    }
+                }
+            }
+            //Set response
+            response.setStatus(BEResponseStatusEnum.success);
+            response.setEntity(filteredArr);
+            setActionResponse(response);
+        }
+        catch (Exception e){
+            CMNLogHelper.logError("DAL", e.getMessage());
+            response.setStatus(BEResponseStatusEnum.error);
+            setActionResponse(response);
+        }
+    }
+
+    //Get all trainings, filter by userID
     public static void getTrainingsByUser(String userId){
+        Firebase trainingListRef = trainingsRef;
+        BEResponse response = new BEResponse();
+        try{
+            GetAllTrainingsListener listener = new GetAllTrainingsListener();
+            trainingListRef.addListenerForSingleValueEvent(listener);
+
+            //Get list of all existing trainings from listener
+            ArrayList<BETraining> arr = listener.getAllTrainings();
+            ArrayList<BEBaseEntity> filteredArr = new ArrayList<>();
+
+            //filter trainings according to userId in creator or participant fields
+            if (!arr.isEmpty()){
+                for (int i = 0; i < arr.size(); i++){
+                    if (arr.get(i).getCreatorId().equals(userId) || arr.get(i).getPatricipatedUserIds().contains(userId)){
+                        filteredArr.add(arr.get(i));
+                        CMNLogHelper.logError("getTrainingByUser", arr.get(i).toString());
+                    }
+                }
+
+            }
+            //Set response
+            response.setStatus(BEResponseStatusEnum.success);
+            response.setEntity(filteredArr);
+            setActionResponse(response);
+
+
+        }
+        catch (Exception e){
+            CMNLogHelper.logError("DAL", e.getMessage());
+            response.setStatus(BEResponseStatusEnum.error);
+            setActionResponse(response);
+
+        }
+
 
     }
 
@@ -141,31 +224,67 @@ public class DAL{
 
     }
 
-    //DALFBOnCompleteListener called on setValue() which calls setActionResult() with result
+    //OnSetValueCompleteListener called on setValue() which calls setActionResult() with result
     public static void updateTraining(BETraining training){
 
         //Check and update object if it exists in database, otherwise send error in response
         if (!training.getId().isEmpty()){
             try{
                 Firebase specificTraining = usersRef.child(training.getId());
-                DALFBOnCompleteListener listener = new DALFBOnCompleteListener();
+                OnSetValueCompleteListener listener = new OnSetValueCompleteListener();
                 specificTraining.setValue(training, listener);
             }
             catch (Exception e){
-                Log.e("DAL", e.getMessage());
+                CMNLogHelper.logError("UpgateTraining", e.getMessage());
             }
         }
         else
             objectDoesNotExistsResponse();
     }
 
-    public void joinTraining(String trainingId, String userId){}
+    //update
+    public static void joinTraining(String trainingId, String userId){
+        //Ask Eliran if he can send objects instead of IDs, then i can just run update
+        try{
+            if (trainingId != null && userId != null){
+                //Create DB reference
+                Firebase userRef = usersRef.child(userId);
+                Firebase trainingRef = trainingsRef.child(trainingId);
+
+                //Set up listeners
+                GetBEObjectEventListener listenerUser = new GetBEObjectEventListener(ReadDataTypeEnum.user, false);
+                GetBEObjectEventListener listenerTraining = new GetBEObjectEventListener(ReadDataTypeEnum.training, false);
+
+                //Add listeners to DB references
+                userRef.addListenerForSingleValueEvent(listenerUser);
+                trainingRef.addListenerForSingleValueEvent(listenerTraining);
+
+                //Get relevant data from listener
+                BEUser user = (BEUser)listenerUser.getObject();
+                BETraining training = (BETraining)listenerTraining.getObject();
+
+                //Update objects with new IDs
+                user.addTrainingToTrainingList(trainingId);
+                training.addUserToUsersList(userId);
+
+                //Save objects in DB and return response via setActionResponce
+                updateTraining(training);
+                updateUser(user);
+
+            }
+            else
+                objectDoesNotExistsResponse();
+        }
+        catch (Exception e){
+            CMNLogHelper.logError("joinTraining", e.getMessage());
+        }
+    }
 
     private static void objectDoesNotExistsResponse(){
         BEResponse res = new BEResponse();
         res.setStatus(BEResponseStatusEnum.error);
         res.setMessage("Object does not exists");
-        setActionResult(res);
+        setActionResponse(res);
     }
 
 
@@ -179,9 +298,28 @@ public class DAL{
     }
 
 
-    //this function will be called when need
-    private static void registerToEventsOnce(){
+    //this function will be called when need with object id and extected BE type
+    private static void registerToEventsOnce(String uid, ReadDataTypeEnum expectedObjectType){
+        if (!uid.isEmpty() && expectedObjectType != null){
+            try {
+                Firebase specificObjectRef;
+                if (expectedObjectType == ReadDataTypeEnum.training){
+                    specificObjectRef = trainingsRef.child(uid);
+                }
+                else {
+                    specificObjectRef = usersRef.child(uid);
+                }
+                GetBEObjectEventListener listener = new GetBEObjectEventListener(expectedObjectType, true);
+                specificObjectRef.addListenerForSingleValueEvent(listener);
 
+            }
+            catch (Exception e){
+                CMNLogHelper.logError("RegisterToEvent", e.getMessage());
+            }
+
+        }
+        else
+            objectDoesNotExistsResponse();
     }
 
 
@@ -189,6 +327,34 @@ public class DAL{
     //callbacks
 
     public static void setActionResponse(BEResponse response) {
+
+        //Register usersRef to childEventListener
+//        usersRef.addChildEventListener(new ChildEventListener() {
+//            @Override
+//            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+//                CMNLogHelper.logError("ChildListenerAdd", dataSnapshot.getValue().toString());
+//            }
+//
+//            @Override
+//            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+//                CMNLogHelper.logError("ChildListenerChange", dataSnapshot.getValue().toString());
+//            }
+//
+//            @Override
+//            public void onChildRemoved(DataSnapshot dataSnapshot) {
+//
+//            }
+//
+//            @Override
+//            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+//
+//            }
+//
+//            @Override
+//            public void onCancelled(FirebaseError firebaseError) {
+//
+//            }
+//        });
 
         //use this to update App entities when need
         ServerAPI sApi = ServerAPI.getInstance();
@@ -206,7 +372,7 @@ public class DAL{
 
         //Create user test
         BEUser user = new BEUser();
-        user.setEmail("user@whatever.com");
+        user.setEmail("blabla@whatever.com");
         user.setName("user");
         registerUser(user);
 
@@ -216,11 +382,14 @@ public class DAL{
         //Find user by training id
 
         //Update user
+        user.setHeigth(180);
+        updateUser(user);
 
 
         //Create training test
         BETraining t = new BETraining();
         t.setName("MyTraining");
+        t.setCreatorId("-KSOPKQmfBJKpUcwLAmt");
         t.setTrainingDate(new Date());
         createTraining(t);
 
@@ -228,12 +397,20 @@ public class DAL{
         getTraining(t.getId());
 
         //Update training
+        t.setName("UpdatedName");
+        updateTraining(t);
 
         //Find training by user id
+        getTrainingsByUser("-KSOPKQmfBJKpUcwLAmt");
 
         //join training
 
         //get all public trainings
+        ArrayList<String> arr = new ArrayList<>();
+        arr.add("-KSNfQcBV2d9ESKsQqic");
+        arr.add("-KSNfUF-UvM66pv4ZzRt");
+        arr.add("-KSNfUInzvpo27SmmZDS");
+        getPublicTrainings(arr);
 
 
     }

@@ -13,7 +13,7 @@ import zina_eliran.app.BusinessEntities.BEResponseStatusEnum;
  * Created by Zina K on 9/23/2016.
  */
 
-public class DALFBOnCompleteListener implements Firebase.CompletionListener{
+public class OnSetValueCompleteListener implements Firebase.CompletionListener{
 
     @Override
     public void onComplete(FirebaseError firebaseError, Firebase firebase) {
@@ -26,6 +26,6 @@ public class DALFBOnCompleteListener implements Firebase.CompletionListener{
             response.setStatus(BEResponseStatusEnum.success);
             Log.e("OnComplete", firebase.toString());
         }
-        DAL.setActionResult(response);
+        DAL.setActionResponse(response);
     }
 }

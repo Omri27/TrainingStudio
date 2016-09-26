@@ -10,18 +10,7 @@
     tools:context="zina_eliran.app.LobbyActivity">
 
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center">
-
-        <ImageView
-            android:layout_width="130dp"
-            android:layout_height="60dp"
-            android:layout_marginTop="15dp"
-            android:background="@drawable/app_logo" />
-
-    </LinearLayout>
+    <include layout="@layout/app_header_icon"></include>
 
     <LinearLayout
         android:layout_width="match_parent"

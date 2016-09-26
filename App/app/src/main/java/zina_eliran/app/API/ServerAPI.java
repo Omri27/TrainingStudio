@@ -73,31 +73,66 @@ public class ServerAPI {
 //business logic
     //**************
 
+    //Get response via getActionResponse
+    public void registerUser(BEUser user){
+        DAL.registerUser(user);
+    }
 
-    public void registerUser(BEUser user){} //onUpdateUserCallback
+    //Get response via getActionResponse
+    public void getUser(String userId){
+        DAL.getUserByUID(userId);
+    }
 
-    public void getUser(String userId){} //onUpdateUserCallback
+    //Get response via getActionResponse
+    public void updateUser(BEUser user){
+        DAL.updateUser(user);
+    }
 
-    public void updateUser(BEUser user){} //onUpdateUserCallback
+    //Get response via getActionResponse
+    public void getUsersByTraining(String trainingId){
+        DAL.getUsersByTraining(trainingId);
+    }
 
-    public void getUsersByTraining(String trainingId){} //onGetUsersByTrainingCallback
+    //Get response via getActionResponse
+    public void getTraining(String trainingId){
+        DAL.getTraining(trainingId);
+    }
 
-    public void getTraining(String trainingId){} //?
+    //Get response via getActionResponse
+    public void getPublicTrainings(ArrayList<String> excludeTrainingIds){
+        DAL.getPublicTrainings(excludeTrainingIds);
+    }
 
-    public void getPublicTrainings(ArrayList<String> excludeTrainingIds){} //onGetTrainingsCallback
+    //Get response via getActionResponse
+    public void getTrainingsByUser(String userId){
+        DAL.getTrainingsByUser(userId);
+    }
 
-    public void getTrainingsByUser(String userId){} //onGetTrainingsCallback
+    //Get response via getActionResponse
+    public void createTraining(BETraining training){
+        DAL.createTraining(training);
+    }
 
-    public void createTraining(BETraining training){} //onGetTrainingsCallback
+    //Get response via getActionResponse
+    public void updateTraining(BETraining training){
+        DAL.updateTraining(training);
+    } //num of participants and status can be changed
 
-    public void updateTraining(BETraining training){} //num of participants and status can be changed
+    //Get response via getActionResponse
+    public void joinTraining(String trainingId, String userId){
+        DAL.joinTraining(trainingId,userId);
+    }
 
-    public void joinTraining(String trainingId, String userId){}
+    public void leaveTraining(String trainingId, String userId){
+
+    }
 
 
     //extra functions
     //**************
 
+
+    //Generate 6 digit ramdon verification code
     public static String generateVerificationCode(){
         Random rand = new Random();
         Integer num = rand.nextInt(900000) + 100000;

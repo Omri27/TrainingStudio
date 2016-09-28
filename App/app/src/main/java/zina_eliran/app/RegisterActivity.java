@@ -59,6 +59,9 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
             verifyBtn = (Button) findViewById(R.id.register_verify_btn);
             pBar = (ProgressBar) findViewById(R.id.register_pbar);
             pBar.setVisibility(View.INVISIBLE);
+            pBar.bringToFront();
+            registrationLayout.invalidate();
+            verificationLayout.invalidate();
             //set ui layout mode
             setLayoutMode(isRegistered);
 
@@ -113,19 +116,14 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
                     if (sApi.getAppUser() != null &&
                             verificationCodeEditText.getText().toString().equals(sApi.getAppUser().getVerificationCode())) {
 
-                        //BEResponse verificationResult = ServerAPI.registerUser(user);
 
-                      /*  //validate verification & write to shared preferences
-                        if (verificationResult != null && verificationResult.getStatus() == BEResponseStatusEnum.success) {
-                            user = (BEUser) verificationResult.getEntity();
-                            writeToSharedPreferences(AppConstsEnum.userVerificationCode.toString(), user.getVerificationCode());
-                            writeToSharedPreferences(AppConstsEnum.userVerificationPermission.toString(), "true");
+                            writeToSharedPreferences(_getString(R.string.user_verification_code), sApi.getAppUser().getVerificationCode());
+                            writeToSharedPreferences(_getString(R.string.user_verification_permission), "true");
 
-                            Toast.makeText(this, String.format(_getString(R.string.verification_success_message), user.getName() ), Toast.LENGTH_LONG).show();
+                            Toast.makeText(this, String.format(_getString(R.string.verification_success_message), sApi.getAppUser().getName() ), Toast.LENGTH_LONG).show();
 
                             //navigate to lobby when user verified his account
                             navigateToActivity(this, LobbyActivity.class, true, null);
-                        }*/
 
                     } else {
                         pBar.setVisibility(View.GONE);
@@ -166,8 +164,8 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
         //handle async response.
         if(response!=null && response.getStatus() == BEResponseStatusEnum.success){
             if(response.getActionType() == DALActionTypeEnum.registerUser){
-                //bla bal
 
+                sApi.setAppUser((BEUser) response.getEntity().get(0));
                 writeToSharedPreferences(_getString(R.string.user_id), sApi.getAppUser().getId().toString());
                 writeToSharedPreferences(_getString(R.string.user_verification_code), sApi.getAppUser().getVerificationCode());
                 writeToSharedPreferences(_getString(R.string.user_registration_permission), "true");

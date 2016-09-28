@@ -34,6 +34,8 @@ public class BaseActivity extends AppCompatActivity {
         appContext = this;
         Firebase.setAndroidContext(this);
         //DAL d = new DAL();
+        //run this once when you want to "init" the registration process
+        //clearSharedPreferences();
 
         //create the Shared Preferences read/write objects
         preferences = getSharedPreferences(appPreferences, 0);

@@ -8,6 +8,7 @@ import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import zina_eliran.app.API.DAL;
 import zina_eliran.app.BaseActivity;
@@ -15,8 +16,10 @@ import zina_eliran.app.BusinessEntities.BEBaseEntity;
 import zina_eliran.app.BusinessEntities.BEResponse;
 import zina_eliran.app.BusinessEntities.BEResponseStatusEnum;
 import zina_eliran.app.BusinessEntities.BETraining;
+import zina_eliran.app.BusinessEntities.BETypesEnum;
 import zina_eliran.app.BusinessEntities.BEUser;
 import zina_eliran.app.BusinessEntities.CMNLogHelper;
+import zina_eliran.app.BusinessEntities.DALActionTypeEnum;
 import zina_eliran.app.Utils.FireBaseHandler;
 
 /**
@@ -24,35 +27,29 @@ import zina_eliran.app.Utils.FireBaseHandler;
  */
 
 public class GetBEObjectEventListener implements ValueEventListener {
-    private ReadDataTypeEnum readDataType;
-    private BEBaseEntity object;
-    private boolean shouldForwardResponse; //if flag is false, no response sent to setActionResponse
-    private FireBaseHandler fbHandler;
+    private ArrayList<BEBaseEntity> objects;
+    private BETypesEnum dataType;
+//    private BEBaseEntity object;
+    private FireBaseHandler fbHandler; //If null, do not try to callback
+    private DALActionTypeEnum action;
+
+
+    public ArrayList<BEBaseEntity> getObjects(){
+        return objects;
+    }
 
 
     public BEBaseEntity getObject() {
-        return object;
+        return objects.get(0);
     }
 
-    public GetBEObjectEventListener(ReadDataTypeEnum readType, boolean shouldForwardResponse){
-        this.readDataType = readType;
-        this.object = new BEBaseEntity();
-        this.shouldForwardResponse = shouldForwardResponse;
-    }
 
     //Required expected Object Type to read
-    public GetBEObjectEventListener(ReadDataTypeEnum readType, boolean shouldForwardResponse, FireBaseHandler fbHandler){
-        this.readDataType = readType;
-        this.object = new BEBaseEntity();
-        this.shouldForwardResponse = shouldForwardResponse;
+    public GetBEObjectEventListener(BETypesEnum dataType, FireBaseHandler fbHandler, DALActionTypeEnum action){
+        this.dataType = dataType;
+        this.objects = new ArrayList<>();
         this.fbHandler = fbHandler;
-    }
-
-    @Override
-    public void onCancelled(FirebaseError firebaseError) {
-        if (shouldForwardResponse){
-            forwardResponse(null, BEResponseStatusEnum.error, firebaseError.toString());
-        }
+        this.action = action;
     }
 
     @Override
@@ -60,38 +57,69 @@ public class GetBEObjectEventListener implements ValueEventListener {
         BEResponseStatusEnum status = BEResponseStatusEnum.success;
         String errorMessage = null;
 
-        if (readDataType == ReadDataTypeEnum.training)
-            object = dataSnapshot.getValue(BETraining.class);
-        else if (readDataType == ReadDataTypeEnum.user)
-            object = dataSnapshot.getValue(BEUser.class);
-        else {
-            status = BEResponseStatusEnum.error;
-            errorMessage = "Unknown data type";
+
+        if (action == DALActionTypeEnum.getTraining || action == DALActionTypeEnum.getUser){
+            if (dataType == BETypesEnum.Trainings)
+                objects.add(dataSnapshot.getValue(BETraining.class));
+            else if (dataType == BETypesEnum.Users)
+                objects.add(dataSnapshot.getValue(BEUser.class));
+            else {
+                status = BEResponseStatusEnum.error;
+                errorMessage = "Unknown data type";
+            }
+
+            //Use for tests - Zina
+            Log.e("DAL", "ObjectListener");
+            if( objects.get(0) instanceof BEUser)
+                CMNLogHelper.logError("GetUserListener", "[[" + action.toString()  + "]]"  + " " + ((BEUser)objects.get(0)).toString());
+            else if (objects.get(0) instanceof BETraining)
+                CMNLogHelper.logError("GetTrainingListener", "[[" + action.toString() + "]]" + " " + ((BETraining)objects.get(0)).toString());
         }
 
-        //Use for tests - Zina
-        Log.e("DAL", "ObjectListener");
-        if( object instanceof BEUser)
-            CMNLogHelper.logError("GetUser", ((BEUser)object).getEmail());
-        else if (object instanceof BETraining)
-            CMNLogHelper.logError("GetTraining", ((BETraining)object).getName());
+        else if (action == DALActionTypeEnum.getAllTrainings){
+            for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
+                BETraining t = postSnapshot.getValue(BETraining.class);
+                objects.add(t);
+            }
 
-        if (shouldForwardResponse)
-            forwardResponse(object, status, errorMessage);
+            //Use for tests - Zina
+            for (int i = 0; i < objects.size(); i++)
+                CMNLogHelper.logError("All trainings listener", objects.get(i).toString());
+        }
+
+        else {
+            status = BEResponseStatusEnum.error;
+            errorMessage = "Unknown action type";
+        }
+
+        if (fbHandler != null)
+            forwardResponse(objects, status, errorMessage);
 
 
     }
 
-    private void forwardResponse(BEBaseEntity object, BEResponseStatusEnum isActionSucceeded, String errorMessage){
+    @Override
+    public void onCancelled(FirebaseError firebaseError) {
+        if (fbHandler != null){
+            forwardResponse(null, BEResponseStatusEnum.error, firebaseError.toString());
+        }
+    }
+
+
+    private void forwardResponse(ArrayList<BEBaseEntity> objects, BEResponseStatusEnum isActionSucceeded, String errorMessage){
         BEResponse res = new BEResponse();
-        if (object != null) {
-            ArrayList<BEBaseEntity> arr = new ArrayList<>();
-            arr.add(object);
+        res.setActionType(action);
+        res.setEntityType(dataType);
+
+        if (objects != null) {
+            res.setEntity(objects);
+            CMNLogHelper.logError("GetListener-forward"+ new Date() + " " + action.toString()+ " " + isActionSucceeded.toString() + " ", objects.toString());
         }
         res.setStatus(isActionSucceeded);
         if (errorMessage != null)
             res.setMessage(errorMessage);
-        fbHandler.onActionCallback(res);
-//        DAL.setActionResponse(res);
+
+        if (fbHandler != null)
+            fbHandler.onActionCallback(res);
     }
 }

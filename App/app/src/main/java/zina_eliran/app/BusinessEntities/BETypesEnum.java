@@ -5,5 +5,5 @@ package zina_eliran.app.BusinessEntities;
  */
 
 public enum BETypesEnum {
-    user, training
+    Users, Trainings
 }

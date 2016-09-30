@@ -310,7 +310,7 @@ public class TrainingsListActivity extends BaseActivity implements View.OnClickL
         try {
 
             if (response != null) {
-                if (response.getEntityType() == BETypesEnum.training) {
+                if (response.getEntityType() == BETypesEnum.Trainings) {
                     if (response.getActionType() == DALActionTypeEnum.getMyTrainings) {
                         if (isMyTrainingMode) {
 /*                            myCreatedTrainingList = response.getEntities()

@@ -21,6 +21,8 @@ public class BEUser extends BEBaseEntity {
     private Date registeredDate;
     private ArrayList<String> myTrainingIds; //All training that user chas created and user participates
     private boolean isTrainingCancelledNotification;
+    private boolean isTrainingFullNotification;
+    private boolean isTrainingRemainderNotification;
 
 
 
@@ -130,6 +132,22 @@ public class BEUser extends BEBaseEntity {
 
     public void setTrainingCancelledNotification(boolean trainingCancelledNotification) {
         isTrainingCancelledNotification = trainingCancelledNotification;
+    }
+
+    public boolean isTrainingFullNotification() {
+        return isTrainingFullNotification;
+    }
+
+    public void setTrainingFullNotification(boolean trainingFullNotification) {
+        isTrainingFullNotification = trainingFullNotification;
+    }
+
+    public boolean isTrainingRemainderNotification() {
+        return isTrainingRemainderNotification;
+    }
+
+    public void setTrainingRemainderNotification(boolean trainingRemainderNotification) {
+        isTrainingRemainderNotification = trainingRemainderNotification;
     }
 
     @Override

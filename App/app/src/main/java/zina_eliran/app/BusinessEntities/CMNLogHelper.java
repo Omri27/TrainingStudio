@@ -4,7 +4,7 @@ import android.util.Log;
 
 public class CMNLogHelper {
 
-    public static boolean logTraffic = false;
+    public static boolean logTraffic = true;
 
     public static void logError(String tagName, String message){
         if(logTraffic)

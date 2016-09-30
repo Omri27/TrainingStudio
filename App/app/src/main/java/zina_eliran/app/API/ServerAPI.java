@@ -17,6 +17,8 @@ public class ServerAPI {
 
     private BEUser appUser;
     private ArrayList<BEUser> trainingUsers;
+    private ArrayList<BEUser> selectedTrainingUsers;
+    private BETraining selectedTraining;
     private ArrayList<BETraining> myTrainings;
     private ArrayList<BETraining> publicTrainings;
 

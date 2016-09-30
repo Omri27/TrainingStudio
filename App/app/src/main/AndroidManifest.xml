@@ -26,7 +26,11 @@
             android:configChanges="screenSize"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
         <activity android:name=".TrainingsListActivity" />
-        <activity android:name=".ProfileSettingsActivity"></activity>
+        <activity android:name=".ProfileSettingsActivity" />
+        <activity
+            android:name=".TrainingDetailsActivity"
+            android:label="@string/title_activity_training_details"
+            android:theme="@style/Theme.AppCompat.NoActionBar"></activity>
     </application>
 
 </manifest>

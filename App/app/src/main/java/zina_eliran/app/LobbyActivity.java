@@ -64,33 +64,34 @@ public class LobbyActivity extends BaseActivity implements View.OnClickListener 
             Map<String, String> intentParams = new HashMap<>();
             switch (v.getId()) {
                 case R.id.lobby_create_training_btn:
-                    //go to edit activity.
-                    //navigateToActivity(this, TrainingsListActivity.class, false, intentParams);
+                    //navigate to create new training activity
+                    intentParams.put(_getString(R.string.training_details_new_mode), "true");
+                    navigateToActivity(this, TrainingDetailsActivity.class, false, intentParams);
                     break;
 
                 case R.id.lobby_public_trainings_btn:
-                    intentParams.put(_getString(R.string.training_list_title), _getString(R.string.public_training_list_title));
                     intentParams.put(_getString(R.string.training_list_public_mode), "true");
                     navigateToActivity(this, TrainingsListActivity.class, false, intentParams);
                     break;
 
                 case R.id.lobby_my_profile_settings_btn:
-                    //navigateToActivity(this, TrainingsListActivity.class, false, null);
+                    navigateToActivity(this, ProfileSettingsActivity.class, false, null);
                     break;
 
                 case R.id.lobby_my_trainings_btn:
-                    intentParams.put(_getString(R.string.training_list_title), _getString(R.string.my_training_list_title));
-                    intentParams.put(_getString(R.string.manage_training_permission), "true");
+                    intentParams.put(_getString(R.string.training_list_manage_training_permission), "true");
                     intentParams.put(_getString(R.string.training_list_my_trainings_mode), "true");
                     navigateToActivity(this, TrainingsListActivity.class, false, intentParams);
                     break;
 
                 case R.id.lobby_start_training_btn:
                     //disables in phase 1
+                    //will enable to start recording data while running
                     break;
 
                 case R.id.lobby_my_progress_btn:
                     //disables in phase 1
+                    //will enable to see data about past trainings, progress etc.
                     break;
 
             }

@@ -39,8 +39,12 @@
         <item name="android:ellipsize">end</item>
     </style>
 
-    <style name="training_list_style_bold" parent="@style/training_list_style" >
+    <style name="training_list_style_bold" parent="@style/training_list_style">
         <item name="android:textStyle">bold</item>
     </style>
+
+    <style name="AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
 </resources>

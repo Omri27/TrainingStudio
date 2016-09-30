@@ -5,5 +5,5 @@ package zina_eliran.app.BusinessEntities;
  */
 
 public enum DALActionTypeEnum {
-    registerUser, updateUser, createTraining
+    registerUser, updateUser, createTraining, getPublicTrainings, getMyTrainings, getUser
 }

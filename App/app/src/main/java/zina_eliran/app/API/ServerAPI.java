@@ -3,9 +3,11 @@ package zina_eliran.app.API;
 import java.util.ArrayList;
 import java.util.Random;
 
+import zina_eliran.app.BusinessEntities.BEBaseEntity;
 import zina_eliran.app.BusinessEntities.BEResponse;
 import zina_eliran.app.BusinessEntities.BETraining;
 import zina_eliran.app.BusinessEntities.BEUser;
+import zina_eliran.app.BusinessEntities.CMNLogHelper;
 import zina_eliran.app.Utils.FireBaseHandler;
 
 //singleton class
@@ -76,57 +78,61 @@ public class ServerAPI {
 //business logic
     //**************
 
-    //Get response via getActionResponse
+
     public void registerUser(BEUser user, FireBaseHandler fbHandler){
         DAL.registerUser(user, fbHandler);
     }
 
-    //Get response via getActionResponse
-    public void getUser(String userId){
-        DAL.getUserByUID(userId);
+
+    public void getUser(String userId, FireBaseHandler fbHandler){
+        DAL.getUserByUID(userId, fbHandler);
     }
 
-    //Get response via getActionResponse
-    public void updateUser(BEUser user){
-        DAL.updateUser(user);
+
+    public void updateUser(BEUser user, FireBaseHandler fbHandler){
+        DAL.updateUser(user, fbHandler);
     }
 
-    //Get response via getActionResponse
-    public void getUsersByTraining(String trainingId){
-        DAL.getUsersByTraining(trainingId);
+
+    public void getUsersByTraining(String trainingId, FireBaseHandler fbHandler){
+        DAL.getUsersByTraining(trainingId, fbHandler);
     }
 
-    //Get response via getActionResponse
-    public void getTraining(String trainingId){
-        DAL.getTraining(trainingId);
+
+    public void getTraining(String trainingId, FireBaseHandler fbHandler){
+        DAL.getTraining(trainingId, fbHandler);
     }
 
-    //Get response via getActionResponse
-    public void getPublicTrainings(ArrayList<String> excludeTrainingIds){
-        DAL.getPublicTrainings(excludeTrainingIds);
+
+    public void getPublicTrainings(ArrayList<String> excludeTrainingIds, FireBaseHandler fbHandler){
+        DAL.getPublicTrainings(excludeTrainingIds, fbHandler);
     }
 
-    //Get response via getActionResponse
-    public void getTrainingsByUser(String userId){
-        DAL.getTrainingsByUser(userId);
+    public void getAllTrainings(FireBaseHandler fbHandler){
+        DAL.getAllTrainings(fbHandler);
     }
 
-    //Get response via getActionResponse
-    public void createTraining(BETraining training){
-        DAL.createTraining(training);
+
+    public void getTrainingsByUser(String userId, FireBaseHandler fbHandler){
+        DAL.getTrainingsByUser(userId, fbHandler);
     }
 
-    //Get response via getActionResponse
-    public void updateTraining(BETraining training){
-        DAL.updateTraining(training);
+
+    public void createTraining(BETraining training, FireBaseHandler fbHandler){
+        DAL.createTraining(training, fbHandler);
+    }
+
+
+    public void updateTraining(BETraining training, FireBaseHandler fbHandler){
+        DAL.updateTraining(training, fbHandler);
     } //num of participants and status can be changed
 
-    //Get response via getActionResponse
-    public void joinTraining(String trainingId, String userId){
-        DAL.joinTraining(trainingId,userId);
+
+    public void joinTraining(String trainingId, String userId, FireBaseHandler fbHandler){
+        DAL.joinTraining(trainingId,userId, fbHandler);
     }
 
-    public void leaveTraining(String trainingId, String userId){
+    public void leaveTraining(String trainingId, String userId, FireBaseHandler fbHandler){
 
     }
 
@@ -140,6 +146,41 @@ public class ServerAPI {
         Random rand = new Random();
         Integer num = rand.nextInt(900000) + 100000;
         return num.toString();
+    }
+
+
+    public void filterPublicTrainings(ArrayList<String> excludeTrainingIds, ArrayList<BETraining> trainings){
+        ArrayList<BETraining> publicTrainings = new ArrayList<>();
+
+        //Filter trainings to exlude ones in excludeTrainingIds
+        if (!trainings.isEmpty()){
+            for (int i = 0; i < trainings.size(); i++){
+                if (!excludeTrainingIds.contains(trainings.get(i).getId())){
+                    publicTrainings.add(trainings.get(i));
+                    CMNLogHelper.logError("publicTrainings", trainings.get(i).toString());
+                }
+            }
+        }
+
+        this.publicTrainings = publicTrainings;
+
+    }
+
+    public void filterMyTrainings(String userId, ArrayList<BETraining> trainings){
+        ArrayList<BETraining> myTrainings = new ArrayList<>();
+        //Filter all trainings that user participeted in or creator
+        if (!trainings.isEmpty()){
+            for (int i = 0; i < trainings.size(); i++){
+                BETraining currectTraining = trainings.get(i);
+                if (currectTraining.getPatricipatedUserIds().contains(userId) || currectTraining.getCreatorId().equals(userId)){
+                    myTrainings.add(trainings.get(i));
+                    CMNLogHelper.logError("myTrainings", currectTraining.toString());
+                }
+            }
+        }
+        this.myTrainings = myTrainings;
+
+
     }
 
 

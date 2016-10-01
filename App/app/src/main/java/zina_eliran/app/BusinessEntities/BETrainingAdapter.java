@@ -10,11 +10,13 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
+import zina_eliran.app.BaseActivity;
 import zina_eliran.app.R;
 
 public class BETrainingAdapter extends RecyclerView.Adapter<BETrainingAdapter.TrainingViewHolder> {
 
     private List<BETraining> trainingList;
+    private boolean isDisplayTrainingId = false;
 
     public List<BETraining> getTrainingList() {
         return trainingList;
@@ -25,10 +27,11 @@ public class BETrainingAdapter extends RecyclerView.Adapter<BETrainingAdapter.Tr
     }
 
     public class TrainingViewHolder extends RecyclerView.ViewHolder {
-        public TextView description, level, duration, trainingDate, trainingTime, trainingCreationDate, numberOfParticipates, numberOfJoinedParticipates;
+        public TextView id, description, level, duration, trainingDate, trainingTime, trainingCreationDate, numberOfParticipates, numberOfJoinedParticipates;
 
         public TrainingViewHolder(View view) {
             super(view);
+            id = (TextView) view.findViewById(R.id.training_list_training_id_tv);
             description = (TextView) view.findViewById(R.id.training_list_training_description_tv);
             level = (TextView) view.findViewById(R.id.training_list_training_level_tv);
             duration = (TextView) view.findViewById(R.id.training_list_duration_tv);
@@ -55,10 +58,15 @@ public class BETrainingAdapter extends RecyclerView.Adapter<BETrainingAdapter.Tr
 
     @Override
     public void onBindViewHolder(TrainingViewHolder holder, int position) {
-        DateFormat dateFormatter = new SimpleDateFormat("MMM DD");
+        DateFormat dateFormatter = new SimpleDateFormat("MMM dd");
         DateFormat timeFormatter = new SimpleDateFormat("hh:mm");
 
         BETraining training = trainingList.get(position);
+        if(isDisplayTrainingId){
+            //dev use
+            holder.id.setVisibility(View.VISIBLE);
+            holder.id.setText(training.getId().substring(training.getId().length()-7));
+        }
         holder.description.setText(training.getDescription());
         holder.level.setText(training.getLevel().toString());
         holder.duration.setText(String.valueOf(training.getDuration()));

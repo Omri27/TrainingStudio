@@ -32,7 +32,7 @@ public class LobbyActivity extends BaseActivity implements View.OnClickListener,
         }
          //navigate to Lobby if the user is verified
          else {
-            navigateToActivity(this, RegisterActivity.class, false, null);
+            navigateToActivity(this, RegisterActivity.class, true, null);
         }
 
     }

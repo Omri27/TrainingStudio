@@ -13,7 +13,10 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
+import android.widget.Toast;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -36,10 +39,13 @@ public class TrainingDetailsActivity extends BaseActivity implements View.OnClic
     Switch trainingFullNotificationSwitch;
     EditText descriptionEt;
     Spinner levelSpinner;
+    ArrayAdapter<CharSequence> levelAdapter;
     EditText dateEt;
     EditText timeEt;
     EditText participatesEt;
     Spinner durationSpinner;
+    ArrayAdapter<CharSequence> durationAdapter;
+
     ImageButton locationIBtn;
     Button actionBtn;
     BETrainingDetailsModeEnum activityMode;
@@ -89,21 +95,21 @@ public class TrainingDetailsActivity extends BaseActivity implements View.OnClic
             locationIBtn = (ImageButton) findViewById(R.id.training_details_location_map_ibtn);
 
             levelSpinner = (Spinner) findViewById(R.id.training_details_level_spinner);
-            ArrayAdapter<CharSequence> adapter1 = ArrayAdapter.createFromResource(this,
+            levelAdapter = ArrayAdapter.createFromResource(this,
                     R.array.training_level_values, R.layout.app_spinner_item);
-            adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            levelSpinner.setAdapter(adapter1);
+            levelAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            levelSpinner.setAdapter(levelAdapter);
             levelSpinner.setSelection(0, true);
-            adapter1.notifyDataSetChanged();
+            levelAdapter.notifyDataSetChanged();
 
 
             durationSpinner = (Spinner) findViewById(R.id.training_details_duration_spinner);
-            ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(this,
+            durationAdapter = ArrayAdapter.createFromResource(this,
                     R.array.training_duration_values, R.layout.app_spinner_item);
-            adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            durationSpinner.setAdapter(adapter2);
+            durationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            durationSpinner.setAdapter(durationAdapter);
             durationSpinner.setSelection(0, true);
-            adapter2.notifyDataSetChanged();
+            durationAdapter.notifyDataSetChanged();
 
 
         } catch (Exception e) {
@@ -137,7 +143,7 @@ public class TrainingDetailsActivity extends BaseActivity implements View.OnClic
                     setActionButtonState("Join", false, true);
                     break;
                 case training_details_cancel_mode:
-                    setActionButtonState("Cancel", true, true);
+                    setActionButtonState("Cancel Training", true, true);
                     break;
                 case training_details_leave_mode:
                     setActionButtonState("Leave", true, true);
@@ -181,14 +187,14 @@ public class TrainingDetailsActivity extends BaseActivity implements View.OnClic
 
 
             if (activityMode != BETrainingDetailsModeEnum.training_details_create_mode) {
-                sApi.getTraining(getIntentParam( intent, _getString(R.string.training_details_training_id)), this);
+                sApi.getTraining(getIntentParam(intent, _getString(R.string.training_details_training_id)), this);
             }
 
             switch (activityMode) {
                 case training_details_join_mode:
                 case training_details_leave_mode:
                 case training_details_view_mode:
-                    notificationsSwitchesLayout.setVisibility(View.INVISIBLE);
+                    notificationsSwitchesLayout.setVisibility(View.GONE);
                 case training_details_cancel_mode:
                     disableTrainingElements();
                     break;
@@ -225,7 +231,12 @@ public class TrainingDetailsActivity extends BaseActivity implements View.OnClic
                 case training_details_create_mode:
                     //create object
 
+                    //!!!validations will be added as ui elements such as spinners & calenders & google map elements at phase 2
+
                     training = new BETraining();
+                    if (!validateBeforeSave()) {
+                        return;
+                    }
                     training.setDescription(descriptionEt.getText().toString());
                     training.setLevel(BETrainingLevelEnum.valueOf(levelSpinner.getSelectedItem().toString()));
                     training.setDuration(Integer.parseInt(durationSpinner.getSelectedItem().toString().replace("Min", "").trim()));
@@ -269,6 +280,34 @@ public class TrainingDetailsActivity extends BaseActivity implements View.OnClic
         }
     }
 
+    private boolean validateBeforeSave() {
+
+        boolean isValid = true;
+        try {
+            if (descriptionEt.getText().toString().isEmpty()) {
+                isValid = false;
+            }
+            if (dateEt.getText().toString().isEmpty()) {
+                isValid = false;
+            }
+            if (timeEt.getText().toString().isEmpty()) {
+                isValid = false;
+            }
+            if (participatesEt.getText().toString().isEmpty()) {
+                isValid = false;
+            }
+
+
+            if (!isValid) {
+                Toast.makeText(_getAppContext(), _getString(R.string.inputs_missing_or_invalid), Toast.LENGTH_LONG).show();
+            }
+
+        } catch (Exception e) {
+            CMNLogHelper.logError("TrainingDetailsActivity", e.getMessage());
+        }
+        return  isValid;
+    }
+
     @Override
     public void onActionCallback(BEResponse response) {
         try {
@@ -281,6 +320,21 @@ public class TrainingDetailsActivity extends BaseActivity implements View.OnClic
                     if (response.getActionType() == DALActionTypeEnum.getTraining) {
                         training = ((BETraining) response.getEntities().get(0));
                         //bind elements to the object fields
+                        DateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy");
+                        DateFormat timeFormatter = new SimpleDateFormat("hh:mm");
+
+                        descriptionEt.setText(training.getDescription());
+                        levelSpinner.setSelection(levelAdapter.getPosition(training.getLevel().toString()));
+                        levelAdapter.notifyDataSetChanged();
+                        durationSpinner.setSelection(durationAdapter.getPosition(training.getDuration() + " Min"));
+                        durationAdapter.notifyDataSetChanged();
+
+                        dateEt.setText(dateFormatter.format(training.getTrainingDate()));
+                        timeEt.setText(timeFormatter.format(training.getTrainingDate()));
+                        participatesEt.setText("" + training.getMaxNumberOfParticipants());
+                        userJoinedNotificationSwitch.setChecked(training.isJoinTrainingNotificationFlag());
+                        trainingFullNotificationSwitch.setChecked(training.isTrainingFullNotificationFlag());
+
                     } else if (response.getActionType() == DALActionTypeEnum.joinTraining ||
                             response.getActionType() == DALActionTypeEnum.leaveTraining ||
                             response.getActionType() == DALActionTypeEnum.createTraining ||
@@ -291,7 +345,7 @@ public class TrainingDetailsActivity extends BaseActivity implements View.OnClic
                                 //navigate to my created trainings list
                                 intentParams.put(_getString(R.string.training_list_manage_training_permission), "true");
                                 intentParams.put(_getString(R.string.training_list_my_trainings_mode), "true");
-                                navigateToActivity(this, TrainingsListActivity.class, false, intentParams);
+                                navigateToActivity(this, TrainingsListActivity.class, true, intentParams);
                                 break;
                             case training_details_join_mode:
                             case training_details_leave_mode:
@@ -299,17 +353,17 @@ public class TrainingDetailsActivity extends BaseActivity implements View.OnClic
                                 intentParams.put(_getString(R.string.training_list_manage_training_permission), "true");
                                 intentParams.put(_getString(R.string.training_list_my_trainings_mode), "true");
                                 intentParams.put(_getString(R.string.training_list_join_mode), "true");
-                                navigateToActivity(this, TrainingsListActivity.class, false, intentParams);
+                                navigateToActivity(this, TrainingsListActivity.class, true, intentParams);
                                 break;
                             case training_details_cancel_mode:
                                 if (isDirty) {
                                     isDirty = false;
-                                    setActionButtonState("Cancel", true, true);
+                                    setActionButtonState("Cancel Training", true, true);
                                 } else {
                                     //navigate to my created trainings list
                                     intentParams.put(_getString(R.string.training_list_manage_training_permission), "true");
                                     intentParams.put(_getString(R.string.training_list_my_trainings_mode), "true");
-                                    navigateToActivity(this, TrainingsListActivity.class, false, intentParams);
+                                    navigateToActivity(this, TrainingsListActivity.class, true, intentParams);
                                 }
                                 break;
                         }

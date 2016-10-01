@@ -169,8 +169,7 @@ public class TrainingsListActivity extends BaseActivity implements View.OnClickL
                         intentParams.put(_getString(R.string.training_details_activity_mode), _getString(R.string.training_details_join_mode));
                     }
 
-
-                    navigateToActivity(TrainingsListActivity.this, TrainingDetailsActivity.class, false, intentParams);
+                    navigateToActivity(TrainingsListActivity.this, TrainingDetailsActivity.class, true, intentParams);
 
                 }
 
@@ -208,7 +207,7 @@ public class TrainingsListActivity extends BaseActivity implements View.OnClickL
         //navigate to create new training activity
         Map<String, String> intentParams = new HashMap<>();
         intentParams.put(_getString(R.string.training_details_activity_mode), _getString(R.string.training_details_create_mode));
-        navigateToActivity(this, TrainingDetailsActivity.class, false, intentParams);
+        navigateToActivity(this, TrainingDetailsActivity.class, true, intentParams);
     }
 
     @Override

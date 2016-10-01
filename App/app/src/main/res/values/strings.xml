@@ -4,7 +4,7 @@
     <string name="user_id">user_id</string>
     <string name="general_error_message"></string>
     <string name="training_list_manage_training_permission">training_list_manage_training_permission</string>
-
+    <string name="inputs_missing_or_invalid">Some of the values are missing or incorrect, please fix and try again..</string>
 
     <!--********************************************************************************************-->
     <!--registration/verification values-->

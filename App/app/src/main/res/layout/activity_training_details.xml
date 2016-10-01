@@ -170,6 +170,7 @@
                     android:id="@+id/training_details_location_map_ibtn"
                     android:layout_width="match_parent"
                     android:layout_height="200dp"
+                    android:background="@drawable/training_location_map"
                     android:layout_weight="1"/>
 
 

@@ -45,7 +45,7 @@ public class OnSetValueCompleteListener implements Firebase.CompletionListener{
         //DB action completed with no error
         else {
             response.setStatus(BEResponseStatusEnum.success);
-            response.setEntity(entities);
+            response.setEntities(entities);
             CMNLogHelper.logError("OnComplete", firebase.toString());
 
             //Print object after DB update

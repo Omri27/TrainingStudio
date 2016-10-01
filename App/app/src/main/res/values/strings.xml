@@ -29,16 +29,18 @@
     <string name="training_list_mode">training_list_mode</string>
     <string name="training_list_public_mode">training_list_public_mode</string>
     <string name="training_list_my_trainings_mode">training_list_my_trainings_mode</string>
+    <string name="training_list_join_mode">training_list_join_mode</string>
     <string name="title_activity_training_details">TrainingDetailsActivity</string>
 
 
     <!--********************************************************************************************-->
     <!--training details values-->
-    <string name="training_details_new_mode">training_details_new_mode</string>
-    <string name="training_details_edit_mode">training_details_edit_mode</string>
-    <string name="training_details_view_mode">training_details_view_mode</string>
     <string name="training_details_training_id">training_details_training_id</string>
-    <string name="training_details_join_leave_mode">training_details_join_leave_mode</string>
+    <string name="training_details_activity_mode">training_details_activity_mode</string>
+    <string name="training_details_create_mode">training_details_create_mode</string>
+    <string name="training_details_join_mode">training_details_join_mode</string>
     <string name="training_details_cancel_mode">training_details_cancel_mode</string>
+    <string name="training_details_leave_mode">training_details_leave_mode</string>
+    <string name="training_details_view_mode">training_details_view_mode</string>
 
 </resources>

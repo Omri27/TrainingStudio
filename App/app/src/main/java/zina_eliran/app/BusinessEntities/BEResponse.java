@@ -8,8 +8,6 @@ import java.util.ArrayList;
 public class BEResponse {
 
 
-    //TODO need to remove this.
-    ArrayList<BEBaseEntity> entity;
     ArrayList<BEBaseEntity> entities;
     BETypesEnum entityType;
     DALActionTypeEnum actionType;
@@ -27,14 +25,6 @@ public class BEResponse {
 
     public void setStatus(BEResponseStatusEnum status) {
         this.status = status;
-    }
-
-    public ArrayList<BEBaseEntity> getEntity() {
-        return entity;
-    }
-
-    public void setEntity(ArrayList<BEBaseEntity> entity) {
-        this.entity = entity;
     }
 
     public ArrayList<BEBaseEntity> getEntities() {

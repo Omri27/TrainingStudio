@@ -5,6 +5,9 @@ import android.view.View;
 import android.widget.TextView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import zina_eliran.app.R;
@@ -13,16 +16,27 @@ public class BETrainingAdapter extends RecyclerView.Adapter<BETrainingAdapter.Tr
 
     private List<BETraining> trainingList;
 
+    public List<BETraining> getTrainingList() {
+        return trainingList;
+    }
+
+    public void setTrainingList(List<BETraining> trainingList) {
+        this.trainingList = trainingList;
+    }
+
     public class TrainingViewHolder extends RecyclerView.ViewHolder {
-        public TextView name, level, duration, location, trainingDate;
+        public TextView description, level, duration, trainingDate, trainingTime, trainingCreationDate, numberOfParticipates, numberOfJoinedParticipates;
 
         public TrainingViewHolder(View view) {
             super(view);
-            name = (TextView) view.findViewById(R.id.training_list_training_name_tv);
+            description = (TextView) view.findViewById(R.id.training_list_training_description_tv);
             level = (TextView) view.findViewById(R.id.training_list_training_level_tv);
-            //duration = (TextView) view.findViewById(R.id.);
-            //location = (TextView) view.findViewById(R.id.training_list_training_location_tv);
+            duration = (TextView) view.findViewById(R.id.training_list_duration_tv);
             trainingDate = (TextView) view.findViewById(R.id.training_list_training_date_tv);
+            trainingTime = (TextView) view.findViewById(R.id.training_list_training_time_tv);
+            trainingCreationDate = (TextView) view.findViewById(R.id.training_list_creation_date_tv);
+            numberOfParticipates = (TextView) view.findViewById(R.id.training_list_num_of_participates);
+            numberOfJoinedParticipates = (TextView) view.findViewById(R.id.training_list_num_of_joined_participates);
         }
     }
 
@@ -41,11 +55,18 @@ public class BETrainingAdapter extends RecyclerView.Adapter<BETrainingAdapter.Tr
 
     @Override
     public void onBindViewHolder(TrainingViewHolder holder, int position) {
+        DateFormat dateFormatter = new SimpleDateFormat("MMM DD");
+        DateFormat timeFormatter = new SimpleDateFormat("hh:mm");
+
         BETraining training = trainingList.get(position);
-        holder.name.setText(training.getName());
+        holder.description.setText(training.getDescription());
         holder.level.setText(training.getLevel().toString());
-        //holder.location.setText(training.getLocation());
-        holder.trainingDate.setText(training.getTrainingDate().toString());
+        holder.duration.setText(String.valueOf(training.getDuration()));
+        holder.trainingDate.setText( dateFormatter.format(training.getTrainingDate()));
+        holder.trainingTime.setText( timeFormatter.format(training.getTrainingDate()));
+        holder.trainingCreationDate.setText("CREATION DATE: " + dateFormatter.format(training.getCreationDate()));
+        holder.numberOfParticipates.setText("OF " +training.getMaxNumberOfParticipants());
+        holder.numberOfJoinedParticipates.setText("" +training.getCurrentNumberOfParticipants());
     }
 
     @Override

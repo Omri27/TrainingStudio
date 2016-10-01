@@ -112,7 +112,7 @@ public class GetBEObjectEventListener implements ValueEventListener {
         res.setEntityType(dataType);
 
         if (objects != null) {
-            res.setEntity(objects);
+            res.setEntities(objects);
             CMNLogHelper.logError("GetListener-forward"+ new Date() + " " + action.toString()+ " " + isActionSucceeded.toString() + " ", objects.toString());
         }
         res.setStatus(isActionSucceeded);

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="training_duration_values">
+        <item>15 Min</item>
+        <item>30 Min</item>
+        <item>45 Min</item>
+        <item>60 Min</item>
+        <item>75 Min</item>
+        <item>90 Min</item>
+    </string-array>
+</resources>

@@ -11,9 +11,11 @@ import java.util.Date;
 public class BETraining extends BEBaseEntity {
     private String creatorId;
     private String name;
+    private String description;
     private BETrainingLevelEnum level;
     private int duration;
     private Date trainingDate;
+    private Date creationDate;
     private Location location;
     private int maxNumberOfParticipants;
     private int currentNumberOfParticipants;
@@ -43,6 +45,15 @@ public class BETraining extends BEBaseEntity {
         this.name = name;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+        setName(description);
+    }
+
     public BETrainingLevelEnum getLevel() {
         return level;
     }
@@ -57,6 +68,14 @@ public class BETraining extends BEBaseEntity {
 
     public void setDuration(int duration) {
         this.duration = duration;
+    }
+
+    public Date getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(Date creationDate) {
+        this.creationDate = creationDate;
     }
 
     public Date getTrainingDate() {
@@ -100,6 +119,9 @@ public class BETraining extends BEBaseEntity {
     }
 
     public ArrayList<String> getPatricipatedUserIds() {
+        if(patricipatedUserIds == null){
+            setPatricipatedUserIds(new ArrayList<String>());
+        }
         return patricipatedUserIds;
     }
 
@@ -123,11 +145,12 @@ public class BETraining extends BEBaseEntity {
         isTrainingFullNotificationFlag = trainingFullNotificationFlag;
     }
 
+
     @Override
     public String toString() {
         return super.toString() + "BETraining{" +
                 "creatorId='" + creatorId + '\'' +
-                ", name='" + name + '\'' +
+                ", name='" + description + '\'' +
                 ", duration=" + duration +
                 ", trainingDate=" + trainingDate +
                 '}';

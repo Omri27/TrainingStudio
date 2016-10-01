@@ -109,6 +109,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
                     BEUser user = new BEUser();
                     user.setName(nameEditText.getText().toString());
                     user.setEmail(emailEditText.getText().toString());
+                    user.setPrivateProfile(true);
 
                     sApi.registerUser(user, this);
 
@@ -171,7 +172,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
         if(response!=null && response.getStatus() == BEResponseStatusEnum.success){
             if(response.getActionType() == DALActionTypeEnum.registerUser){
 
-                sApi.setAppUser((BEUser) response.getEntity().get(0));
+                sApi.setAppUser((BEUser) response.getEntities().get(0));
                 writeToSharedPreferences(_getString(R.string.user_id), sApi.getAppUser().getId().toString());
                 writeToSharedPreferences(_getString(R.string.user_verification_code), sApi.getAppUser().getVerificationCode());
                 writeToSharedPreferences(_getString(R.string.user_registration_permission), "true");

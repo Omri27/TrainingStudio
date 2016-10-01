@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
-    android:layout_height="200dp"
+    android:layout_height="210dp"
     android:layout_marginBottom="7dp"
+    android:paddingTop="8dp"
     android:background="#ffffff"
     android:clickable="true"
     android:focusable="true"
@@ -38,7 +39,7 @@
                     android:paddingRight="5dp">
 
                     <TextView
-                        android:id="@+id/training_list_num_of_registered_participates"
+                        android:id="@+id/training_list_num_of_joined_participates"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_weight="2"
@@ -145,7 +146,7 @@
                 android:paddingRight="10dp">
 
                 <TextView
-                    android:id="@+id/training_list_training_name_tv"
+                    android:id="@+id/training_list_training_description_tv"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"

@@ -10,12 +10,20 @@
     android:gravity="center_vertical"
     tools:context="zina_eliran.app.TrainingsListActivity">
 
-    <include android:id="@+id/training_list_header_layout" layout="@layout/app_header_title" />
+    <include
+        android:id="@+id/training_list_public_trainings_header_view"
+        layout="@layout/app_header_title"
+        android:visibility="invisible"/>
+
+    <include
+        android:id="@+id/training_list_my_trainings_header_view"
+        layout="@layout/my_training_list_header_title" />
 
     <View
+        android:id="@+id/training_list_header_border_view"
         android:layout_width="match_parent"
         android:layout_height="3dp"
-        android:layout_below="@+id/training_list_header_layout"
+        android:layout_marginTop="58dp"
         android:background="#ffffff" />
 
 

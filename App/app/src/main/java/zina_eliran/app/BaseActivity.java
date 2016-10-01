@@ -125,13 +125,14 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     public String getIntentParam(Intent intent, String key) {
+        String result = null;
         if (intent != null) {
             Bundle extras = intent.getExtras();
             if (extras != null) {
-                return extras.getString(key);
+                result = extras.getString(key);
             }
         }
-        return null;
+        return result != null ? result : "";
     }
 
     public String _getString(int key) {

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#ddFFA330"
+    android:gravity="center"
+    android:paddingRight="15dp">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="35dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/app_title"
+        android:layout_weight="1"/>
+
+    <ToggleButton
+        android:id="@+id/training_list_my_training_header_title_tb"
+        android:layout_width="match_parent"
+        android:textSize="8dp"
+        android:textOn="My created trainings"
+        android:textOff="My joined trainings"
+        android:layout_height="45dp"
+        android:layout_weight="4"/>
+</LinearLayout>

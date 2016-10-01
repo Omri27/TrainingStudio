@@ -164,38 +164,107 @@ public class DAL{
 
     }
 
+    public static void joinTraining(BEUser user, BETraining training, FireBaseHandler fireBaseHandler){
+        try {
+            if (user != null && training != null){
+                /**Allow user to join if:
+                 * user is not training creator
+                 * user not participated to this training yet
+                 * training is not in user's trainings list*/
+                String userID = user.getId();
+                String trainingID = training.getId();
+                if (!training.getCreatorId().equals(userID) && !training.getPatricipatedUserIds().contains(userID) && !user.getMyTrainingIds().contains(trainingID)){
+                    training.addUserToUsersList(userID);
+                    user.addTrainingToTrainingList(trainingID);
+
+                    //update user and training in DB
+                    updateObject(BETypesEnum.Users, DALActionTypeEnum.joinTraining, user, fireBaseHandler);
+                    updateObject(BETypesEnum.Trainings, DALActionTypeEnum.joinTraining, training, fireBaseHandler);
+
+                }
+                else
+                    cannotPerformAction(fireBaseHandler, DALActionTypeEnum.joinTraining, "User cannot join this training");
+
+            }
+            else
+                cannotPerformAction(fireBaseHandler,DALActionTypeEnum.joinTraining, "Cannot join training, wrong parameters");
+
+        }
+        catch (Exception e){
+            CMNLogHelper.logError("joinTraining", e.getMessage());
+            cannotPerformAction(fireBaseHandler,DALActionTypeEnum.joinTraining, e.getMessage());
+        }
+
+    }
+
+    public static void leaveTraining(BEUser user, BETraining training, FireBaseHandler fireBaseHandler){
+        try {
+            if (user != null && training != null){
+                String userID = user.getId();
+                String trainingID = training.getId();
+                if (!training.getCreatorId().equals(userID) && training.getPatricipatedUserIds().contains(userID) && user.getMyTrainingIds().contains(trainingID)){
+                    training.removeUserFromTraining(userID);
+                    user.removeTrainingFromUser(trainingID);
+
+                    //update user and training in DB
+                    updateObject(BETypesEnum.Users, DALActionTypeEnum.joinTraining, user, fireBaseHandler);
+                    updateObject(BETypesEnum.Trainings, DALActionTypeEnum.joinTraining, training, fireBaseHandler);
+
+                }
+                else
+                    cannotPerformAction(fireBaseHandler, DALActionTypeEnum.joinTraining, "User cannot leave this training");
+
+            }
+            else
+                cannotPerformAction(fireBaseHandler,DALActionTypeEnum.joinTraining, "Cannot leave training, wrong parameters");
+
+        }
+        catch (Exception e){
+            CMNLogHelper.logError("joinTraining", e.getMessage());
+            cannotPerformAction(fireBaseHandler,DALActionTypeEnum.joinTraining, e.getMessage());
+        }
+
+
+    }
+
     //Not Ready
     public static void joinTraining(String trainingId, String userId, FireBaseHandler fireBaseHandler){
         //Ask Eliran if he can send objects instead of IDs, then i can just run update
         try{
-            if (trainingId != null && userId != null){
-                //Create DB reference
-                Firebase userRef = usersRef.child(userId);
-                Firebase trainingRef = trainingsRef.child(trainingId);
 
-                //Set up listeners
-//                GetBEObjectEventListener listenerUser = new GetBEObjectEventListener(ReadDataTypeEnum.user, false);
-//                GetBEObjectEventListener listenerTraining = new GetBEObjectEventListener(ReadDataTypeEnum.training, false);
-
-                //Add listeners to DB references
+//            if (trainingId != null && userId != null){
+//                //Create DB reference
+//                Firebase userRef = usersRef.child(userId);
+//                Firebase trainingRef = trainingsRef.child(trainingId);
+//
+//                //Set up listeners
+//
+//                //Save objects in DB and return response via  GetBEObjectEventListener listenerUser = new GetBEObjectEventListener(ReadDataTypeEnum.user, false);
+//                GetBEObjectEventListener listenerTraining = new GetBEObjectEventListener(BETypesEnum.Trainings, null, DALActionTypeEnum.getTraining );
+//                GetBEObjectEventListener listenerUser = new GetBEObjectEventListener(BETypesEnum.Users, null, DALActionTypeEnum.getUser );
+//
+//                //Add listeners to DB references
 //                userRef.addListenerForSingleValueEvent(listenerUser);
 //                trainingRef.addListenerForSingleValueEvent(listenerTraining);
-
-                //Get relevant data from listener
+//
+//                //Get relevant data from listener
 //                BEUser user = (BEUser)listenerUser.getObject();
 //                BETraining training = (BETraining)listenerTraining.getObject();
+//                CMNLogHelper.logError("joinTraining-user", user.toString());
+//                CMNLogHelper.logError("joinTraining-training", training.toString());
 //
 //                //Update objects with new IDs
-//                user.addTrainingToTrainingList(trainingId);
-//                training.addUserToUsersList(userId);
+//                if (user != null && training != null){
+//                    user.addTrainingToTrainingList(trainingId);
+//                    training.addUserToUsersList(userId);
+//                    //Update changes in DB
+//                    updateTraining(training, fireBaseHandler);
+//                    updateUser(user, fireBaseHandler);
+//                }
 //
-//                //Save objects in DB and return response via setActionResponce
-//                updateTraining(training, null);
-//                updateUser(user, null);
-
-            }
-            else
-                cannotPerformAction(fireBaseHandler, DALActionTypeEnum.joinTraining, "One of the parameters invalid");
+//            }
+//            else
+//                cannotPerformAction(fireBaseHandler, DALActionTypeEnum.joinTraining, "One of the parameters invalid");
         }
         catch (Exception e){
             CMNLogHelper.logError("joinTraining", e.getMessage());
@@ -442,10 +511,12 @@ public class DAL{
         updateTraining(t, fireBaseHandler);
 
         //Find training by user id
-        CMNLogHelper.logError("GET TRAINING By user", "test");
-        getTrainingsByUser(user.getId(), fireBaseHandler);
+//        CMNLogHelper.logError("GET TRAINING By user", "test");
+//        getTrainingsByUser(user.getId(), fireBaseHandler);
 
         //join training
+        CMNLogHelper.logError("JOIN TRAINING", "test");
+        joinTraining(user.getId(), t.getId(), fireBaseHandler);
 
         //get all public trainings
         CMNLogHelper.logError("GET ALL TRAININGS", "test");

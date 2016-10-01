@@ -137,4 +137,9 @@ public class BETraining extends BEBaseEntity{
     public void addUserToUsersList(String userId){
         this.patricipatedUserIds.add(userId);
     }
+
+    public void removeUserFromTraining(String userID) {
+        if (patricipatedUserIds.contains(userID))
+            patricipatedUserIds.remove(userID);
+    }
 }

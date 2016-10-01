@@ -40,7 +40,9 @@ public class GetBEObjectEventListener implements ValueEventListener {
 
 
     public BEBaseEntity getObject() {
-        return objects.get(0);
+        if (!objects.isEmpty())
+            return objects.get(0);
+        return null;
     }
 
 

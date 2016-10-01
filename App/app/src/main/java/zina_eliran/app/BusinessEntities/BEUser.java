@@ -146,4 +146,11 @@ public class BEUser extends BEBaseEntity {
     public void addTrainingToTrainingList(String trainingId){
         this.myTrainingIds.add(trainingId);
     }
+
+
+    public void removeTrainingFromUser(String trainingID) {
+        if (myTrainingIds.contains(trainingID))
+            myTrainingIds.remove(trainingID);
+    }
+
 }

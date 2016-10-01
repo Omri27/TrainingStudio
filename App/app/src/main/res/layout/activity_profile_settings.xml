@@ -199,7 +199,7 @@
                             android:backgroundTint="#eeFF6600"
                             android:textOff="Female"
                             android:textOn="Male"
-                            android:textSize="8dp" />
+                            android:textSize="9dp" />
 
 
                         <ImageView

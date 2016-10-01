@@ -305,7 +305,7 @@ public class TrainingDetailsActivity extends BaseActivity implements View.OnClic
         } catch (Exception e) {
             CMNLogHelper.logError("TrainingDetailsActivity", e.getMessage());
         }
-        return  isValid;
+        return isValid;
     }
 
     @Override

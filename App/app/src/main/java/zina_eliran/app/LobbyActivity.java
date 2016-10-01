@@ -1,10 +1,13 @@
 package zina_eliran.app;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+
 import java.util.HashMap;
 import java.util.Map;
+
 import zina_eliran.app.BusinessEntities.BEResponse;
 import zina_eliran.app.BusinessEntities.BEResponseStatusEnum;
 import zina_eliran.app.BusinessEntities.BEUser;
@@ -24,16 +27,8 @@ public class LobbyActivity extends BaseActivity implements View.OnClickListener,
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_lobby);
-
-        if (isVerified()) {
-            sApi.getUser(readFromSharedPreferences(_getString(R.string.user_id)), this);
-        }
-         //navigate to Lobby if the user is verified
-         else {
-            navigateToActivity(this, RegisterActivity.class, true, null);
-        }
+        handleLoginState();
 
     }
 
@@ -106,19 +101,42 @@ public class LobbyActivity extends BaseActivity implements View.OnClickListener,
 
     @Override
     public void onActionCallback(BEResponse response) {
-        try{
+        try {
 
-            if(response!=null){
-                if(response.getStatus() == BEResponseStatusEnum.error){
+            if (response != null) {
+                if (response.getStatus() == BEResponseStatusEnum.error) {
                     CMNLogHelper.logError("TrainingsListActivity", "error in get trainings callback | err:" + response.getMessage());
                     //toast here
-                }
-                else {
+                } else {
                     sApi.setAppUser((BEUser) response.getEntities().get(0));
                     onCreateUI();
                 }
             }
 
+        } catch (Exception e) {
+            CMNLogHelper.logError("LobbyActivity", e.getMessage());
+        }
+    }
+
+    private void handleLoginState() {
+        try {
+            if (isVerified()) {
+                sApi.getUser(readFromSharedPreferences(_getString(R.string.user_id)), this);
+            }
+            //navigate to Lobby if the user is verified
+            else {
+                navigateToActivity(this, RegisterActivity.class, true, null);
+            }
+        } catch (Exception e) {
+            CMNLogHelper.logError("LobbyActivity", e.getMessage());
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        try {
+            super.onActivityResult(requestCode, resultCode, data);
+            handleLoginState();
         } catch (Exception e) {
             CMNLogHelper.logError("LobbyActivity", e.getMessage());
         }

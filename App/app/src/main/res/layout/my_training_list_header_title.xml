@@ -17,7 +17,7 @@
     <ToggleButton
         android:id="@+id/training_list_my_training_header_title_tb"
         android:layout_width="match_parent"
-        android:textSize="8dp"
+        android:textSize="9dp"
         android:textOn="My created trainings"
         android:textOff="My joined trainings"
         android:layout_height="45dp"

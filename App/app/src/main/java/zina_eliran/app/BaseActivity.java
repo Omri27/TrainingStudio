@@ -33,7 +33,6 @@ public class BaseActivity extends AppCompatActivity {
         sApi = ServerAPI.getInstance();
         appContext = this;
         Firebase.setAndroidContext(this);
-        //DAL d = new DAL();
 
         //create the Shared Preferences read/write objects
         preferences = getSharedPreferences(appPreferences, 0);

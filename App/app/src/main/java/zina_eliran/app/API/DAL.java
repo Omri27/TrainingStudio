@@ -99,21 +99,35 @@ public class DAL {
                 Firebase userRef = usersRef.child(userId);
                 Firebase trainingRef = trainingsRef.child(trainingId);
 
-                //Set up listeners
-//                GetBEObjectEventListener listenerUser = new GetBEObjectEventListener(ReadDataTypeEnum.user, false);
-//                GetBEObjectEventListener listenerTraining = new GetBEObjectEventListener(ReadDataTypeEnum.training, false);
-
-                //Add listeners to DB references
+//            if (trainingId != null && userId != null){
+//                //Create DB reference
+//                Firebase userRef = usersRef.child(userId);
+//                Firebase trainingRef = trainingsRef.child(trainingId);
+//
+//                //Set up listeners
+//
+//                //Save objects in DB and return response via  GetBEObjectEventListener listenerUser = new GetBEObjectEventListener(ReadDataTypeEnum.user, false);
+//                GetBEObjectEventListener listenerTraining = new GetBEObjectEventListener(BETypesEnum.Trainings, null, DALActionTypeEnum.getTraining );
+//                GetBEObjectEventListener listenerUser = new GetBEObjectEventListener(BETypesEnum.Users, null, DALActionTypeEnum.getUser );
+//
+//                //Add listeners to DB references
 //                userRef.addListenerForSingleValueEvent(listenerUser);
 //                trainingRef.addListenerForSingleValueEvent(listenerTraining);
-
-                //Get relevant data from listener
+//
+//                //Get relevant data from listener
 //                BEUser user = (BEUser)listenerUser.getObject();
 //                BETraining training = (BETraining)listenerTraining.getObject();
+//                CMNLogHelper.logError("joinTraining-user", user.toString());
+//                CMNLogHelper.logError("joinTraining-training", training.toString());
 //
 //                //Update objects with new IDs
-//                user.addTrainingToTrainingList(trainingId);
-//                training.addUserToUsersList(userId);
+//                if (user != null && training != null){
+//                    user.addTrainingToTrainingList(trainingId);
+//                    training.addUserToUsersList(userId);
+//                    //Update changes in DB
+//                    updateTraining(training, fireBaseHandler);
+//                    updateUser(user, fireBaseHandler);
+//                }
 //
 //                //Save objects in DB and return response via setActionResponce
 //                updateTraining(training, null);
@@ -284,6 +298,8 @@ public class DAL {
 
 
         //join training
+        CMNLogHelper.logError("JOIN TRAINING", "test");
+        joinTraining(user.getId(), t.getId(), fireBaseHandler);
 
         //get all public trainings
         CMNLogHelper.logError("GET ALL TRAININGS", "test");

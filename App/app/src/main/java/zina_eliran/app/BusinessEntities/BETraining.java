@@ -8,7 +8,7 @@ import java.util.Date;
 /**
  * Created by Zina K on 9/10/2016.
  */
-public class BETraining extends BEBaseEntity {
+public class BETraining extends BEBaseEntity{
     private String creatorId;
     private String name;
     private String description;
@@ -23,6 +23,7 @@ public class BETraining extends BEBaseEntity {
     private boolean isJoinTrainingNotificationFlag;
     private boolean isTrainingFullNotificationFlag;
     private ArrayList<String> patricipatedUserIds;
+
 
 
     public BETraining() {
@@ -156,8 +157,13 @@ public class BETraining extends BEBaseEntity {
                 '}';
     }
 
-    public void addUserToUsersList(String userId) {
+    public void addUserToUsersList(String userId){
         this.patricipatedUserIds.add(userId);
+    }
+
+    public void removeUserFromTraining(String userID) {
+        if (patricipatedUserIds.contains(userID))
+            patricipatedUserIds.remove(userID);
     }
 
     public boolean isUserParticipateInTraining(String userId) {

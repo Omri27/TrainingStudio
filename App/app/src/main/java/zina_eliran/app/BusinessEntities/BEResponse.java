@@ -8,7 +8,9 @@ import java.util.ArrayList;
 public class BEResponse {
 
 
+    //TODO need to remove this.
     ArrayList<BEBaseEntity> entity;
+    ArrayList<BEBaseEntity> entities;
     BETypesEnum entityType;
     DALActionTypeEnum actionType;
     String message;
@@ -33,6 +35,14 @@ public class BEResponse {
 
     public void setEntity(ArrayList<BEBaseEntity> entity) {
         this.entity = entity;
+    }
+
+    public ArrayList<BEBaseEntity> getEntities() {
+        return this.entities;
+    }
+
+    public void setEntities(ArrayList<BEBaseEntity> entities) {
+        this.entities = entities;
     }
 
     public String getMessage() {

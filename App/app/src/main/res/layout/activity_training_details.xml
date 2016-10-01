@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/app_bg2"
+    android:layoutDirection="ltr"
+    android:orientation="vertical"
+    tools:context="zina_eliran.app.TrainingDetailsActivity">
+
+    <include layout="@layout/app_header_title"></include>
+
+    <ProgressBar
+        android:id="@+id/training_details_pbar"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_centerInParent="true"
+        android:indeterminate="true"
+        android:indeterminateTint="#FF6600"
+        android:indeterminateTintMode="src_atop"
+        android:visibility="gone" />
+
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="60dp"
+        android:layout_marginTop="75dp">
+
+        <LinearLayout
+            android:id="@+id/training_details_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="50dp"
+            android:paddingRight="50dp">
+
+
+
+            <EditText
+                android:id="@+id/training_details_training_name_et"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="25dp"
+                android:background="#ffffff"
+                android:hint="Name"
+                android:paddingLeft="20dp"
+                android:textColor="#000000"
+                android:textColorHint="#555555" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="#00000000" />
+
+            <EditText
+                android:id="@+id/training_details_level_et"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="#ffffff"
+                android:hint="Level"
+                android:paddingLeft="20dp"
+                android:textColor="#000000"
+                android:textColorHint="#555555" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="#00000000" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <EditText
+                        android:id="@+id/training_details_date_et"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:layout_marginRight="1dp"
+                        android:layout_weight="1"
+                        android:background="#ffffff"
+                        android:hint="Date"
+                        android:paddingLeft="20dp"
+                        android:textColor="#000000"
+                        android:textColorHint="#555555" />
+
+                    <EditText
+                        android:id="@+id/training_details_time_et"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:layout_marginLeft="2dp"
+                        android:layout_weight="1"
+                        android:background="#ffffff"
+                        android:hint="Time"
+                        android:paddingLeft="20dp"
+                        android:textColor="#000000"
+                        android:textColorHint="#555555" />
+
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="#00000000" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <EditText
+                        android:id="@+id/training_details_participates_et"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:layout_marginRight="1dp"
+                        android:layout_weight="1"
+                        android:background="#ffffff"
+                        android:hint="Participates"
+                        android:paddingLeft="20dp"
+                        android:textColor="#000000"
+                        android:textColorHint="#555555" />
+
+                    <EditText
+                        android:id="@+id/training_details_duration_et"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:layout_marginLeft="2dp"
+                        android:layout_weight="1"
+                        android:background="#ffffff"
+                        android:hint="Duration"
+                        android:paddingLeft="20dp"
+                        android:textColor="#000000"
+                        android:textColorHint="#555555" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginLeft="4dp"
+                    android:textSize="18dp"
+                    android:textColor="#ffffff"
+                    android:text="Training location:"/>
+
+                <ImageButton
+                    android:id="@+id/training_details_location_map_ibtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:layout_weight="1"/>
+
+
+            </LinearLayout>
+
+
+
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:layout_marginTop="25dp"
+                android:layout_marginBottom="20dp"
+                android:background="#eeFF6600" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingLeft="3dp"
+                android:layout_marginBottom="50dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textSize="18dp"
+                    android:textStyle="bold"
+                    android:textColor="#ffffff"
+                    android:text="Get notification when:"/>
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingTop="15dp"
+                    android:orientation="horizontal">
+
+                    <Switch
+                        android:id="@+id/training_details_user_joined_notification_switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="User has been joined to the training."
+                        android:paddingTop="4dp"
+                        android:paddingLeft="10dp"
+                        android:textSize="16dp"
+                        android:textColor="#ffffff"
+                        android:layout_weight="1"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingTop="15dp"
+                    android:orientation="horizontal">
+
+                    <Switch
+                        android:id="@+id/training_details_training_full_notification_switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="Training has been fully registered."
+                        android:paddingTop="4dp"
+                        android:paddingLeft="10dp"
+                        android:textSize="16dp"
+                        android:textColor="#ffffff"
+                        android:layout_weight="1"/>
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <Button
+        android:id="@+id/training_details_action_btn"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        android:background="@drawable/app_rect_buttons_shape"
+        android:elevation="2dp"
+        android:text="Create"
+        android:textSize="17dp" />
+
+</RelativeLayout>

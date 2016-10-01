@@ -1,40 +1,42 @@
 package zina_eliran.app;
 
+
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
-
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
+import zina_eliran.app.BusinessEntities.BEResponse;
 import zina_eliran.app.BusinessEntities.BETraining;
 import zina_eliran.app.BusinessEntities.BETrainingAdapter;
 import zina_eliran.app.BusinessEntities.BETrainingLevelEnum;
+import zina_eliran.app.BusinessEntities.BETypesEnum;
 import zina_eliran.app.BusinessEntities.CMNLogHelper;
+import zina_eliran.app.BusinessEntities.DALActionTypeEnum;
+import zina_eliran.app.Utils.FireBaseHandler;
 import zina_eliran.app.Utils.Listeners.ClickListener;
 import zina_eliran.app.Utils.Listeners.RecyclerTouchListener;
 
-public class TrainingsListActivity extends BaseActivity implements View.OnClickListener {
+public class TrainingsListActivity extends BaseActivity implements View.OnClickListener, FireBaseHandler {
 
     RecyclerView trainingRv;
     List<BETraining> trainingsList = new ArrayList<>();
+    List<BETraining> myJoinedTrainingsList = new ArrayList<>();
+    List<BETraining> myCreatedTrainingList = new ArrayList<>();
     BETrainingAdapter trainingAdapter;
-    RelativeLayout rv;
-    TextView titleTv;
-    ImageButton deleteTrainingBtn;
+    RelativeLayout trainingListRl;
     FloatingActionButton createTrainingFab;
-    boolean isManageTrainingPermission;
-    boolean isViewMode;
-    boolean isPublicTrainingMode;
     boolean isMyTrainingMode;
+    boolean isPublicTrainingMode;
+    boolean isViewMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,17 +49,14 @@ public class TrainingsListActivity extends BaseActivity implements View.OnClickL
     private void onCreateUI() {
         try {
 
-            initActivityMode();
+            initActivityFlags();
 
             initFabButton();
 
-            rv = (RelativeLayout) findViewById(R.id.training_list_relative_layout);
+            trainingListRl = (RelativeLayout) findViewById(R.id.training_list_relative_layout);
             //call invalidate in order to float the create button in front of the list
-            rv.invalidate();
+            trainingListRl.invalidate();
 
-            initDeleteButton();
-
-            initActivityTitle();
 
             //init adapter & recycle view
             initTrainingAdapter();
@@ -68,18 +67,15 @@ public class TrainingsListActivity extends BaseActivity implements View.OnClickL
         }
     }
 
-    private void initActivityMode() {
-
+    private void initActivityFlags() {
         try {
-
-            String publicTrainingsMode = getIntentParam(intent, _getString(R.string.training_list_public_mode));
-            String myTrainingsMode = getIntentParam(intent, _getString(R.string.training_list_my_trainings_mode));
-
-            if (publicTrainingsMode != null) {
+            if (!getIntentParam(intent, _getString(R.string.training_list_public_mode)).isEmpty()) {
                 isPublicTrainingMode = true;
-            } else if (myTrainingsMode != null) {
+            }
+            if (!getIntentParam(intent, _getString(R.string.training_list_my_trainings_mode)).isEmpty()) {
                 isMyTrainingMode = true;
-            } else {
+            }
+            if (getIntentParam(intent, _getString(R.string.training_list_manage_training_permission)).isEmpty()) {
                 isViewMode = true;
             }
 
@@ -93,33 +89,13 @@ public class TrainingsListActivity extends BaseActivity implements View.OnClickL
             createTrainingFab = (FloatingActionButton) findViewById(R.id.fab);
             createTrainingFab.setOnClickListener(this);
             createTrainingFab.bringToFront();
-            String hasManageTrainingPermission = getIntentParam(intent, _getString(R.string.manage_training_permission));
-            if (hasManageTrainingPermission != null) {
-                isManageTrainingPermission = true;
+
+            //allow to create new trainings in public mode only.
+            if (isPublicTrainingMode) {
                 createTrainingFab.setVisibility(View.VISIBLE);
             } else {
                 createTrainingFab.setVisibility(View.INVISIBLE);
             }
-
-        } catch (Exception e) {
-            CMNLogHelper.logError("TrainingsListActivity", e.getMessage());
-        }
-    }
-
-    public void initDeleteButton() {
-        try {
-            deleteTrainingBtn = (ImageButton) findViewById(R.id.training_list_delete_training_btn);
-            deleteTrainingBtn.setOnClickListener(this);
-            deleteTrainingBtn.setVisibility(View.INVISIBLE);
-
-            //set when long click, do the save when create
-            /*String hasManageTrainingPermission = getIntentParam(intent, _getString(R.string.manage_training_permission));
-            if (hasManageTrainingPermission != null && isMyTrainingMode) {
-                isManageTrainingPermission = true;
-                createTrainingFab.setVisibility(View.VISIBLE);
-            } else {
-                createTrainingFab.setVisibility(View.INVISIBLE);
-            }*/
 
         } catch (Exception e) {
             CMNLogHelper.logError("TrainingsListActivity", e.getMessage());
@@ -140,6 +116,12 @@ public class TrainingsListActivity extends BaseActivity implements View.OnClickL
                 public void onClick(View view, int position) {
 
                     BETraining training = trainingsList.get(position);
+                    //navigate to training details activity
+                    Map<String, String> intentParams = new HashMap<>();
+                    intentParams.put(_getString(R.string.training_details_edit_mode), "true");
+                    intentParams.put(_getString(R.string.training_details_training_id), training.getId());
+                    navigateToActivity(TrainingsListActivity.this, TrainingDetailsActivity.class, false, intentParams);
+
                     Toast.makeText(getApplicationContext(), training.getName() + " is selected!", Toast.LENGTH_SHORT).show();
                 }
 
@@ -162,26 +144,20 @@ public class TrainingsListActivity extends BaseActivity implements View.OnClickL
         }
     }
 
-    public void initActivityTitle() {
-        try {
-            titleTv = (TextView) findViewById(R.id.training_list_title_tv);
-            String title = getIntentParam(intent, _getString(R.string.training_list_title));
-            if (title != null) {
-                titleTv.setText(title);
+    public void setAdapterTrainingData() {
+
+/*        try {
+            //in case we in public trainings mode
+            if (!getIntentParam(intent, _getString(R.string.training_list_public_mode)).isEmpty()) {
+                sApi.setActionResponse(null);
+                sApi.getPublicTrainings(new ArrayList<>());
+            } else {
+                sApi.setActionResponse(null);
+                sApi.getTrainingsByUser(sApi.getAppUser().getId());
             }
         } catch (Exception e) {
             CMNLogHelper.logError("TrainingsListActivity", e.getMessage());
-        }
-    }
-
-    public void setAdapterTrainingData() {
-
-        try {
-            //get data from db here
-            //what about listeners for creating new trainings?
-        } catch (Exception e) {
-            CMNLogHelper.logError("TrainingsListActivity", e.getMessage());
-        }
+        }*/
 
 
         BETraining tr = new BETraining();
@@ -317,11 +293,78 @@ public class TrainingsListActivity extends BaseActivity implements View.OnClickL
         tr.setLevel(BETrainingLevelEnum.Hobby);
         trainingsList.add(tr);
 
+
         trainingAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void onClick(View v) {
-        Toast.makeText(getApplicationContext(), "!!!!!!!!!!!!!!!!!", Toast.LENGTH_SHORT).show();
+        //navigate to create new training activity
+        Map<String, String> intentParams = new HashMap<>();
+        intentParams.put(_getString(R.string.training_details_new_mode), "true");
+        navigateToActivity(this, TrainingDetailsActivity.class, false, intentParams);
+    }
+
+    @Override
+    public void onActionCallback(BEResponse response) {
+        try {
+
+            if (response != null) {
+                if (response.getEntityType() == BETypesEnum.Trainings) {
+                    if (response.getActionType() == DALActionTypeEnum.getMyTrainings) {
+                        if (isMyTrainingMode) {
+/*                            myCreatedTrainingList = response.getEntities()
+                                    .stream()
+                                    .filter(t -> ((BETraining) t).getCreatorId() == sApi.getAppUser().getId())
+                                    .map(object -> (BETraining) object)
+                                    .sorted(Comparator.comparing(t -> t.getTrainingDate()))
+                                    .collect(Collectors.toList());
+
+
+                            myJoinedTrainingsList = response.getEntities()
+                                    .stream()
+                                    .filter(t -> ((BETraining) t).getCreatorId() != sApi.getAppUser().getId())
+                                    .map(object -> (BETraining) object)
+                                    .sorted(Comparator.comparing(t -> t.getTrainingDate()))
+                                    .collect(Collectors.toList());
+
+
+                            if (myCreatedTrainingList.size() > 0) {
+                                trainingsList = myCreatedTrainingList;
+                                //set the switch button status here
+                            } else {
+                                trainingsList = myJoinedTrainingsList;
+                                //set the switch button status here
+                            }
+
+                            trainingAdapter.notifyDataSetChanged();*/
+                        } else {
+                            CMNLogHelper.logError("TrainingsListActivity", "wrong action type in get trainings callback - getMyTrainings");
+                        }
+
+                    } else if (response.getActionType() == DALActionTypeEnum.getPublicTrainings) {
+                        if (isPublicTrainingMode) {
+                            //filter out all joined trainings or all created by "me" trainings
+/*                            trainingsList = response.getEntities()
+                                    .stream()
+                                    .filter(t -> !((BETraining) t).isUserParticipateInTraining(sApi.getAppUser().getId()))
+                                    .filter(t -> ((BETraining) t).getCreatorId() != sApi.getAppUser().getId())
+                                    .map(object -> (BETraining) object)
+                                    .collect(Collectors.toList());
+                            trainingAdapter.notifyDataSetChanged();*/
+                        } else {
+                            CMNLogHelper.logError("TrainingsListActivity", "wrong action type in get trainings callback - getPublicTrainings");
+                        }
+                    } else {
+                        CMNLogHelper.logError("TrainingsListActivity", "wrong action type in get trainings callback");
+                    }
+                } else {
+                    CMNLogHelper.logError("TrainingsListActivity", "wrong action type in callback" + response.getEntityType());
+                }
+            }
+
+        } catch (Exception e) {
+            CMNLogHelper.logError("TrainingsListActivity", e.getMessage());
+        }
     }
 }

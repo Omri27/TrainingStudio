@@ -142,4 +142,8 @@ public class BETraining extends BEBaseEntity{
         if (patricipatedUserIds.contains(userID))
             patricipatedUserIds.remove(userID);
     }
+
+    public boolean isUserParticipateInTraining(String userId) {
+        return getPatricipatedUserIds().contains(userId);
+    }
 }

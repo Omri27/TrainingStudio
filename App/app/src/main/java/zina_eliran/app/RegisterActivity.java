@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -41,6 +42,11 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
         //in debug mode: set to true, on release - set to false!
         CMNLogHelper.logTraffic = true;
         setContentView(R.layout.activity_register);
+
+        //prevent open keyboard automatically
+        getWindow().setSoftInputMode(
+                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
         onCreateUI();
 
     }

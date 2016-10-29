@@ -16,14 +16,18 @@ public class BEUser extends BEBaseEntity {
     private BETrainingLevelEnum trainingLevel;
     private float heigth;
     private float weigth;
+    private int age;
     private boolean isPrivateProfile;
     private Location myLocation;
+    private String country;
+    private String city;
     private Date registeredDate;
     private ArrayList<String> myTrainingIds; //All training that user chas created and user participates
+    private ArrayList<Integer> myPreferredDays;
+    private ArrayList<Integer> myPreferredHours;
     private boolean isTrainingCancelledNotification;
     private boolean isTrainingFullNotification;
     private boolean isTrainingRemainderNotification;
-
 
 
     public BEUser() {
@@ -74,24 +78,32 @@ public class BEUser extends BEBaseEntity {
         return trainingLevel;
     }
 
-    public void setTrainingLevel(BETrainingLevelEnum trainingLevel) {
-        this.trainingLevel = trainingLevel;
+    public void setTrainingLevel(String trainingLevel) {
+        this.trainingLevel = BETrainingLevelEnum.valueOf(trainingLevel.toString().replace("Level:", "").trim());
     }
 
     public float getHeigth() {
         return heigth;
     }
 
-    public void setHeigth(float heigth) {
-        this.heigth = heigth;
+    public void setHeigth(String heigth) {
+        this.heigth = Float.parseFloat(heigth.replace("(m)", "").trim());
     }
 
     public float getWeigth() {
         return weigth;
     }
 
-    public void setWeigth(float weigth) {
-        this.weigth = weigth;
+    public void setWeigth(String weigth) {
+        this.weigth = Float.parseFloat(weigth.replace("KG", "").trim());
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(String age) {
+        this.age = Integer.parseInt(age.replace("Age:", "").trim());
     }
 
     public boolean isPrivateProfile() {
@@ -110,6 +122,22 @@ public class BEUser extends BEBaseEntity {
         this.myLocation = myLocation;
     }
 
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
     public Date getRegisteredDate() {
         return registeredDate;
     }
@@ -124,6 +152,22 @@ public class BEUser extends BEBaseEntity {
 
     public void setMyTrainingIds(ArrayList<String> myTrainingIds) {
         this.myTrainingIds = myTrainingIds;
+    }
+
+    public ArrayList<Integer> getMyPreferredDays() {
+        return myPreferredDays;
+    }
+
+    public void setMyPreferredDays(ArrayList<Integer> myPreferredDays) {
+        this.myPreferredDays = myPreferredDays;
+    }
+
+    public ArrayList<Integer> getMyPreferredHours() {
+        return myPreferredHours;
+    }
+
+    public void setMyPreferredHours(ArrayList<Integer> myPreferredHours) {
+        this.myPreferredHours = myPreferredHours;
     }
 
     public boolean isTrainingCancelledNotification() {
@@ -161,7 +205,7 @@ public class BEUser extends BEBaseEntity {
     }
 
 
-    public void addTrainingToTrainingList(String trainingId){
+    public void addTrainingToTrainingList(String trainingId) {
         this.myTrainingIds.add(trainingId);
     }
 

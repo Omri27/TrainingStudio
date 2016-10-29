@@ -28,11 +28,13 @@ import zina_eliran.app.BusinessEntities.BETraining;
 import zina_eliran.app.BusinessEntities.BETrainingDetailsModeEnum;
 import zina_eliran.app.BusinessEntities.BETrainingLevelEnum;
 import zina_eliran.app.BusinessEntities.BETrainingStatusEnum;
+import zina_eliran.app.BusinessEntities.BETypesEnum;
 import zina_eliran.app.BusinessEntities.CMNLogHelper;
 import zina_eliran.app.BusinessEntities.DALActionTypeEnum;
 import zina_eliran.app.Utils.FireBaseHandler;
 
-public class TrainingDetailsActivity extends BaseActivity implements View.OnClickListener, FireBaseHandler, CompoundButton.OnCheckedChangeListener {
+public class TrainingDetailsActivity extends BaseActivity
+        implements View.OnClickListener, FireBaseHandler, CompoundButton.OnCheckedChangeListener {
 
     LinearLayout notificationsSwitchesLayout;
     Switch userJoinedNotificationSwitch;
@@ -314,8 +316,10 @@ public class TrainingDetailsActivity extends BaseActivity implements View.OnClic
 
             if (response != null) {
                 if (response.getStatus() == BEResponseStatusEnum.error) {
+                    CMNLogHelper.logError("TrainingDetailsActivity", "error in training details callbacks | err:" + response.getMessage());
+                    Toast.makeText(_getAppContext(), "Error while performing training action, please try again later.", Toast.LENGTH_LONG).show();
 
-                } else {
+                } else if (response.getEntityType() == BETypesEnum.Trainings) {
 
                     if (response.getActionType() == DALActionTypeEnum.getTraining) {
                         training = ((BETraining) response.getEntities().get(0));
@@ -324,7 +328,7 @@ public class TrainingDetailsActivity extends BaseActivity implements View.OnClic
                         DateFormat timeFormatter = new SimpleDateFormat("hh:mm");
 
                         descriptionEt.setText(training.getDescription());
-                        levelSpinner.setSelection(levelAdapter.getPosition(training.getLevel().toString()));
+                        levelSpinner.setSelection(levelAdapter.getPosition("Level: " + training.getLevel().toString()));
                         levelAdapter.notifyDataSetChanged();
                         durationSpinner.setSelection(durationAdapter.getPosition(training.getDuration() + " Min"));
                         durationAdapter.notifyDataSetChanged();
@@ -368,9 +372,10 @@ public class TrainingDetailsActivity extends BaseActivity implements View.OnClic
                                 break;
                         }
                     }
+                } else {
+                    CMNLogHelper.logError("TrainingDetailsActivity", "wrong action type in callback" + response.getEntityType() + ", " + response.getActionType());
                 }
             }
-
 
         } catch (Exception e) {
             CMNLogHelper.logError("TrainingDetailsActivity", e.getMessage());
@@ -385,7 +390,7 @@ public class TrainingDetailsActivity extends BaseActivity implements View.OnClic
                 setActionButtonState("Update", false, true);
             }
         } catch (Exception e) {
-
+            CMNLogHelper.logError("TrainingDetailsActivity", e.getMessage());
         }
     }
 

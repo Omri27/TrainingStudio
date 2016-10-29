@@ -275,7 +275,7 @@ public class DAL {
 
 
         //Update user
-        user.setHeigth(180);
+        user.setHeigth(""+180);
         user.setName("NEWuser name");
         updateUser(user, fireBaseHandler);
 

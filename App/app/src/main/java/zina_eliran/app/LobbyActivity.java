@@ -4,14 +4,17 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import zina_eliran.app.BusinessEntities.BEResponse;
 import zina_eliran.app.BusinessEntities.BEResponseStatusEnum;
+import zina_eliran.app.BusinessEntities.BETypesEnum;
 import zina_eliran.app.BusinessEntities.BEUser;
 import zina_eliran.app.BusinessEntities.CMNLogHelper;
+import zina_eliran.app.BusinessEntities.DALActionTypeEnum;
 import zina_eliran.app.Utils.FireBaseHandler;
 
 public class LobbyActivity extends BaseActivity implements View.OnClickListener, FireBaseHandler {
@@ -105,11 +108,14 @@ public class LobbyActivity extends BaseActivity implements View.OnClickListener,
 
             if (response != null) {
                 if (response.getStatus() == BEResponseStatusEnum.error) {
-                    CMNLogHelper.logError("TrainingsListActivity", "error in get trainings callback | err:" + response.getMessage());
-                    //toast here
-                } else {
+                    CMNLogHelper.logError("LobbyActivity", "error in get user callback on app load | err:" + response.getMessage());
+                    Toast.makeText(_getAppContext(), "Error while retrieving user data, please try again later.", Toast.LENGTH_LONG).show();
+                } else  if (response.getActionType() == DALActionTypeEnum.getUser && response.getEntityType() == BETypesEnum.Users) {
                     sApi.setAppUser((BEUser) response.getEntities().get(0));
                     onCreateUI();
+                }
+                else {
+                    CMNLogHelper.logError("LobbyActivity", "wrong action type in callback" + response.getEntityType() + ", " + response.getActionType());
                 }
             }
 
@@ -117,6 +123,7 @@ public class LobbyActivity extends BaseActivity implements View.OnClickListener,
             CMNLogHelper.logError("LobbyActivity", e.getMessage());
         }
     }
+
 
     private void handleLoginState() {
         try {

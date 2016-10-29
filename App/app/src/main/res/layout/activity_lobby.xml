@@ -5,7 +5,6 @@
     android:layout_height="match_parent"
     android:background="@drawable/app_bg1"
     android:gravity="center"
-    android:layoutDirection="ltr"
     android:orientation="vertical"
     tools:context="zina_eliran.app.LobbyActivity">
 

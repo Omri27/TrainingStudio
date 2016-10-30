@@ -240,7 +240,7 @@ public class TrainingDetailsActivity extends BaseActivity
                         return;
                     }
                     training.setDescription(descriptionEt.getText().toString());
-                    training.setLevel(BETrainingLevelEnum.valueOf(levelSpinner.getSelectedItem().toString()));
+                    training.setLevel(BETrainingLevelEnum.valueOf(levelSpinner.getSelectedItem().toString().replace("Level:","").trim()));
                     training.setDuration(Integer.parseInt(durationSpinner.getSelectedItem().toString().replace("Min", "").trim()));
                     //create full date object
                     Date d = new Date();

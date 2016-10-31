@@ -1,10 +1,16 @@
 package zina_eliran.app.API;
 
+import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.MutableData;
+import com.firebase.client.Transaction;
 
 import java.util.ArrayList;
 import java.util.Date;
 
+import zina_eliran.app.API.EmailSender.EmailSendThread;
+import zina_eliran.app.API.EmailSender.EmailSender;
 import zina_eliran.app.API.Listeners.OnSetValueCompleteListener;
 import zina_eliran.app.API.Listeners.GetBEObjectEventListener;
 import zina_eliran.app.BusinessEntities.BEBaseEntity;
@@ -28,12 +34,25 @@ public class DAL {
         if (user != null) {
             user.setVerificationCode(ServerAPI.generateVerificationCode());
             createObject(BETypesEnum.Users, DALActionTypeEnum.registerUser, user, fbHandler);
+
+            //Send verification code
+            EmailSendThread thread = new EmailSendThread(user.getEmail(), user.getName(), user.getVerificationCode());
+            new Thread(thread).start();
+
         } else
             cannotPerformAction(fbHandler, DALActionTypeEnum.registerUser, "Cannot create null user");
     }
 
 
     public static void createTraining(BETraining training, FireBaseHandler fireBaseHandler) {
+
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+
         if (training != null) {
             createObject(BETypesEnum.Trainings, DALActionTypeEnum.createTraining, training, fireBaseHandler);
         } else {
@@ -181,6 +200,7 @@ public class DAL {
                 entities.add(object);
                 OnSetValueCompleteListener listener = new OnSetValueCompleteListener(fbHandler, entities, action, objectType);
                 newObject.setValue(object, listener);
+
                 CMNLogHelper.logError("Object created", object.toString());
             }
         } catch (Exception e) {
@@ -209,6 +229,34 @@ public class DAL {
             cannotPerformAction(fbHandler, action, "Could not update object");
             CMNLogHelper.logError("Create-Object-DB", e.getMessage());
         }
+    }
+
+    private static void updateObjectWithTransaction(BETypesEnum objectType, DALActionTypeEnum action, BEBaseEntity object, FireBaseHandler fbHandler){
+        Firebase ref = rootRef.child(objectType.toString());
+        Firebase specificOnject = ref.child(object.getId());
+        specificOnject.runTransaction(new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+                if(mutableData.getValue() != null){
+                    CMNLogHelper.logError("TRANSACTION", mutableData.toString());
+                    BETraining obj =  mutableData.getValue(BETraining.class);
+                    MutableData numOfParticipants = mutableData.child("currentNumberOfParticipants");
+                    if (numOfParticipants.getValue(Integer.class) == 0)
+                        numOfParticipants.setValue(5);
+                    CMNLogHelper.logError("UpdateTransaction", "update participants");
+                    return Transaction.success(mutableData);
+                }
+                else
+                    CMNLogHelper.logError("UpdateTransaction", "update participants failed");
+                    return Transaction.abort();
+
+            }
+
+            @Override
+            public void onComplete(FirebaseError firebaseError, boolean b, DataSnapshot dataSnapshot) {
+                CMNLogHelper.logError("UpdateTransaction", "completed");
+            }
+        });
     }
 
 
@@ -313,4 +361,7 @@ public class DAL {
 
     }
 
+    public static Firebase getUsersRef() {
+        return usersRef;
+    }
 }

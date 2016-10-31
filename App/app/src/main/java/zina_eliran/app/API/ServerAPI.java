@@ -3,6 +3,7 @@ package zina_eliran.app.API;
 import java.util.ArrayList;
 import java.util.Random;
 
+import zina_eliran.app.API.EmailSender.EmailSender;
 import zina_eliran.app.BusinessEntities.BEBaseEntity;
 import zina_eliran.app.BusinessEntities.BEResponse;
 import zina_eliran.app.BusinessEntities.BETraining;
@@ -57,6 +58,20 @@ public class ServerAPI {
 
     public void registerUser(BEUser user, FireBaseHandler fbHandler) {
         DAL.registerUser(user, fbHandler);
+
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    EmailSender send = new EmailSender("zina@ctera.com", "Zina Kuzmin" , "123456" );
+                } catch (Exception e) {
+                    CMNLogHelper.logError("SendMailFailed", e.getMessage());
+                }
+            }
+
+        }).start();
+
     }
 
 

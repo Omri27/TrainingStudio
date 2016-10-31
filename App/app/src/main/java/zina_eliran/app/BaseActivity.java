@@ -12,6 +12,8 @@ import android.view.View;
 
 import com.firebase.client.Firebase;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.Map;
 
@@ -30,6 +32,8 @@ public class BaseActivity extends AppCompatActivity {
     ServerAPI sApi;
     Context appContext;
     Intent intent;
+    DateFormat dateFormatter = new SimpleDateFormat("MMM DD");
+    DateFormat timeFormatter = new SimpleDateFormat("hh:mm");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

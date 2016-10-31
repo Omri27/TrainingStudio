@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="training_participates_number_values">
+        <item>3 Runners</item>
+        <item>4 Runners</item>
+        <item>5 Runners</item>
+        <item>6 Runners</item>
+        <item>7 Runners</item>
+        <item>8 Runners</item>
+        <item>9 Runners</item>
+        <item>10 Runners</item>
+    </string-array>
+</resources>

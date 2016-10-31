@@ -34,7 +34,6 @@
             android:paddingRight="50dp">
 
 
-
             <EditText
                 android:id="@+id/training_details_training_name_et"
                 android:layout_width="match_parent"
@@ -55,8 +54,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#ffffff"
-                android:layout_weight="1">
+                android:layout_weight="1"
+                android:background="#ffffff">
 
                 <Spinner
                     android:id="@+id/training_details_level_spinner"
@@ -65,10 +64,6 @@
                     android:background="@null"></Spinner>
 
             </LinearLayout>
-
-
-
-
 
 
             <View
@@ -83,32 +78,36 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="50dp"
                     android:orientation="horizontal">
 
-                    <EditText
-                        android:id="@+id/training_details_date_et"
+                    <TextView
+                        android:id="@+id/training_details_date_tv"
                         android:layout_width="match_parent"
-                        android:layout_height="50dp"
+                        android:layout_height="match_parent"
                         android:layout_marginRight="1dp"
                         android:layout_weight="1"
                         android:background="#ffffff"
-                        android:hint="Date"
+                        android:gravity="center_vertical"
                         android:paddingLeft="20dp"
-                        android:textColor="#000000"
-                        android:textColorHint="#555555" />
+                        android:text="Pick Date"
+                        android:textColor="#555555"
+                        android:textColorHint="#555555"
+                        android:textSize="18dp" />
 
-                    <EditText
-                        android:id="@+id/training_details_time_et"
+                    <TextView
+                        android:id="@+id/training_details_time_tv"
                         android:layout_width="match_parent"
-                        android:layout_height="50dp"
-                        android:layout_marginLeft="1dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginRight="1dp"
                         android:layout_weight="1"
                         android:background="#ffffff"
-                        android:hint="Time"
+                        android:gravity="center_vertical"
                         android:paddingLeft="20dp"
-                        android:textColor="#000000"
-                        android:textColorHint="#555555" />
+                        android:text="Pick Time"
+                        android:textColor="#555555"
+                        android:textColorHint="#555555"
+                        android:textSize="18dp" />
 
 
                 </LinearLayout>
@@ -123,34 +122,34 @@
                     android:layout_height="match_parent"
                     android:orientation="horizontal">
 
-                    <EditText
-                        android:id="@+id/training_details_participates_et"
-                        android:inputType="number"
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="50dp"
-                        android:layout_marginRight="1dp"
+                        android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:background="#ffffff"
-                        android:hint="Participates"
-                        android:paddingLeft="20dp"
-                        android:textColor="#000000"
-                        android:textColorHint="#555555" />
+                        android:background="#ffffff">
 
+                        <Spinner
+                            android:id="@+id/training_details_participates_spinner"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:background="@null"></Spinner>
+
+                    </LinearLayout>
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:background="#ffffff"
                         android:layout_marginLeft="1dp"
-                        android:layout_weight="1">
+                        android:layout_weight="1"
+                        android:background="#ffffff">
 
-                    <Spinner
-                        android:id="@+id/training_details_duration_spinner"
-                        android:layout_width="match_parent"
-                        android:layout_height="50dp"
-                        android:background="@null"></Spinner>
+                        <Spinner
+                            android:id="@+id/training_details_duration_spinner"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:background="@null"></Spinner>
 
-                        </LinearLayout>
+                    </LinearLayout>
 
 
                 </LinearLayout>
@@ -158,62 +157,60 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:layout_marginTop="20dp"
                     android:layout_marginBottom="17dp"
+                    android:layout_marginTop="20dp"
                     android:background="#eeFF6600" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginLeft="4dp"
                     android:layout_marginBottom="5dp"
-                    android:textSize="18dp"
-                    android:textStyle="bold"
+                    android:layout_marginLeft="4dp"
+                    android:text="Training location:"
                     android:textColor="#ffffff"
-                    android:text="Training location:"/>
+                    android:textSize="18dp"
+                    android:textStyle="bold" />
 
                 <ImageButton
                     android:id="@+id/training_details_location_map_ibtn"
                     android:layout_width="match_parent"
                     android:layout_height="200dp"
-                    android:background="@drawable/training_location_map"
-                    android:layout_weight="1"/>
+                    android:layout_weight="1"
+                    android:background="@drawable/training_location_map" />
 
 
             </LinearLayout>
 
 
-
-
             <View
                 android:layout_width="match_parent"
                 android:layout_height="3dp"
-                android:layout_marginTop="25dp"
                 android:layout_marginBottom="20dp"
+                android:layout_marginTop="25dp"
                 android:background="#eeFF6600" />
 
             <LinearLayout
                 android:id="@+id/training_details_switches_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:paddingLeft="3dp"
                 android:layout_marginBottom="50dp"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:paddingLeft="3dp">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:textSize="18dp"
-                    android:textStyle="bold"
+                    android:text="Get notification when:"
                     android:textColor="#ffffff"
-                    android:text="Get notification when:"/>
+                    android:textSize="18dp"
+                    android:textStyle="bold" />
 
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:paddingTop="15dp"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:paddingTop="15dp">
 
                     <Switch
                         android:id="@+id/training_details_user_joined_notification_switch"
@@ -223,20 +220,20 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:text="User has been joined to the training."
-                        android:paddingTop="4dp"
+                        android:layout_weight="1"
                         android:paddingLeft="10dp"
-                        android:textSize="16dp"
+                        android:paddingTop="4dp"
+                        android:text="User has been joined to the training."
                         android:textColor="#ffffff"
-                        android:layout_weight="1"/>
+                        android:textSize="16dp" />
 
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:paddingTop="15dp"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:paddingTop="15dp">
 
                     <Switch
                         android:id="@+id/training_details_training_full_notification_switch"
@@ -246,18 +243,17 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:text="Training has been fully registered."
-                        android:paddingTop="4dp"
+                        android:layout_weight="1"
                         android:paddingLeft="10dp"
-                        android:textSize="16dp"
+                        android:paddingTop="4dp"
+                        android:text="Training has been fully registered."
                         android:textColor="#ffffff"
-                        android:layout_weight="1"/>
+                        android:textSize="16dp" />
 
                 </LinearLayout>
 
 
             </LinearLayout>
-
 
 
         </LinearLayout>

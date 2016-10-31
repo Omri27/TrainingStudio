@@ -10,8 +10,21 @@ import android.widget.TimePicker;
 
 import java.util.Calendar;
 
+import zina_eliran.app.BusinessEntities.BEFragmentResultTypeEnum;
+
 public class TimePickerFragment extends DialogFragment
         implements TimePickerDialog.OnTimeSetListener {
+
+    DateTimeFragmentHandler activity;
+
+    public TimePickerFragment(DateTimeFragmentHandler activity) {
+        super();
+        this.activity = activity;
+    }
+
+    public TimePickerFragment() {
+        super();
+    }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -27,5 +40,8 @@ public class TimePickerFragment extends DialogFragment
 
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
         // Do something with the time chosen by the user
+        Calendar c = Calendar.getInstance();
+        c.set(0, 0, 0, hourOfDay, minute, 0);
+        activity.onFragmentCallback(c, BEFragmentResultTypeEnum.time);
     }
 }

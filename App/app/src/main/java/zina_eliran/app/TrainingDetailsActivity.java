@@ -1,5 +1,6 @@
 package zina_eliran.app;
 
+import android.app.DialogFragment;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -13,15 +14,18 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import zina_eliran.app.BusinessEntities.BEFragmentResultTypeEnum;
 import zina_eliran.app.BusinessEntities.BEResponse;
 import zina_eliran.app.BusinessEntities.BEResponseStatusEnum;
 import zina_eliran.app.BusinessEntities.BETraining;
@@ -31,10 +35,13 @@ import zina_eliran.app.BusinessEntities.BETrainingStatusEnum;
 import zina_eliran.app.BusinessEntities.BETypesEnum;
 import zina_eliran.app.BusinessEntities.CMNLogHelper;
 import zina_eliran.app.BusinessEntities.DALActionTypeEnum;
+import zina_eliran.app.Utils.DatePickerFragment;
+import zina_eliran.app.Utils.DateTimeFragmentHandler;
 import zina_eliran.app.Utils.FireBaseHandler;
+import zina_eliran.app.Utils.TimePickerFragment;
 
-public class TrainingDetailsActivity extends BaseActivity
-        implements View.OnClickListener, FireBaseHandler, CompoundButton.OnCheckedChangeListener {
+public class TrainingDetailsActivity extends BaseFragmentActivity
+        implements View.OnClickListener, FireBaseHandler, CompoundButton.OnCheckedChangeListener , DateTimeFragmentHandler {
 
     LinearLayout notificationsSwitchesLayout;
     Switch userJoinedNotificationSwitch;
@@ -42,9 +49,10 @@ public class TrainingDetailsActivity extends BaseActivity
     EditText descriptionEt;
     Spinner levelSpinner;
     ArrayAdapter<CharSequence> levelAdapter;
-    EditText dateEt;
-    EditText timeEt;
-    EditText participatesEt;
+    TextView dateTv;
+    TextView timeTv;
+    Spinner participatesSpinner;
+    ArrayAdapter<CharSequence> participatesAdapter;
     Spinner durationSpinner;
     ArrayAdapter<CharSequence> durationAdapter;
 
@@ -53,7 +61,6 @@ public class TrainingDetailsActivity extends BaseActivity
     BETrainingDetailsModeEnum activityMode;
     boolean isDirty;
     BETraining training;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,10 +98,13 @@ public class TrainingDetailsActivity extends BaseActivity
 
 
             descriptionEt = (EditText) findViewById(R.id.training_details_training_name_et);
-            dateEt = (EditText) findViewById(R.id.training_details_date_et);
-            timeEt = (EditText) findViewById(R.id.training_details_time_et);
-            participatesEt = (EditText) findViewById(R.id.training_details_participates_et);
             locationIBtn = (ImageButton) findViewById(R.id.training_details_location_map_ibtn);
+            dateTv = (TextView) findViewById(R.id.training_details_date_tv);
+            timeTv = (TextView) findViewById(R.id.training_details_time_tv);
+
+            //add events
+            dateTv.setOnClickListener(this);
+            timeTv.setOnClickListener(this);
 
             levelSpinner = (Spinner) findViewById(R.id.training_details_level_spinner);
             levelAdapter = ArrayAdapter.createFromResource(this,
@@ -112,6 +122,15 @@ public class TrainingDetailsActivity extends BaseActivity
             durationSpinner.setAdapter(durationAdapter);
             durationSpinner.setSelection(0, true);
             durationAdapter.notifyDataSetChanged();
+
+
+            participatesSpinner = (Spinner) findViewById(R.id.training_details_participates_spinner);
+            participatesAdapter = ArrayAdapter.createFromResource(this,
+                    R.array.training_participates_number_values, R.layout.app_spinner_item);
+            participatesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            participatesSpinner.setAdapter(participatesAdapter);
+            participatesSpinner.setSelection(0, true);
+            participatesAdapter.notifyDataSetChanged();
 
 
         } catch (Exception e) {
@@ -211,9 +230,9 @@ public class TrainingDetailsActivity extends BaseActivity
         try {
 
             descriptionEt.setEnabled(false);
-            dateEt.setEnabled(false);
-            timeEt.setEnabled(false);
-            participatesEt.setEnabled(false);
+            dateTv.setEnabled(false);
+            timeTv.setEnabled(false);
+            participatesSpinner.setEnabled(false);
             locationIBtn.setEnabled(false);
             levelSpinner.setEnabled(false);
             durationSpinner.setEnabled(false);
@@ -229,51 +248,63 @@ public class TrainingDetailsActivity extends BaseActivity
     public void onClick(View view) {
         try {
 
-            switch (activityMode) {
-                case training_details_create_mode:
-                    //create object
+            switch (view.getId()) {
+                case R.id.training_details_action_btn:
+                    switch (activityMode) {
+                        case training_details_create_mode:
+                            //create object
 
-                    //!!!validations will be added as ui elements such as spinners & calenders & google map elements at phase 2
+                            //!!!validations will be added as ui elements such as spinners & calenders & google map elements at phase 2
 
-                    training = new BETraining();
-                    if (!validateBeforeSave()) {
-                        return;
+                            training = new BETraining();
+                            if (!validateBeforeSave()) {
+                                return;
+                            }
+                            training.setDescription(descriptionEt.getText().toString());
+                            training.setLevel(BETrainingLevelEnum.valueOf(levelSpinner.getSelectedItem().toString().replace("Level:", "").trim()));
+                            training.setDuration(Integer.parseInt(durationSpinner.getSelectedItem().toString().replace("Min", "").trim()));
+                            //create full date object
+                            Date d = new Date();
+                            training.setTrainingDate(d);
+                            training.setMaxNumberOfParticipants(Integer.parseInt(participatesSpinner.getSelectedItem().toString().replace("Runners", "").trim()));
+                            training.setCurrentNumberOfParticipants(0);
+                            training.setCreationDate(new Date());
+                            training.setCreatorId(sApi.getAppUser().getId());
+                            training.setPatricipatedUserIds(new ArrayList<String>());
+                            training.setStatus(BETrainingStatusEnum.open);
+                            training.setJoinTrainingNotificationFlag(userJoinedNotificationSwitch.isChecked());
+                            training.setTrainingFullNotificationFlag(trainingFullNotificationSwitch.isChecked());
+
+                            sApi.createTraining(training, this);
+
+                            break;
+                        case training_details_join_mode:
+                            sApi.joinTraining(training.getId(), sApi.getAppUser().getId(), this);
+                            break;
+                        case training_details_leave_mode:
+                            sApi.leaveTraining(training.getId(), sApi.getAppUser().getId(), this);
+                            break;
+                        case training_details_cancel_mode:
+                            if (isDirty) {
+                                //save
+                                training.setJoinTrainingNotificationFlag(userJoinedNotificationSwitch.isChecked());
+                                training.setTrainingFullNotificationFlag(trainingFullNotificationSwitch.isChecked());
+                                sApi.updateTraining(training, this);
+                            } else {
+                                //cancel
+                                training.setStatus(BETrainingStatusEnum.cancelled);
+                                sApi.updateTraining(training, this);
+                            }
+                            break;
                     }
-                    training.setDescription(descriptionEt.getText().toString());
-                    training.setLevel(BETrainingLevelEnum.valueOf(levelSpinner.getSelectedItem().toString().replace("Level:","").trim()));
-                    training.setDuration(Integer.parseInt(durationSpinner.getSelectedItem().toString().replace("Min", "").trim()));
-                    //create full date object
-                    Date d = new Date();
-                    training.setTrainingDate(d);
-                    training.setMaxNumberOfParticipants(Integer.parseInt(participatesEt.getText().toString()));
-                    training.setCurrentNumberOfParticipants(0);
-                    training.setCreationDate(new Date());
-                    training.setCreatorId(sApi.getAppUser().getId());
-                    training.setPatricipatedUserIds(new ArrayList<String>());
-                    training.setStatus(BETrainingStatusEnum.open);
-                    training.setJoinTrainingNotificationFlag(userJoinedNotificationSwitch.isChecked());
-                    training.setTrainingFullNotificationFlag(trainingFullNotificationSwitch.isChecked());
-
-                    sApi.createTraining(training, this);
-
                     break;
-                case training_details_join_mode:
-                    sApi.joinTraining(training.getId(), sApi.getAppUser().getId(), this);
+                case R.id.training_details_time_tv:
+                    DialogFragment timeFragment = new TimePickerFragment(this);
+                    timeFragment.show(getFragmentManager(), "timePicker");
                     break;
-                case training_details_leave_mode:
-                    sApi.leaveTraining(training.getId(), sApi.getAppUser().getId(), this);
-                    break;
-                case training_details_cancel_mode:
-                    if (isDirty) {
-                        //save
-                        training.setJoinTrainingNotificationFlag(userJoinedNotificationSwitch.isChecked());
-                        training.setTrainingFullNotificationFlag(trainingFullNotificationSwitch.isChecked());
-                        sApi.updateTraining(training, this);
-                    } else {
-                        //cancel
-                        training.setStatus(BETrainingStatusEnum.cancelled);
-                        sApi.updateTraining(training, this);
-                    }
+                case R.id.training_details_date_tv:
+                    DialogFragment dateFragment = new DatePickerFragment(this);
+                    dateFragment.show(getFragmentManager(), "datePicker");
                     break;
             }
 
@@ -289,16 +320,12 @@ public class TrainingDetailsActivity extends BaseActivity
             if (descriptionEt.getText().toString().isEmpty()) {
                 isValid = false;
             }
-            if (dateEt.getText().toString().isEmpty()) {
+            if (dateTv.getText().toString().isEmpty() || dateTv.getText().toString().contains("Pick")) {
                 isValid = false;
             }
-            if (timeEt.getText().toString().isEmpty()) {
+            if (timeTv.getText().toString().isEmpty() || timeTv.getText().toString().contains("Pick")) {
                 isValid = false;
             }
-            if (participatesEt.getText().toString().isEmpty()) {
-                isValid = false;
-            }
-
 
             if (!isValid) {
                 Toast.makeText(_getAppContext(), _getString(R.string.inputs_missing_or_invalid), Toast.LENGTH_LONG).show();
@@ -324,18 +351,16 @@ public class TrainingDetailsActivity extends BaseActivity
                     if (response.getActionType() == DALActionTypeEnum.getTraining) {
                         training = ((BETraining) response.getEntities().get(0));
                         //bind elements to the object fields
-                        DateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy");
-                        DateFormat timeFormatter = new SimpleDateFormat("hh:mm");
-
                         descriptionEt.setText(training.getDescription());
                         levelSpinner.setSelection(levelAdapter.getPosition("Level: " + training.getLevel().toString()));
                         levelAdapter.notifyDataSetChanged();
                         durationSpinner.setSelection(durationAdapter.getPosition(training.getDuration() + " Min"));
                         durationAdapter.notifyDataSetChanged();
+                        participatesSpinner.setSelection(participatesAdapter.getPosition((training.getMaxNumberOfParticipants()-3) + " Runners"));
+                        participatesAdapter.notifyDataSetChanged();
 
-                        dateEt.setText(dateFormatter.format(training.getTrainingDate()));
-                        timeEt.setText(timeFormatter.format(training.getTrainingDate()));
-                        participatesEt.setText("" + training.getMaxNumberOfParticipants());
+                        dateTv.setText(dateFormatter.format(training.getTrainingDate()));
+                        timeTv.setText(timeFormatter.format(training.getTrainingDate()));
                         userJoinedNotificationSwitch.setChecked(training.isJoinTrainingNotificationFlag());
                         trainingFullNotificationSwitch.setChecked(training.isTrainingFullNotificationFlag());
 
@@ -394,4 +419,34 @@ public class TrainingDetailsActivity extends BaseActivity
         }
     }
 
+    @Override
+    public void onFragmentCallback(Calendar value, BEFragmentResultTypeEnum entityType) {
+        try{
+            if(entityType == BEFragmentResultTypeEnum.date){
+                if (value.before(Calendar.getInstance())) {
+                    Toast.makeText(_getAppContext(), "Training date must be equal or later than today.", Toast.LENGTH_LONG).show();
+                    dateTv.setText("Pick Date");
+                }
+                else {
+                    dateTv.setText(dateFormatter.format(value));
+                }
+            }
+            else if(entityType == BEFragmentResultTypeEnum.time){
+                Calendar c = Calendar.getInstance();
+                c.set(0,0,0);
+                c.add(Calendar.HOUR, 6);
+                if(value.before(c)){
+                    Toast.makeText(_getAppContext(), "Training time must be at least 6 hours later then now.", Toast.LENGTH_LONG).show();
+                    dateTv.setText("Pick Date");
+                }
+                else {
+                    timeTv.setText(timeFormatter.format(value));
+                }
+            }
+
+        } catch (Exception e) {
+            CMNLogHelper.logError("TrainingDetailsActivity", e.getMessage());
+        }
+
+    }
 }

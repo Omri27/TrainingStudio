@@ -7,9 +7,21 @@ import android.os.Bundle;
 import android.widget.DatePicker;
 
 import java.util.Calendar;
+import zina_eliran.app.BusinessEntities.BEFragmentResultTypeEnum;
 
-public class DatePickerFragment  extends DialogFragment
+public class DatePickerFragment extends DialogFragment
         implements DatePickerDialog.OnDateSetListener {
+
+    DateTimeFragmentHandler activity;
+
+    public DatePickerFragment(DateTimeFragmentHandler activity) {
+        super();
+        this.activity = activity;
+    }
+
+    public DatePickerFragment() {
+        super();
+    }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -25,5 +37,8 @@ public class DatePickerFragment  extends DialogFragment
 
     public void onDateSet(DatePicker view, int year, int month, int day) {
         // Do something with the date chosen by the user
+        Calendar c = Calendar.getInstance();
+        c.set(year, month, day, 0, 0, 0);
+        activity.onFragmentCallback(c, BEFragmentResultTypeEnum.date);
     }
 }

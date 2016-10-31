@@ -177,7 +177,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
                 Toast.makeText(_getAppContext(), _getString(R.string.registration_success_message), Toast.LENGTH_LONG).show();
 
                 //this will be removed after we handle with email verification
-                verificationCodeEditText.setText("" + sApi.getAppUser().getVerificationCode());
+                //verificationCodeEditText.setText("" + sApi.getAppUser().getVerificationCode());
 
                 //set spinner off
                 pBar.setVisibility(View.GONE);

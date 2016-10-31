@@ -58,23 +58,29 @@ public class BETrainingAdapter extends RecyclerView.Adapter<BETrainingAdapter.Tr
 
     @Override
     public void onBindViewHolder(TrainingViewHolder holder, int position) {
-        DateFormat dateFormatter = new SimpleDateFormat("MMM dd");
-        DateFormat timeFormatter = new SimpleDateFormat("hh:mm");
 
-        BETraining training = trainingList.get(position);
-        if(isDisplayTrainingId){
-            //dev use
-            holder.id.setVisibility(View.VISIBLE);
-            holder.id.setText(training.getId().substring(training.getId().length()-7));
+        try {
+            DateFormat dateFormatter = new SimpleDateFormat("MMM dd");
+            DateFormat timeFormatter = new SimpleDateFormat("hh:mm");
+
+            BETraining training = trainingList.get(position);
+            if (isDisplayTrainingId) {
+                //dev use
+                holder.id.setVisibility(View.VISIBLE);
+                holder.id.setText(training.getId().substring(training.getId().length() - 7));
+            }
+            holder.description.setText(training.getDescription());
+            holder.level.setText((training.getLevel() == null ? "" : training.getLevel().toString()));
+            holder.duration.setText(String.valueOf(training.getDuration()));
+            holder.trainingDate.setText(dateFormatter.format(training.getTrainingDate()));
+            holder.trainingTime.setText(timeFormatter.format(training.getTrainingDate()));
+            holder.trainingCreationDate.setText("CREATION DATE: " + dateFormatter.format(training.getCreationDate()));
+            holder.numberOfParticipates.setText("OF " + training.getMaxNumberOfParticipants());
+            holder.numberOfJoinedParticipates.setText("" + training.getCurrentNumberOfParticipants());
+
+        } catch (Exception e) {
+            CMNLogHelper.logError("BETrainingAdapter", e.getMessage());
         }
-        holder.description.setText(training.getDescription());
-        holder.level.setText(training.getLevel().toString());
-        holder.duration.setText(String.valueOf(training.getDuration()));
-        holder.trainingDate.setText( dateFormatter.format(training.getTrainingDate()));
-        holder.trainingTime.setText( timeFormatter.format(training.getTrainingDate()));
-        holder.trainingCreationDate.setText("CREATION DATE: " + dateFormatter.format(training.getCreationDate()));
-        holder.numberOfParticipates.setText("OF " +training.getMaxNumberOfParticipants());
-        holder.numberOfJoinedParticipates.setText("" +training.getCurrentNumberOfParticipants());
     }
 
     @Override

@@ -18,8 +18,8 @@
         android:id="@+id/training_list_my_training_header_title_tb"
         android:layout_width="match_parent"
         android:textSize="9dp"
-        android:textOn="My created trainings"
-        android:textOff="My joined trainings"
+        android:textOn="Created trainings"
+        android:textOff="Joined trainings"
         android:layout_height="45dp"
         android:layout_weight="4"/>
 </LinearLayout>

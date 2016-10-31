@@ -217,7 +217,7 @@ public class TrainingsListActivity extends BaseActivity implements View.OnClickL
             if (response != null) {
                 if (response.getStatus() == BEResponseStatusEnum.error) {
                     CMNLogHelper.logError("TrainingsListActivity", "error in get trainings callback | err:" + response.getMessage());
-                    //toast here
+                    Toast.makeText(_getAppContext(), "Error while retrieving trainings data, please try again later.", Toast.LENGTH_LONG).show();
                 } else if (response.getEntityType() == BETypesEnum.Trainings) {
                     if (response.getActionType() == DALActionTypeEnum.getAllTrainings) {
                         if (isMyTrainingMode) {
@@ -242,14 +242,13 @@ public class TrainingsListActivity extends BaseActivity implements View.OnClickL
                             trainingAdapter.setTrainingList(trainingsList);
                             trainingAdapter.notifyDataSetChanged();
 
-                        } else {
-                            //todo fix error
-                            CMNLogHelper.logError("TrainingsListActivity", "wrong action type in get trainings callback - getMyTrainings");
                         }
-
+                    }
+                    else {
+                        CMNLogHelper.logError("TrainingsListActivity", "wrong action type in callback" + response.getActionType());
                     }
                 } else {
-                    CMNLogHelper.logError("TrainingsListActivity", "wrong action type in callback" + response.getEntityType());
+                    CMNLogHelper.logError("TrainingsListActivity", "wrong entity type in callback" + response.getEntityType());
                 }
             }
 

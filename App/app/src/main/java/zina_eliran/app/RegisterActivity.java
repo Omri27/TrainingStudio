@@ -100,9 +100,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
 
                     registerBtn.setEnabled(false);
                     //set spinner on
-                    //TODO Eiran - add async task here
                     pBar.setVisibility(View.VISIBLE);
-
                     sApi.setActionResponse(null);
 
                     //register user into db. a user update view

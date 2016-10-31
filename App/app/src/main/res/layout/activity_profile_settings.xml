@@ -4,7 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/app_bg1"
-    android:layoutDirection="ltr"
     android:orientation="vertical"
     tools:context="zina_eliran.app.ProfileSettingsActivity">
 
@@ -37,7 +36,8 @@
 
             <ImageButton
                 android:id="@+id/profile_settings_my_picture_ibtn"
-                android:layout_width="100dp"
+                android:layout_width="110dp"
+                android:background="@drawable/app_profile_settings_icon"
                 android:layout_height="100dp" />
 
             <LinearLayout
@@ -108,9 +108,11 @@
                 android:layout_marginTop="25dp"
                 android:background="#ffffff"
                 android:hint="Country"
+                android:text="Israel"
                 android:paddingLeft="20dp"
                 android:textColor="#000000"
-                android:textColorHint="#555555" />
+                android:textColorHint="#555555"
+                android:enabled="false"/>
 
             <View
                 android:layout_width="match_parent"
@@ -132,15 +134,19 @@
                 android:layout_height="2dp"
                 android:background="#00000000" />
 
-            <EditText
-                android:id="@+id/profile_settings_level_et"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
+                android:layout_height="match_parent"
                 android:background="#ffffff"
-                android:hint="Level"
-                android:paddingLeft="20dp"
-                android:textColor="#000000"
-                android:textColorHint="#555555" />
+                android:layout_weight="1">
+
+                <Spinner
+                    android:id="@+id/profile_settings_level_spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@null"></Spinner>
+
+            </LinearLayout>
 
             <View
                 android:layout_width="match_parent"
@@ -154,20 +160,23 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="50dp"
                     android:orientation="horizontal">
 
-                    <EditText
-                        android:id="@+id/profile_settings_age_et"
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="50dp"
-                        android:layout_marginRight="1dp"
-                        android:layout_weight="1"
+                        android:layout_height="match_parent"
                         android:background="#ffffff"
-                        android:hint="Age"
-                        android:paddingLeft="20dp"
-                        android:textColor="#000000"
-                        android:textColorHint="#555555" />
+                        android:layout_weight="1">
+
+                        <Spinner
+                            android:id="@+id/profile_settings_age_spinner"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:background="@null"></Spinner>
+
+                    </LinearLayout>
+
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -180,9 +189,9 @@
                         <ImageView
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:layout_weight="3"
-                            android:paddingBottom="5dp"
-                            android:paddingTop="5dp"
+                            android:layout_weight="4"
+                            android:paddingBottom="8dp"
+                            android:paddingTop="8dp"
                             android:src="@drawable/app_man_icon" />
 
 
@@ -205,9 +214,9 @@
                         <ImageView
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:layout_weight="3"
-                            android:paddingBottom="5dp"
-                            android:paddingTop="5dp"
+                            android:layout_weight="4"
+                            android:paddingBottom="8dp"
+                            android:paddingTop="8dp"
                             android:src="@drawable/app_woman_icon" />
 
                     </LinearLayout>
@@ -222,32 +231,36 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="50dp"
                     android:orientation="horizontal">
 
-                    <EditText
-                        android:id="@+id/profile_settings_height_et"
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="50dp"
-                        android:layout_marginRight="1dp"
-                        android:layout_weight="1"
+                        android:layout_height="match_parent"
                         android:background="#ffffff"
-                        android:hint="Height"
-                        android:paddingLeft="20dp"
-                        android:textColor="#000000"
-                        android:textColorHint="#555555" />
+                        android:layout_weight="1">
 
-                    <EditText
-                        android:id="@+id/profile_settings_weight_et"
+                        <Spinner
+                            android:id="@+id/profile_settings_height_spinner"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:background="@null"></Spinner>
+
+                    </LinearLayout>
+
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="50dp"
-                        android:layout_marginLeft="2dp"
-                        android:layout_weight="1"
+                        android:layout_height="match_parent"
                         android:background="#ffffff"
-                        android:hint="Weight"
-                        android:paddingLeft="20dp"
-                        android:textColor="#000000"
-                        android:textColorHint="#555555" />
+                        android:layout_weight="1">
+
+                        <Spinner
+                            android:id="@+id/profile_settings_weight_spinner"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:background="@null"></Spinner>
+
+                    </LinearLayout>
 
                 </LinearLayout>
 
@@ -256,34 +269,140 @@
                     android:layout_height="2dp"
                     android:background="#00000000" />
 
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="25dp"
+                    android:layout_marginBottom="20dp"
+                    android:background="#eeFF6600" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:textSize="18dp"
+                        android:textStyle="bold"
+                        android:textColor="#ffffff"
+                        android:text="Preferred training days:"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="15dp"
+                        android:orientation="horizontal">
+
+                        <CheckBox android:id="@+id/profile_settings_saturday_check_box"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Saturday"/>
+
+                        <CheckBox android:id="@+id/profile_settings_sunday_check_box"
+                            android:layout_width="wrap_content"
+                            android:layout_height="20dp"
+                            android:text="Sonday"
+                            android:textColor="#ffffff"/>
+
+                        <CheckBox android:id="@+id/profile_settings_monday_check_box"
+                            android:layout_width="wrap_content"
+                            android:layout_height="20dp"
+                            android:text="Monday"
+                            android:textColor="#ffffff"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="15dp"
+                        android:orientation="horizontal">
+
+                        <CheckBox android:id="@+id/profile_settings_tuesday_check_box"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Tuesday"/>
+
+                        <CheckBox android:id="@+id/profile_settings_wednesday_check_box"
+                            android:layout_width="wrap_content"
+                            android:layout_height="20dp"
+                            android:text="Wednesday"
+                            android:textColor="#ffffff"/>
+
+                        <CheckBox android:id="@+id/profile_settings_thursday_check_box"
+                            android:layout_width="wrap_content"
+                            android:layout_height="20dp"
+                            android:text="Thursday"
+                            android:textColor="#ffffff"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="15dp"
+                        android:orientation="horizontal">
+
+                        <CheckBox android:id="@+id/profile_settings_friday_check_box"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Friday"/>
+
+                    </LinearLayout>
+
+
+
+                </LinearLayout>
+
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="25dp"
+                    android:layout_marginBottom="20dp"
+                    android:background="#eeFF6600" />
+
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="horizontal">
+                    android:orientation="vertical">
 
-                    <EditText
-                        android:id="@+id/profile_settings_preferred_days_et"
+                    <TextView
                         android:layout_width="match_parent"
-                        android:layout_height="50dp"
-                        android:layout_marginRight="1dp"
-                        android:layout_weight="1"
-                        android:background="#ffffff"
-                        android:hint="Pref Days"
-                        android:paddingLeft="20dp"
-                        android:textColor="#000000"
-                        android:textColorHint="#555555" />
+                        android:layout_height="match_parent"
+                        android:textSize="18dp"
+                        android:textStyle="bold"
+                        android:textColor="#ffffff"
+                        android:text="Preferred training hours:"/>
 
-                    <EditText
-                        android:id="@+id/profile_settings_preferred_hours_et"
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="50dp"
-                        android:layout_marginLeft="2dp"
-                        android:layout_weight="1"
-                        android:background="#ffffff"
-                        android:hint="Pref Hours"
-                        android:paddingLeft="20dp"
-                        android:textColor="#000000"
-                        android:textColorHint="#555555" />
+                        android:layout_height="wrap_content"
+                        android:paddingTop="15dp"
+                        android:orientation="vertical">
+
+                        <CheckBox android:id="@+id/profile_settings_first_cycle_hours_check_box"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="06:00-12:00"/>
+
+                        <CheckBox android:id="@+id/profile_settings_second_cycle_hours_check_box"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="12:00-18:00"/>
+
+                        <CheckBox android:id="@+id/profile_settings_third_cycle_hours_check_box"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="18:00-00:00"/>
+
+                    </LinearLayout>
+
+
 
                 </LinearLayout>
 

@@ -3,12 +3,16 @@ package zina_eliran.app;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.content.Context;
+import android.view.View;
 
 import com.firebase.client.Firebase;
 
+import java.util.Locale;
 import java.util.Map;
 
 import zina_eliran.app.API.DAL;
@@ -37,6 +41,16 @@ public class BaseActivity extends AppCompatActivity {
         //create the Shared Preferences read/write objects
         preferences = getSharedPreferences(appPreferences, 0);
         editor = preferences.edit();
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        //"force" LTR alignment
+        String languageToLoad  = "en"; // your language
+        Locale locale = new Locale(languageToLoad);
+        Locale.setDefault(locale);
+        Configuration config = new Configuration();
+        config.locale = locale;
+        getBaseContext().getResources().updateConfiguration(config,
+                getBaseContext().getResources().getDisplayMetrics());
 
         //run this once when you want to "init" the registration process
         //clearSharedPreferences();
@@ -137,6 +151,5 @@ public class BaseActivity extends AppCompatActivity {
     public String _getString(int key) {
         return appContext.getString(key);
     }
-
 
 }

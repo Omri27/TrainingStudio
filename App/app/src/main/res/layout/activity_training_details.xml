@@ -4,7 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/app_bg2"
-    android:layoutDirection="ltr"
     android:orientation="vertical"
     tools:context="zina_eliran.app.TrainingDetailsActivity">
 
@@ -154,15 +153,22 @@
                         </LinearLayout>
 
 
-
                 </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="17dp"
+                    android:background="#eeFF6600" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginTop="20dp"
                     android:layout_marginLeft="4dp"
+                    android:layout_marginBottom="5dp"
                     android:textSize="18dp"
+                    android:textStyle="bold"
                     android:textColor="#ffffff"
                     android:text="Training location:"/>
 

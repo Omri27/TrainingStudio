@@ -4,7 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/app_intro_bg"
-    android:layoutDirection="ltr"
     android:orientation="vertical"
     tools:context="zina_eliran.app.RegisterActivity">
 

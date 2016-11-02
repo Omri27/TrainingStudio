@@ -33,7 +33,7 @@ public class BaseActivity extends AppCompatActivity {
     Context appContext;
     Intent intent;
     DateFormat dateFormatter = new SimpleDateFormat("dd/MM/yy");
-    DateFormat timeFormatter = new SimpleDateFormat("hh:mm");
+    DateFormat timeFormatter = new SimpleDateFormat("kk:mm"); //kk = 1-24
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +57,7 @@ public class BaseActivity extends AppCompatActivity {
                 getBaseContext().getResources().getDisplayMetrics());
 
         //run this once when you want to "init" the registration process
-        //clearSharedPreferences();
+        clearSharedPreferences();
     }
 
 

@@ -16,10 +16,17 @@ public class TimePickerFragment extends DialogFragment
         implements TimePickerDialog.OnTimeSetListener {
 
     DateTimeFragmentHandler activity;
+    Calendar c;
 
-    public TimePickerFragment(DateTimeFragmentHandler activity) {
+    public TimePickerFragment(DateTimeFragmentHandler activity, Calendar c) {
         super();
         this.activity = activity;
+        if(c == null){
+            this.c  = Calendar.getInstance();
+        }
+        else {
+            this.c = (Calendar)c.clone();
+        }
     }
 
     public TimePickerFragment() {
@@ -29,7 +36,6 @@ public class TimePickerFragment extends DialogFragment
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // Use the current time as the default values for the picker
-        final Calendar c = Calendar.getInstance();
         int hour = c.get(Calendar.HOUR_OF_DAY);
         int minute = c.get(Calendar.MINUTE);
 

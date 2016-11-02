@@ -129,7 +129,7 @@ public class ServerAPI {
                 if (!training.getCreatorId().equals(userId) ||
                         (training.getPatricipatedUserIds().contains(userId)) &&
                         (training.getStatus() != BETrainingStatusEnum.cancelled) &&
-                                (training.getTrainingDate().after(new Date()))) {
+                                (training.getTrainingDateTimeCalender().after(new Date()))) {
                     publicTrainings.add(((BETraining) trainings.get(i)));
 //                    CMNLogHelper.logError("publicTrainings", trainings.get(i).toString());
                 }

@@ -22,11 +22,10 @@ import zina_eliran.app.Utils.FireBaseHandler;
  */
 
 public class JoinLeaveThread implements FireBaseHandler {
-    private static BETraining training;
-    private static BEUser user;
-    private static boolean isOperationCompleted;
-    private static FireBaseHandler fb;
-    private static DALActionTypeEnum action;
+    private  BETraining training;
+    private  BEUser user;
+    private  FireBaseHandler fb;
+    private  DALActionTypeEnum action;
 
     public JoinLeaveThread(FireBaseHandler fb,DALActionTypeEnum action ){
         this.fb = fb;
@@ -51,12 +50,14 @@ public class JoinLeaveThread implements FireBaseHandler {
 
     private void startJoinLeaveOperation(BETraining training, BEUser user) {
         BEResponseStatusEnum actionStatus = BEResponseStatusEnum.success;
+        String message = "";
         if (action == DALActionTypeEnum.joinTraining && canJoin(training, user))
             joinOperation(training, user);
         else if (action == DALActionTypeEnum.leaveTraining && canLeave(training,user))
             leaveOperation(training,user);
         else {
             actionStatus = BEResponseStatusEnum.error;
+            message = action.toString() + " failed, action cannot be performed";
         }
 
 
@@ -77,11 +78,16 @@ public class JoinLeaveThread implements FireBaseHandler {
         res.setStatus(actionStatus);
         res.setActionType(action);
         res.setEntities(e);
-        CMNLogHelper.logError("Training" +action.toString() , " " + training.getId() + " User " + user.getId());
+        res.setMessage(message);
+
+        //For test
         CMNLogHelper.logError("Response ", res.toString());
 
         if (fb != null)
             fb.onActionCallback(res);
+
+        training = null;
+        user = null;
 
     }
 
@@ -123,7 +129,7 @@ public class JoinLeaveThread implements FireBaseHandler {
         //check if training is valid for join
         if (training.getMaxNumberOfParticipants() == training.getCurrentNumberOfParticipants()
                 || training.getStatus() == BETrainingStatusEnum.cancelled
-                || training.getTrainingDate().after(new Date())
+                || training.getTrainingDateTimeCalender().after(new Date())
                 || training.getPatricipatedUserIds().contains(user.getId())){
             canJoin = false;
         }

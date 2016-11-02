@@ -57,6 +57,7 @@ public class UpdateTransactionHandler implements Transaction.Handler {
 
             //Fetch training from DB and save as oldTraining
             originalTraining =  mutableData.getValue(BETraining.class);
+            CMNLogHelper.logError("TransactionUpdate", originalTraining.toString());
 
             //Override flags fields and training status on each run
             overrideTrainingFields(mutableData);
@@ -135,7 +136,7 @@ public class UpdateTransactionHandler implements Transaction.Handler {
     public ArrayList<String> mergeLists(ArrayList<String> oldList, String userID) {
         if (action == DALActionTypeEnum.joinTraining)
             oldList.add(userID);
-        else
+        else if (action == DALActionTypeEnum.leaveTraining)
             oldList.remove(userID);
         return oldList;
     }

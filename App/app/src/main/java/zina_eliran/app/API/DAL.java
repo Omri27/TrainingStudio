@@ -50,20 +50,11 @@ public class DAL {
 
 
     public static void createTraining(BETraining training, FireBaseHandler fireBaseHandler) {
-
-//        try {
-//            Thread.sleep(5000);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-
-
         if (training != null) {
             createObject(BETypesEnum.Trainings, DALActionTypeEnum.createTraining, training, fireBaseHandler);
         } else {
             cannotPerformAction(fireBaseHandler, DALActionTypeEnum.createTraining, "Cannot create null training");
         }
-
 
     }
 
@@ -133,25 +124,6 @@ public class DAL {
                 userRef.addListenerForSingleValueEvent(listenerUser);
                 trainingRef.addListenerForSingleValueEvent(listenerTraining);
 
-                //Get relevant data from listener
-//                BEUser user = (BEUser)listenerUser.getObject();
-//                BETraining training = (BETraining)listenerTraining.getObject();
-//                CMNLogHelper.logError("joinTraining-user", user.toString());
-//                CMNLogHelper.logError("joinTraining-training", training.toString());
-//
-//                //Update objects with new IDs
-//                if (user != null && training != null){
-//                    user.addTrainingToTrainingList(trainingId);
-//                    training.addUserToUsersList(userId);
-//                    //Update changes in DB
-//                    updateTraining(training, fireBaseHandler);
-//                    updateUser(user, fireBaseHandler);
-//                }
-//
-//                //Save objects in DB and return response via setActionResponce
-//                updateTraining(training, null);
-//                updateUser(user, null);
-
             } else
                 cannotPerformAction(fireBaseHandler, DALActionTypeEnum.joinTraining, "One of the parameters invalid");
         } catch (Exception e) {
@@ -179,18 +151,11 @@ public class DAL {
             } else
                 cannotPerformAction(fireBaseHandler, DALActionTypeEnum.joinTraining, "One of the parameters invalid");
         } catch (Exception e) {
-            CMNLogHelper.logError("joinTraining", e.getMessage());
+            CMNLogHelper.logError("leaveTraining", e.getMessage());
         }
     }
 
 
-
-    public static void joinTraining(BETraining training, BEUser user, FireBaseHandler fireBaseHandler){
-        UpdateTransactionHandler update = new UpdateTransactionHandler(BETypesEnum.Trainings ,DALActionTypeEnum.joinTraining,
-                fireBaseHandler, user, training );
-        Firebase specificObject = trainingsRef.child(training.getId());
-        specificObject.runTransaction(update);
-    }
     //////////////////////////////////////////////////////////////////
     //////////// Generic DAL actions /////////////////////////////////
 
@@ -262,47 +227,47 @@ public class DAL {
         }
     }
 
-    private static void updateObjectWithTransaction(BETypesEnum objectType, DALActionTypeEnum action, final BEBaseEntity object, FireBaseHandler fbHandler){
-        Firebase ref = rootRef.child(objectType.toString());
-        Firebase specificObject = ref.child(object.getId()); //.child("currentNumberOfParticipants");
-        specificObject.runTransaction(new Transaction.Handler() {
-            @Override
-            public Transaction.Result doTransaction(MutableData mutableData) {
-//                try{
-//                    Thread.sleep(3000);
-//                }
-//                catch (Exception e){
+//    private static void updateObjectWithTransaction(BETypesEnum objectType, DALActionTypeEnum action, final BEBaseEntity object, FireBaseHandler fbHandler){
+//        Firebase ref = rootRef.child(objectType.toString());
+//        Firebase specificObject = ref.child(object.getId()); //.child("currentNumberOfParticipants");
+//        specificObject.runTransaction(new Transaction.Handler() {
+//            @Override
+//            public Transaction.Result doTransaction(MutableData mutableData) {
+////                try{
+////                    Thread.sleep(3000);
+////                }
+////                catch (Exception e){
+////
+////                }
 //
+//                BETraining obj = (BETraining)mutableData.getValue();
+////                BETraining obj =  mutableData.getValue(BETraining.class);
+//                boolean hasChild = mutableData.hasChildren();
+//
+//                String key = mutableData.getKey();
+//                if(obj != null){
+//                    CMNLogHelper.logError("TRANSACTION", mutableData.toString());
+////                    BETraining obj =  mutableData.getValue(BETraining.class);
+//                    if (mutableData.getValue(Integer.class) == 0)
+//                        mutableData.setValue(11);
+//                    CMNLogHelper.logError("UpdateTransaction", "update participants");
+//                    return Transaction.success(mutableData);
 //                }
-
-                BETraining obj = (BETraining)mutableData.getValue();
-//                BETraining obj =  mutableData.getValue(BETraining.class);
-                boolean hasChild = mutableData.hasChildren();
-
-                String key = mutableData.getKey();
-                if(obj != null){
-                    CMNLogHelper.logError("TRANSACTION", mutableData.toString());
-//                    BETraining obj =  mutableData.getValue(BETraining.class);
-                    if (mutableData.getValue(Integer.class) == 0)
-                        mutableData.setValue(11);
-                    CMNLogHelper.logError("UpdateTransaction", "update participants");
-                    return Transaction.success(mutableData);
-                }
-                else {
-
-                    CMNLogHelper.logError("UpdateTransaction", "update participants failed");
-                    return Transaction.abort();
-                }
-
-            }
-
-            @Override
-            public void onComplete(FirebaseError firebaseError, boolean b, DataSnapshot dataSnapshot) {
-                CMNLogHelper.logError("Update Transaction", dataSnapshot.toString());
-                CMNLogHelper.logError("UpdateTransaction", "completed");
-            }
-        });
-    }
+//                else {
+//
+//                    CMNLogHelper.logError("UpdateTransaction", "update participants failed");
+//                    return Transaction.abort();
+//                }
+//
+//            }
+//
+//            @Override
+//            public void onComplete(FirebaseError firebaseError, boolean b, DataSnapshot dataSnapshot) {
+//                CMNLogHelper.logError("Update Transaction", dataSnapshot.toString());
+//                CMNLogHelper.logError("UpdateTransaction", "completed");
+//            }
+//        });
+//    }
 
 
     private static void getObject(BETypesEnum objectType, DALActionTypeEnum action, String uid, FireBaseHandler fireBaseHandler) {
@@ -383,12 +348,12 @@ public class DAL {
     public static void tests(FireBaseHandler fireBaseHandler) {
 
         //Create user test
-        BEUser user = new BEUser();
-        user.setEmail("owner@whatever.com");
-        user.setName("onwer");
-        user.setActive(true);
-        CMNLogHelper.logError("Create-user", "test");
-        registerUser(user, fireBaseHandler);
+//        BEUser user = new BEUser();
+//        user.setEmail("test@whatever.com");
+//        user.setName("test");
+//        user.setActive(true);
+//        CMNLogHelper.logError("Create-user", "test");
+//        registerUser(user, fireBaseHandler);
 
         //Find user by id test
 
@@ -409,20 +374,22 @@ public class DAL {
 
 
         //Create training test
-        BETraining t = new BETraining();
-        t.setName("NewTestTraining");
-        t.setCreatorId("-KVZtKZSHHRhhEyb8XOv");
-        t.setTrainingDate(new Date());
-        t.setCurrentNumberOfParticipants(1);
-        t.setDescription("NewTraining");
-        t.setLevel(BETrainingLevelEnum.Beginner);
-        t.setStatus(BETrainingStatusEnum.open);
-        t.setDuration(45);
-        t.setTrainingFullNotificationFlag(true);
-        t.setJoinTrainingNotificationFlag(true);
-        t.setMaxNumberOfParticipants(5);
-        CMNLogHelper.logError("Create-training", "test");
-        createTraining(t, fireBaseHandler);
+//        BETraining t = new BETraining();
+//        t.setName("NewTestTraining");
+//        t.setCreatorId("-KVZtKZSHHRhhEyb8XOv");
+//        Calendar cal = Calendar.getInstance();
+//        cal.set(2016,11,15,16,00);
+//        t.setTrainingDateTimeCalender(cal);
+//        t.setCurrentNumberOfParticipants(1);
+//        t.setDescription("NewTraining");
+//        t.setLevel(BETrainingLevelEnum.Beginner);
+//        t.setStatus(BETrainingStatusEnum.open);
+//        t.setDuration(45);
+//        t.setTrainingFullNotificationFlag(true);
+//        t.setJoinTrainingNotificationFlag(true);
+//        t.setMaxNumberOfParticipants(5);
+//        CMNLogHelper.logError("Create-training", "test");
+//        createTraining(t, fireBaseHandler);
 
 
 
@@ -439,17 +406,17 @@ public class DAL {
 
 
         //join training
-        CMNLogHelper.logError("JOIN TRAINING", "test1");
-        joinTraining(t.getId(), user.getId(), fireBaseHandler);
-
-        CMNLogHelper.logError("JOIN TRAINING", "test2");
-        joinTraining(t.getId(), "-KV_-5FxpqKiqo5hWz9h", fireBaseHandler);
+//        CMNLogHelper.logError("JOIN TRAINING", "test1");
+//        joinTraining(t.getId(), user.getId(), fireBaseHandler);
+//
+//        CMNLogHelper.logError("JOIN TRAINING", "test2");
+//        joinTraining(t.getId(), "-KV_-5FxpqKiqo5hWz9h", fireBaseHandler);
 
 
 
         //join training
-        CMNLogHelper.logError("Leave TRAINING", "test1");
-        leaveTraining(t.getId(), "-KV_-5FxpqKiqo5hWz9h", fireBaseHandler);
+//        CMNLogHelper.logError("Leave TRAINING", "test1");
+//        leaveTraining(t.getId(), "-KV_-5FxpqKiqo5hWz9h", fireBaseHandler);
 
         //get all public trainings
 //        CMNLogHelper.logError("GET ALL TRAININGS", "test");

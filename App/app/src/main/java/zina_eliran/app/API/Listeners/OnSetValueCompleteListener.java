@@ -46,10 +46,10 @@ public class OnSetValueCompleteListener implements Firebase.CompletionListener{
         else {
             response.setStatus(BEResponseStatusEnum.success);
             response.setEntities(entities);
-            CMNLogHelper.logError("OnComplete", firebase.toString());
+//            CMNLogHelper.logError("OnComplete", firebase.toString());
 
             //Print object after DB update
-            CMNLogHelper.logError("OnSetValue-forward", entities.get(0).toString());
+//            CMNLogHelper.logError("OnSetValue-forward", entities.get(0).toString());
         }
 
         //No callback if Handler is null

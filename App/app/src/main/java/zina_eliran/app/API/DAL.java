@@ -1,5 +1,7 @@
 package zina_eliran.app.API;
 
+import android.app.backup.RestoreObserver;
+
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
@@ -11,12 +13,16 @@ import java.util.Date;
 
 import zina_eliran.app.API.EmailSender.EmailSendThread;
 import zina_eliran.app.API.EmailSender.EmailSender;
+import zina_eliran.app.API.Listeners.JoinLeaveThread;
 import zina_eliran.app.API.Listeners.OnSetValueCompleteListener;
 import zina_eliran.app.API.Listeners.GetBEObjectEventListener;
+import zina_eliran.app.API.Listeners.UpdateTransactionHandler;
 import zina_eliran.app.BusinessEntities.BEBaseEntity;
 import zina_eliran.app.BusinessEntities.BEResponse;
 import zina_eliran.app.BusinessEntities.BEResponseStatusEnum;
 import zina_eliran.app.BusinessEntities.BETraining;
+import zina_eliran.app.BusinessEntities.BETrainingLevelEnum;
+import zina_eliran.app.BusinessEntities.BETrainingStatusEnum;
 import zina_eliran.app.BusinessEntities.BETypesEnum;
 import zina_eliran.app.BusinessEntities.BEUser;
 import zina_eliran.app.BusinessEntities.CMNLogHelper;
@@ -46,11 +52,11 @@ public class DAL {
 
     public static void createTraining(BETraining training, FireBaseHandler fireBaseHandler) {
 
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            Thread.sleep(5000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
 
 
         if (training != null) {
@@ -111,29 +117,24 @@ public class DAL {
 
     //*
     public static void joinTraining(String trainingId, String userId, FireBaseHandler fireBaseHandler) {
-        //Ask Eliran if he can send objects instead of IDs, then i can just run update
         try {
             if (trainingId != null && userId != null) {
                 //Create DB reference
                 Firebase userRef = usersRef.child(userId);
                 Firebase trainingRef = trainingsRef.child(trainingId);
 
-//            if (trainingId != null && userId != null){
-//                //Create DB reference
-//                Firebase userRef = usersRef.child(userId);
-//                Firebase trainingRef = trainingsRef.child(trainingId);
-//
-//                //Set up listeners
-//
-//                //Save objects in DB and return response via  GetBEObjectEventListener listenerUser = new GetBEObjectEventListener(ReadDataTypeEnum.user, false);
-//                GetBEObjectEventListener listenerTraining = new GetBEObjectEventListener(BETypesEnum.Trainings, null, DALActionTypeEnum.getTraining );
-//                GetBEObjectEventListener listenerUser = new GetBEObjectEventListener(BETypesEnum.Users, null, DALActionTypeEnum.getUser );
-//
-//                //Add listeners to DB references
-//                userRef.addListenerForSingleValueEvent(listenerUser);
-//                trainingRef.addListenerForSingleValueEvent(listenerTraining);
-//
-//                //Get relevant data from listener
+                //Set up listeners
+                JoinLeaveThread joinLeaveThread = new JoinLeaveThread(fireBaseHandler, DALActionTypeEnum.joinTraining);
+
+                //Get objects from DB
+                GetBEObjectEventListener listenerTraining = new GetBEObjectEventListener(BETypesEnum.Trainings, joinLeaveThread, DALActionTypeEnum.getTraining );
+                GetBEObjectEventListener listenerUser = new GetBEObjectEventListener(BETypesEnum.Users, joinLeaveThread, DALActionTypeEnum.getUser );
+
+                //Add listeners to DB references
+                userRef.addListenerForSingleValueEvent(listenerUser);
+                trainingRef.addListenerForSingleValueEvent(listenerTraining);
+
+                //Get relevant data from listener
 //                BEUser user = (BEUser)listenerUser.getObject();
 //                BETraining training = (BETraining)listenerTraining.getObject();
 //                CMNLogHelper.logError("joinTraining-user", user.toString());
@@ -159,7 +160,38 @@ public class DAL {
         }
     }
 
+    public static void leaveTraining(String trainingId, String userId, FireBaseHandler fireBaseHandler) {
+        try {
+            if (trainingId != null && userId != null) {
+                //Create DB reference
+                Firebase userRef = usersRef.child(userId);
+                Firebase trainingRef = trainingsRef.child(trainingId);
 
+                //Set up listeners
+                JoinLeaveThread joinLeaveThread = new JoinLeaveThread(fireBaseHandler, DALActionTypeEnum.leaveTraining);
+
+                //Get objects from DB
+                GetBEObjectEventListener listenerTraining = new GetBEObjectEventListener(BETypesEnum.Trainings, joinLeaveThread, DALActionTypeEnum.getTraining );
+                GetBEObjectEventListener listenerUser = new GetBEObjectEventListener(BETypesEnum.Users, joinLeaveThread, DALActionTypeEnum.getUser );
+
+                //Add listeners to DB references
+                userRef.addListenerForSingleValueEvent(listenerUser);
+                trainingRef.addListenerForSingleValueEvent(listenerTraining);
+            } else
+                cannotPerformAction(fireBaseHandler, DALActionTypeEnum.joinTraining, "One of the parameters invalid");
+        } catch (Exception e) {
+            CMNLogHelper.logError("joinTraining", e.getMessage());
+        }
+    }
+
+
+
+    public static void joinTraining(BETraining training, BEUser user, FireBaseHandler fireBaseHandler){
+        UpdateTransactionHandler update = new UpdateTransactionHandler(BETypesEnum.Trainings ,DALActionTypeEnum.joinTraining,
+                fireBaseHandler, user, training );
+        Firebase specificObject = trainingsRef.child(training.getId());
+        specificObject.runTransaction(update);
+    }
     //////////////////////////////////////////////////////////////////
     //////////// Generic DAL actions /////////////////////////////////
 
@@ -222,7 +254,7 @@ public class DAL {
                 objectRef.setValue(object, listener);
                 CMNLogHelper.logError("DAL", "Object updated" + object.toString());
             } else {
-                cannotPerformAction(fbHandler, action, "Could not update training");
+                cannotPerformAction(fbHandler, action, "Could not update object");
             }
 
         } catch (Exception e) {
@@ -231,29 +263,43 @@ public class DAL {
         }
     }
 
-    private static void updateObjectWithTransaction(BETypesEnum objectType, DALActionTypeEnum action, BEBaseEntity object, FireBaseHandler fbHandler){
+    private static void updateObjectWithTransaction(BETypesEnum objectType, DALActionTypeEnum action, final BEBaseEntity object, FireBaseHandler fbHandler){
         Firebase ref = rootRef.child(objectType.toString());
-        Firebase specificOnject = ref.child(object.getId());
-        specificOnject.runTransaction(new Transaction.Handler() {
+        Firebase specificObject = ref.child(object.getId()); //.child("currentNumberOfParticipants");
+        specificObject.runTransaction(new Transaction.Handler() {
             @Override
             public Transaction.Result doTransaction(MutableData mutableData) {
-                if(mutableData.getValue() != null){
+//                try{
+//                    Thread.sleep(3000);
+//                }
+//                catch (Exception e){
+//
+//                }
+
+                BETraining obj = (BETraining)mutableData.getValue();
+//                BETraining obj =  mutableData.getValue(BETraining.class);
+                boolean hasChild = mutableData.hasChildren();
+
+                String key = mutableData.getKey();
+                if(obj != null){
                     CMNLogHelper.logError("TRANSACTION", mutableData.toString());
-                    BETraining obj =  mutableData.getValue(BETraining.class);
-                    MutableData numOfParticipants = mutableData.child("currentNumberOfParticipants");
-                    if (numOfParticipants.getValue(Integer.class) == 0)
-                        numOfParticipants.setValue(5);
+//                    BETraining obj =  mutableData.getValue(BETraining.class);
+                    if (mutableData.getValue(Integer.class) == 0)
+                        mutableData.setValue(11);
                     CMNLogHelper.logError("UpdateTransaction", "update participants");
                     return Transaction.success(mutableData);
                 }
-                else
+                else {
+
                     CMNLogHelper.logError("UpdateTransaction", "update participants failed");
                     return Transaction.abort();
+                }
 
             }
 
             @Override
             public void onComplete(FirebaseError firebaseError, boolean b, DataSnapshot dataSnapshot) {
+                CMNLogHelper.logError("Update Transaction", dataSnapshot.toString());
                 CMNLogHelper.logError("UpdateTransaction", "completed");
             }
         });
@@ -298,6 +344,40 @@ public class DAL {
     }
 
 
+    private static void onActionCallback(BEResponse response, String trainingID, String userID){
+        if (response != null && response.getStatus() == BEResponseStatusEnum.success){
+            if (response.getActionType() == DALActionTypeEnum.joinTraining && response.getEntities().get(0) != null){
+                BETraining trainingFromDB = (BETraining)response.getEntities().get(0);
+                int curremtNumOfParticipants = trainingFromDB.getCurrentNumberOfParticipants();
+                if (trainingFromDB.getMaxNumberOfParticipants() < curremtNumOfParticipants) {
+                    trainingFromDB.setCurrentNumberOfParticipants(curremtNumOfParticipants++);
+                    if (!trainingFromDB.getPatricipatedUserIds().contains(userID))
+                        trainingFromDB.getPatricipatedUserIds().add(userID);
+                    else
+                        CMNLogHelper.logError("JOIN", "object already exists");
+                }
+                else
+                    CMNLogHelper.logError("JOIN", "Reached max capasity");
+
+
+            }
+            else if (response.getActionType() == DALActionTypeEnum.leaveTraining && response.getEntities().get(0) != null){
+                BETraining trainingFromDB = (BETraining)response.getEntities().get(0);
+                int curremtNumOfParticipants = trainingFromDB.getCurrentNumberOfParticipants();
+                if (curremtNumOfParticipants > 0) {
+                    trainingFromDB.setCurrentNumberOfParticipants(curremtNumOfParticipants--);
+                    if (trainingFromDB.getPatricipatedUserIds().contains(userID))
+                        trainingFromDB.getPatricipatedUserIds().remove(userID);
+                    else
+                        CMNLogHelper.logError("Leave", "object does not exist");
+                }
+                else
+                    CMNLogHelper.logError("JOIN", "Reached max capasity");
+            }
+        }
+    }
+
+
     ////////////////////////////////////////////////////////////////
     //Zina's tests
 
@@ -305,63 +385,90 @@ public class DAL {
 
         //Create user test
         BEUser user = new BEUser();
-        user.setEmail("llaaa@whatever.com");
-        user.setName("lala");
+        user.setEmail("owner@whatever.com");
+        user.setName("onwer");
+        user.setActive(true);
         CMNLogHelper.logError("Create-user", "test");
         registerUser(user, fireBaseHandler);
 
         //Find user by id test
 
 //        BEUser getUser = getUserByUID(user.getId(), fireBaseHandler);
-        getUserByUID(user.getId(), fireBaseHandler);
-//        CMNLogHelper.logError("GET USER", getUser.toString());
-        CMNLogHelper.logError("GET USER", "tsts");
-        getUserByUID(user.getId(), fireBaseHandler);
+//        getUserByUID(user.getId(), fireBaseHandler);
+////        CMNLogHelper.logError("GET USER", getUser.toString());
+//        CMNLogHelper.logError("GET USER", "tsts");
+//        getUserByUID(user.getId(), fireBaseHandler);
 
 
         //Find user by training id
 
 
         //Update user
-        user.setHeigth(""+180);
-        user.setName("NEWuser name");
-        updateUser(user, fireBaseHandler);
+//        user.setHeigth(""+180);
+//        user.setName("NEWuser name");
+//        updateUser(user, fireBaseHandler);
 
 
         //Create training test
         BETraining t = new BETraining();
-        t.setName("NewTraining");
-        t.setCreatorId(user.getId());
+        t.setName("NewTestTraining");
+        t.setCreatorId("-KVZtKZSHHRhhEyb8XOv");
         t.setTrainingDate(new Date());
+        t.setCurrentNumberOfParticipants(1);
+        t.setDescription("NewTraining");
+        t.setLevel(BETrainingLevelEnum.Beginner);
+        t.setStatus(BETrainingStatusEnum.open);
+        t.setDuration(45);
+        t.setTrainingFullNotificationFlag(true);
+        t.setJoinTrainingNotificationFlag(true);
+        t.setMaxNumberOfParticipants(5);
         CMNLogHelper.logError("Create-training", "test");
         createTraining(t, fireBaseHandler);
 
+
+
+        //Transaction test
+//        updateObjectWithTransaction(BETypesEnum.Trainings, DALActionTypeEnum.joinTraining, t, fireBaseHandler);
+
         //Find training by id test
-        getTraining(t.getId(), fireBaseHandler);
-        CMNLogHelper.logError("GET TRAINING", "test");
+//        getTraining(t.getId(), fireBaseHandler);
+//        CMNLogHelper.logError("GET TRAINING", "test");
 
         //Update training
-        t.setName("NEWUpdatedName");
-        updateTraining(t, fireBaseHandler);
+//        t.setName("NEWUpdatedName");
+//        updateTraining(t, fireBaseHandler);
 
 
         //join training
-        CMNLogHelper.logError("JOIN TRAINING", "test");
-        joinTraining(user.getId(), t.getId(), fireBaseHandler);
+        CMNLogHelper.logError("JOIN TRAINING", "test1");
+        joinTraining(t.getId(), user.getId(), fireBaseHandler);
+
+        CMNLogHelper.logError("JOIN TRAINING", "test2");
+        joinTraining(t.getId(), "-KV_-5FxpqKiqo5hWz9h", fireBaseHandler);
+
+
+
+        //join training
+        CMNLogHelper.logError("Leave TRAINING", "test1");
+        leaveTraining(t.getId(), "-KV_-5FxpqKiqo5hWz9h", fireBaseHandler);
 
         //get all public trainings
-        CMNLogHelper.logError("GET ALL TRAININGS", "test");
-        getAllTrainings(fireBaseHandler);
+//        CMNLogHelper.logError("GET ALL TRAININGS", "test");
+//        getAllTrainings(fireBaseHandler);
 //        ArrayList<String> arr = new ArrayList<>();
 //        arr.add("-KSNfQcBV2d9ESKsQqic");
 //        arr.add("-KSNfUF-UvM66pv4ZzRt");
 //        arr.add("-KSNfUInzvpo27SmmZDS");
 //        getPublicTrainings(arr, fireBaseHandler);
+//        joinTraining("-KVZHP8m8MGWBskGpE1l", "-KVUEkQ_xFxVw3VHyFam", null);
 
 
     }
 
     public static Firebase getUsersRef() {
         return usersRef;
+    }
+    public static Firebase getTrainingsRef() {
+        return trainingsRef;
     }
 }

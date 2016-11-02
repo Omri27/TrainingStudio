@@ -1,6 +1,7 @@
 package zina_eliran.app.API;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Random;
 
 import zina_eliran.app.API.EmailSender.EmailSender;
@@ -58,20 +59,6 @@ public class ServerAPI {
 
     public void registerUser(BEUser user, FireBaseHandler fbHandler) {
         DAL.registerUser(user, fbHandler);
-
-        new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                try {
-                    EmailSender send = new EmailSender("zina@ctera.com", "Zina Kuzmin" , "123456" );
-                } catch (Exception e) {
-                    CMNLogHelper.logError("SendMailFailed", e.getMessage());
-                }
-            }
-
-        }).start();
-
     }
 
 
@@ -116,7 +103,7 @@ public class ServerAPI {
     }
 
     public void leaveTraining(String trainingId, String userId, FireBaseHandler fbHandler) {
-
+        DAL.leaveTraining(trainingId,userId,fbHandler);
     }
 
 
@@ -135,14 +122,16 @@ public class ServerAPI {
     public ArrayList<BETraining> filterPublicTrainings(String userId, ArrayList<BEBaseEntity> trainings) {
         ArrayList<BETraining> publicTrainings = new ArrayList<>();
 
-        //Filter trainings to exclude current user
+        //Filter trainings to exclude current user, cancelled trainings, and past trainings
         if (!trainings.isEmpty()) {
             for (int i = 0; i < trainings.size(); i++) {
-                if (!(((BETraining) trainings.get(i)).getCreatorId().equals(userId) ||
-                        ((BETraining) trainings.get(i)).getPatricipatedUserIds().contains(userId)) &&
-                        ((BETraining) trainings.get(i)).getStatus() != BETrainingStatusEnum.cancelled) {
+                BETraining training = (BETraining) trainings.get(i);
+                if (!training.getCreatorId().equals(userId) ||
+                        (training.getPatricipatedUserIds().contains(userId)) &&
+                        (training.getStatus() != BETrainingStatusEnum.cancelled) &&
+                                (training.getTrainingDate().after(new Date()))) {
                     publicTrainings.add(((BETraining) trainings.get(i)));
-                    CMNLogHelper.logError("publicTrainings", trainings.get(i).toString());
+//                    CMNLogHelper.logError("publicTrainings", trainings.get(i).toString());
                 }
             }
         }
@@ -162,7 +151,7 @@ public class ServerAPI {
                         (currentTraining.getCreatorId().equals(userId) && isCreatedByMe &&
                                 ((BETraining) trainings.get(i)).getStatus() != BETrainingStatusEnum.cancelled)) {
                     myTrainings.add(currentTraining);
-                    CMNLogHelper.logError("myTrainings", currentTraining.toString());
+//                    CMNLogHelper.logError("myTrainings", currentTraining.toString());
                 }
             }
         }

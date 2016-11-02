@@ -58,4 +58,15 @@ public class BEResponse {
     public void setEntityType(BETypesEnum entityType) {
         this.entityType = entityType;
     }
+
+    @Override
+    public String toString() {
+        return "BEResponse{" +
+                "entities=" + entities +
+                ", entityType=" + entityType +
+                ", actionType=" + actionType +
+                ", message='" + message + '\'' +
+                ", status=" + status +
+                '}';
+    }
 }

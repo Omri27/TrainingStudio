@@ -71,11 +71,11 @@ public class GetBEObjectEventListener implements ValueEventListener {
             }
 
             //Use for tests - Zina
-            Log.e("DAL", "ObjectListener");
-            if( objects.get(0) instanceof BEUser)
-                CMNLogHelper.logError("GetUserListener", "[[" + action.toString()  + "]]"  + " " + ((BEUser)objects.get(0)).toString());
-            else if (objects.get(0) instanceof BETraining)
-                CMNLogHelper.logError("GetTrainingListener", "[[" + action.toString() + "]]" + " " + ((BETraining)objects.get(0)).toString());
+//            Log.e("DAL", "ObjectListener");
+//            if( objects.get(0) instanceof BEUser)
+//                CMNLogHelper.logError("GetUserListener", "[[" + action.toString()  + "]]"  + " " + ((BEUser)objects.get(0)).toString());
+//            else if (objects.get(0) instanceof BETraining)
+//                CMNLogHelper.logError("GetTrainingListener", "[[" + action.toString() + "]]" + " " + ((BETraining)objects.get(0)).toString());
         }
 
         else if (action == DALActionTypeEnum.getAllTrainings){
@@ -85,8 +85,8 @@ public class GetBEObjectEventListener implements ValueEventListener {
             }
 
             //Use for tests - Zina
-            for (int i = 0; i < objects.size(); i++)
-                CMNLogHelper.logError("All trainings listener", objects.get(i).toString());
+//            for (int i = 0; i < objects.size(); i++)
+//                CMNLogHelper.logError("All trainings listener", objects.get(i).toString());
         }
 
         else {
@@ -115,7 +115,7 @@ public class GetBEObjectEventListener implements ValueEventListener {
 
         if (objects != null) {
             res.setEntities(objects);
-            CMNLogHelper.logError("GetListener-forward"+ new Date() + " " + action.toString()+ " " + isActionSucceeded.toString() + " ", objects.toString());
+//            CMNLogHelper.logError("GetListener-forward"+ new Date() + " " + action.toString()+ " " + isActionSucceeded.toString() + " ", objects.toString());
         }
         res.setStatus(isActionSucceeded);
         if (errorMessage != null)

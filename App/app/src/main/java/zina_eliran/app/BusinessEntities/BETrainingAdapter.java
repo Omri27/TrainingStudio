@@ -61,7 +61,7 @@ public class BETrainingAdapter extends RecyclerView.Adapter<BETrainingAdapter.Tr
 
         try {
             DateFormat dateFormatter = new SimpleDateFormat("dd/MM/yy");
-            DateFormat timeFormatter = new SimpleDateFormat("hh:mm");
+            DateFormat timeFormatter = new SimpleDateFormat("kk:mm");
 
             BETraining training = trainingList.get(position);
             if (isDisplayTrainingId) {

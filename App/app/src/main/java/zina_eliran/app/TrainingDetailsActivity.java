@@ -300,11 +300,11 @@ public class TrainingDetailsActivity extends BaseFragmentActivity
                     }
                     break;
                 case R.id.training_details_time_tv:
-                    DialogFragment timeFragment = new TimePickerFragment(this);
+                    DialogFragment timeFragment = new TimePickerFragment(this, trainingCalender);
                     timeFragment.show(getFragmentManager(), "timePicker");
                     break;
                 case R.id.training_details_date_tv:
-                    DialogFragment dateFragment = new DatePickerFragment(this);
+                    DialogFragment dateFragment = new DatePickerFragment(this, trainingCalender);
                     dateFragment.show(getFragmentManager(), "datePicker");
                     break;
             }
@@ -432,25 +432,7 @@ public class TrainingDetailsActivity extends BaseFragmentActivity
                     Toast.makeText(_getAppContext(), "Training date must be equal or later than today.", Toast.LENGTH_LONG).show();
                     dateTv.setText("Pick Date");
                 } else {
-                    if (trainingCalender == null) {
-                        trainingCalender = value;
-                    } else {
-                        trainingCalender.set(Calendar.HOUR, value.get(Calendar.HOUR_OF_DAY));
-                        trainingCalender.set(Calendar.MINUTE, value.get(Calendar.MINUTE));
-                    }
-                    dateTv.setText(dateFormatter.format(value.getTime()));
-                }
-            } else if (entityType == BEFragmentResultTypeEnum.time) {
-                cal.set(Calendar.YEAR, 0);
-                cal.set(Calendar.MONTH, 0);
-                cal.set(Calendar.DAY_OF_MONTH, 0);
-                cal.add(Calendar.HOUR, 6);
-                if (trainingCalender!=null &&
-                        isTodaySelectedDate(trainingCalender) &&
-                        value.getTime().before(cal.getTime())) {
-                    Toast.makeText(_getAppContext(), "Training time must be at least 6 hours later then now.", Toast.LENGTH_LONG).show();
-                    timeTv.setText("Pick Time");
-                } else {
+
                     if (trainingCalender == null) {
                         trainingCalender = value;
                     } else {
@@ -458,6 +440,35 @@ public class TrainingDetailsActivity extends BaseFragmentActivity
                         trainingCalender.set(Calendar.MONTH, value.get(Calendar.MONTH));
                         trainingCalender.set(Calendar.DAY_OF_MONTH, value.get(Calendar.DAY_OF_MONTH));
                     }
+
+                    dateTv.setText(dateFormatter.format(value.getTime()));
+                }
+            } else if (entityType == BEFragmentResultTypeEnum.time) {
+                cal.set(Calendar.YEAR, 0);
+                cal.set(Calendar.MONTH, 0);
+                cal.set(Calendar.DAY_OF_MONTH, 0);
+                cal.add(Calendar.HOUR, 6);
+                if (trainingCalender != null &&
+                        isTodaySelectedDate(trainingCalender) &&
+                        value.getTime().before(cal.getTime())) {
+                    Toast.makeText(_getAppContext(), "Training time must be at least 6 hours later then now.", Toast.LENGTH_LONG).show();
+                    timeTv.setText("Pick Time");
+                } else {
+
+                    if (trainingCalender == null) {
+                        trainingCalender = value;
+                    } else {
+                        trainingCalender.set(Calendar.HOUR, value.get(Calendar.HOUR_OF_DAY));
+                        trainingCalender.set(Calendar.MINUTE, value.get(Calendar.MINUTE));
+                    }
+
+                    if (value.get(Calendar.HOUR_OF_DAY) > 12) {
+                        trainingCalender.set(Calendar.AM_PM, Calendar.PM);
+                    }
+                    else {
+                        trainingCalender.set(Calendar.AM_PM, Calendar.AM);
+                    }
+
                     timeTv.setText(timeFormatter.format(value.getTime()));
                 }
             }

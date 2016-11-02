@@ -1,6 +1,7 @@
 package zina_eliran.app.API.EmailSender;
 
 import java.util.Properties;
+
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
@@ -18,7 +19,7 @@ public class EmailSender {
     private final String FROM_ADREESS_PASSWORD = "c400versions";
 
 
-    public EmailSender(String toAddress, String name, String code){
+    public EmailSender(String toAddress, String name, String code) {
         Properties props = new Properties();
         props.put("mail.smtp.host", "smtp.gmail.com");
         props.put("mail.smtp.socketFactory.port", "465");
@@ -30,7 +31,7 @@ public class EmailSender {
         Session session = Session.getDefaultInstance(props,
                 new javax.mail.Authenticator() {
                     protected PasswordAuthentication getPasswordAuthentication() {
-                        return new PasswordAuthentication(FROM_ADREESS,FROM_ADREESS_PASSWORD);
+                        return new PasswordAuthentication(FROM_ADREESS, FROM_ADREESS_PASSWORD);
                     }
                 });
         session.setDebug(true);
@@ -41,8 +42,37 @@ public class EmailSender {
             message.setFrom(new InternetAddress(FROM_ADREESS));
             message.setRecipients(Message.RecipientType.TO,
                     InternetAddress.parse(toAddress));
-            message.setSubject("RunApp registration confirmation");
-            message.setText("Dear " + name + "\nThank you for using our app. Your verification code is " + code);
+            message.setSubject("Training • Studio | registration confirmation");
+            String htmlBody =
+                    "<div style='width:80%; height:400px; margin-auto;'>" +
+                            "<div style='width: 100%; height: 28px; background:orange; color:white; font-weight:bold; text-align: center; padding-top:10px;'>" +
+                            "TRAINING &middot; STUDIO" +
+                            "</div>" +
+                            "<div style='padding-left:25px; padding-top: 20px;'>" +
+                            "Hi there, " +
+                            "</div>" +
+                            "<div style='padding-left:25px; padding-top: 8px;'>" +
+                            "Welcome to Training Studio!" +
+                            "</div>" +
+                            "<div style='padding-left:25px; padding-top: 8px;'>" +
+                            "You are one step to start create, join and have a lot of running using our app." +
+                            "<br /><br />" +
+                            "<u>To verify your email address please insert the code below: </u>" +
+                            "<br />" +
+                            "Verification code: <b>" + code + "</b>" +
+                            "</div>" +
+                            "<div style='padding-left:25px; padding-top: 25px;'>" +
+                            "<b>Dear " + name + "</b>, if you have any questions, just drop us an email. We'd love to help!" +
+                            "<br /><br />" +
+                            "Happy training!" +
+                            "</div>" +
+                            "<div style='width: 100%; height: 3px; background:orange;  text-align: center; margin-top:25px; margin-bottom:25px;'>" +
+                            "&middot;" +
+                            "</div>" +
+                            "</div>";
+
+            //htmlBody = "Dear " + name + "\nThank you for using our app. Your verification code is " + code;
+            message.setContent(htmlBody, "text/html");
 
             Transport.send(message);
 
@@ -52,7 +82,6 @@ public class EmailSender {
     }
 
 }
-
 
 
 //

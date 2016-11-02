@@ -3,6 +3,7 @@ package zina_eliran.app.BusinessEntities;
 import android.location.Location;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -14,8 +15,8 @@ public class BETraining extends BEBaseEntity{
     private String description;
     private BETrainingLevelEnum level;
     private int duration;
-    private Date trainingDate;
-    private Date creationDate;
+    private Calendar trainingDateTimeCalender;
+    private Calendar creationDateTimeCalender;
     private Location location;
     private int maxNumberOfParticipants;
     private int currentNumberOfParticipants;
@@ -71,20 +72,20 @@ public class BETraining extends BEBaseEntity{
         this.duration = duration;
     }
 
-    public Date getCreationDate() {
-        return creationDate;
+    public Calendar getTrainingDateTimeCalender() {
+        return trainingDateTimeCalender;
     }
 
-    public void setCreationDate(Date creationDate) {
-        this.creationDate = creationDate;
+    public void setTrainingDateTimeCalender(Calendar trainingDateTimeCalender) {
+        this.trainingDateTimeCalender = trainingDateTimeCalender;
     }
 
-    public Date getTrainingDate() {
-        return trainingDate;
+    public Calendar getCreationDateTimeCalender() {
+        return creationDateTimeCalender;
     }
 
-    public void setTrainingDate(Date trainingDate) {
-        this.trainingDate = trainingDate;
+    public void setCreationDateTimeCalender(Calendar creationDateTimeCalender) {
+        this.creationDateTimeCalender = creationDateTimeCalender;
     }
 
     public Location getLocation() {
@@ -153,7 +154,7 @@ public class BETraining extends BEBaseEntity{
                 "creatorId='" + creatorId + '\'' +
                 ", name='" + description + '\'' +
                 ", duration=" + duration +
-                ", trainingDate=" + trainingDate +
+                ", trainingDate=" + trainingDateTimeCalender.getTime().toString() +
                 '}';
     }
 

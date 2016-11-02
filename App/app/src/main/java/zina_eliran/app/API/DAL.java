@@ -7,6 +7,7 @@ import com.firebase.client.MutableData;
 import com.firebase.client.Transaction;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 import zina_eliran.app.API.EmailSender.EmailSendThread;
@@ -332,7 +333,7 @@ public class DAL {
         BETraining t = new BETraining();
         t.setName("NewTraining");
         t.setCreatorId(user.getId());
-        t.setTrainingDate(new Date());
+        t.setTrainingDateTimeCalender(Calendar.getInstance());
         CMNLogHelper.logError("Create-training", "test");
         createTraining(t, fireBaseHandler);
 

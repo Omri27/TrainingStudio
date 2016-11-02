@@ -41,7 +41,12 @@ public class TimePickerFragment extends DialogFragment
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
         // Do something with the time chosen by the user
         Calendar c = Calendar.getInstance();
-        c.set(0, 0, 0, hourOfDay, minute, 0);
+        c.set(Calendar.YEAR, 0);
+        c.set(Calendar.MONTH, 0);
+        c.set(Calendar.DAY_OF_MONTH, 0);
+        c.set(Calendar.HOUR_OF_DAY, hourOfDay);
+        c.set(Calendar.MINUTE, minute);
+        c.set(Calendar.SECOND, 0);
         activity.onFragmentCallback(c, BEFragmentResultTypeEnum.time);
     }
 }

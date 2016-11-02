@@ -32,7 +32,7 @@ public class BaseActivity extends AppCompatActivity {
     ServerAPI sApi;
     Context appContext;
     Intent intent;
-    DateFormat dateFormatter = new SimpleDateFormat("MMM DD");
+    DateFormat dateFormatter = new SimpleDateFormat("dd/MM/yy");
     DateFormat timeFormatter = new SimpleDateFormat("hh:mm");
 
     @Override

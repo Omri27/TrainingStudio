@@ -60,7 +60,7 @@ public class BETrainingAdapter extends RecyclerView.Adapter<BETrainingAdapter.Tr
     public void onBindViewHolder(TrainingViewHolder holder, int position) {
 
         try {
-            DateFormat dateFormatter = new SimpleDateFormat("MMM dd");
+            DateFormat dateFormatter = new SimpleDateFormat("dd/MM/yy");
             DateFormat timeFormatter = new SimpleDateFormat("hh:mm");
 
             BETraining training = trainingList.get(position);
@@ -72,9 +72,9 @@ public class BETrainingAdapter extends RecyclerView.Adapter<BETrainingAdapter.Tr
             holder.description.setText(training.getDescription());
             holder.level.setText((training.getLevel() == null ? "" : training.getLevel().toString()));
             holder.duration.setText(String.valueOf(training.getDuration()));
-            holder.trainingDate.setText(dateFormatter.format(training.getTrainingDate()));
-            holder.trainingTime.setText(timeFormatter.format(training.getTrainingDate()));
-            holder.trainingCreationDate.setText("CREATION DATE: " + dateFormatter.format(training.getCreationDate()));
+            holder.trainingDate.setText(dateFormatter.format(training.getTrainingDateTimeCalender().getTime()));
+            holder.trainingTime.setText(timeFormatter.format(training.getTrainingDateTimeCalender().getTime()));
+            holder.trainingCreationDate.setText("CREATION DATE: " + dateFormatter.format(training.getCreationDateTimeCalender().getTime()));
             holder.numberOfParticipates.setText("OF " + training.getMaxNumberOfParticipants());
             holder.numberOfJoinedParticipates.setText("" + training.getCurrentNumberOfParticipants());
 

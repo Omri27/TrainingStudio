@@ -1,6 +1,7 @@
 package zina_eliran.app;
 
 import android.app.DialogFragment;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -41,7 +42,7 @@ import zina_eliran.app.Utils.FireBaseHandler;
 import zina_eliran.app.Utils.TimePickerFragment;
 
 public class TrainingDetailsActivity extends BaseFragmentActivity
-        implements View.OnClickListener, FireBaseHandler, CompoundButton.OnCheckedChangeListener , DateTimeFragmentHandler {
+        implements View.OnClickListener, FireBaseHandler, CompoundButton.OnCheckedChangeListener, DateTimeFragmentHandler {
 
     LinearLayout notificationsSwitchesLayout;
     Switch userJoinedNotificationSwitch;
@@ -61,6 +62,8 @@ public class TrainingDetailsActivity extends BaseFragmentActivity
     BETrainingDetailsModeEnum activityMode;
     boolean isDirty;
     BETraining training;
+    Calendar trainingCalender;
+    Location trainingLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -263,12 +266,10 @@ public class TrainingDetailsActivity extends BaseFragmentActivity
                             training.setDescription(descriptionEt.getText().toString());
                             training.setLevel(BETrainingLevelEnum.valueOf(levelSpinner.getSelectedItem().toString().replace("Level:", "").trim()));
                             training.setDuration(Integer.parseInt(durationSpinner.getSelectedItem().toString().replace("Min", "").trim()));
-                            //create full date object
-                            Date d = new Date();
-                            training.setTrainingDate(d);
+                            training.setTrainingDateTimeCalender(trainingCalender);
                             training.setMaxNumberOfParticipants(Integer.parseInt(participatesSpinner.getSelectedItem().toString().replace("Runners", "").trim()));
                             training.setCurrentNumberOfParticipants(0);
-                            training.setCreationDate(new Date());
+                            //training.setLocation(trainingLocation);
                             training.setCreatorId(sApi.getAppUser().getId());
                             training.setPatricipatedUserIds(new ArrayList<String>());
                             training.setStatus(BETrainingStatusEnum.open);
@@ -356,11 +357,11 @@ public class TrainingDetailsActivity extends BaseFragmentActivity
                         levelAdapter.notifyDataSetChanged();
                         durationSpinner.setSelection(durationAdapter.getPosition(training.getDuration() + " Min"));
                         durationAdapter.notifyDataSetChanged();
-                        participatesSpinner.setSelection(participatesAdapter.getPosition((training.getMaxNumberOfParticipants()-3) + " Runners"));
+                        participatesSpinner.setSelection(participatesAdapter.getPosition((training.getMaxNumberOfParticipants() - 3) + " Runners"));
                         participatesAdapter.notifyDataSetChanged();
 
-                        dateTv.setText(dateFormatter.format(training.getTrainingDate()));
-                        timeTv.setText(timeFormatter.format(training.getTrainingDate()));
+                        dateTv.setText(dateFormatter.format(training.getTrainingDateTimeCalender().getTime()));
+                        timeTv.setText(timeFormatter.format(training.getTrainingDateTimeCalender().getTime()));
                         userJoinedNotificationSwitch.setChecked(training.isJoinTrainingNotificationFlag());
                         trainingFullNotificationSwitch.setChecked(training.isTrainingFullNotificationFlag());
 
@@ -421,26 +422,43 @@ public class TrainingDetailsActivity extends BaseFragmentActivity
 
     @Override
     public void onFragmentCallback(Calendar value, BEFragmentResultTypeEnum entityType) {
-        try{
-            if(entityType == BEFragmentResultTypeEnum.date){
-                if (value.before(Calendar.getInstance())) {
+        try {
+            Calendar cal = Calendar.getInstance();
+            if (entityType == BEFragmentResultTypeEnum.date) {
+                cal.set(Calendar.HOUR_OF_DAY, 0);
+                cal.set(Calendar.MINUTE, 0);
+                cal.set(Calendar.SECOND, 0);
+                if (value.getTime().before(cal.getTime()) && !isTodaySelectedDate(value)) {
                     Toast.makeText(_getAppContext(), "Training date must be equal or later than today.", Toast.LENGTH_LONG).show();
                     dateTv.setText("Pick Date");
+                } else {
+                    if (trainingCalender == null) {
+                        trainingCalender = value;
+                    } else {
+                        trainingCalender.set(Calendar.HOUR, value.get(Calendar.HOUR_OF_DAY));
+                        trainingCalender.set(Calendar.MINUTE, value.get(Calendar.MINUTE));
+                    }
+                    dateTv.setText(dateFormatter.format(value.getTime()));
                 }
-                else {
-                    dateTv.setText(dateFormatter.format(value));
-                }
-            }
-            else if(entityType == BEFragmentResultTypeEnum.time){
-                Calendar c = Calendar.getInstance();
-                c.set(0,0,0);
-                c.add(Calendar.HOUR, 6);
-                if(value.before(c)){
+            } else if (entityType == BEFragmentResultTypeEnum.time) {
+                cal.set(Calendar.YEAR, 0);
+                cal.set(Calendar.MONTH, 0);
+                cal.set(Calendar.DAY_OF_MONTH, 0);
+                cal.add(Calendar.HOUR, 6);
+                if (trainingCalender!=null &&
+                        isTodaySelectedDate(trainingCalender) &&
+                        value.getTime().before(cal.getTime())) {
                     Toast.makeText(_getAppContext(), "Training time must be at least 6 hours later then now.", Toast.LENGTH_LONG).show();
-                    dateTv.setText("Pick Date");
-                }
-                else {
-                    timeTv.setText(timeFormatter.format(value));
+                    timeTv.setText("Pick Time");
+                } else {
+                    if (trainingCalender == null) {
+                        trainingCalender = value;
+                    } else {
+                        trainingCalender.set(Calendar.YEAR, value.get(Calendar.YEAR));
+                        trainingCalender.set(Calendar.MONTH, value.get(Calendar.MONTH));
+                        trainingCalender.set(Calendar.DAY_OF_MONTH, value.get(Calendar.DAY_OF_MONTH));
+                    }
+                    timeTv.setText(timeFormatter.format(value.getTime()));
                 }
             }
 
@@ -448,5 +466,24 @@ public class TrainingDetailsActivity extends BaseFragmentActivity
             CMNLogHelper.logError("TrainingDetailsActivity", e.getMessage());
         }
 
+    }
+
+    private boolean isTodaySelectedDate(Calendar cal) {
+        try {
+
+            Calendar today = Calendar.getInstance();
+
+            today.set(Calendar.HOUR_OF_DAY, 0);
+            today.set(Calendar.MINUTE, 0);
+            today.set(Calendar.SECOND, 0);
+            today.set(Calendar.MILLISECOND, 0);
+
+            return (cal.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
+                    cal.get(Calendar.MONTH) == today.get(Calendar.MONTH) &&
+                    cal.get(Calendar.DAY_OF_MONTH) == today.get(Calendar.DAY_OF_MONTH));
+        } catch (Exception e) {
+            CMNLogHelper.logError("TrainingDetailsActivity", e.getMessage());
+        }
+        return false;
     }
 }

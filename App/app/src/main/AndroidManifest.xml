@@ -4,14 +4,32 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/app_icon"
+        android:icon="@drawable/app_icon_new"
         android:label="@string/app_name"
         android:screenOrientation="portrait"
         android:theme="@style/Theme.AppCompat.NoActionBar">
+
+        <uses-feature
+            android:name="android.hardware.camera"
+            android:required="true" />
+
+        <meta-data android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key" />
+
+
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
         <activity android:name=".BaseActivity" />
         <activity
             android:name=".LobbyActivity"
@@ -32,6 +50,9 @@
             android:name=".TrainingDetailsActivity"
             android:label="@string/title_activity_training_details"
             android:theme="@style/Theme.AppCompat.NoActionBar"></activity>
+
+        <activity android:name="zina_eliran.app.TrainingMapsActivity"
+            android:label="@string/title_activity_training_maps"></activity>
     </application>
 
 </manifest>

@@ -1,10 +1,10 @@
 package zina_eliran.app.BusinessEntities;
 
-import android.location.Location;
 
+import com.google.android.gms.location.places.Place;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
+
 
 /**
  * Created by Zina K on 9/10/2016.
@@ -17,7 +17,7 @@ public class BETraining extends BEBaseEntity{
     private int duration;
     private Calendar trainingDateTimeCalender;
     private Calendar creationDateTimeCalender;
-    private Location location;
+    private Place location;
     private int maxNumberOfParticipants;
     private int currentNumberOfParticipants;
     private BETrainingStatusEnum status;
@@ -88,11 +88,11 @@ public class BETraining extends BEBaseEntity{
         this.creationDateTimeCalender = creationDateTimeCalender;
     }
 
-    public Location getLocation() {
+    public Place getLocation() {
         return location;
     }
 
-    public void setLocation(Location location) {
+    public void setLocation(Place location) {
         this.location = location;
     }
 

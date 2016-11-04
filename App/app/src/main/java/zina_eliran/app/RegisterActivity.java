@@ -1,18 +1,15 @@
 package zina_eliran.app;
 
-import android.os.AsyncTask;
+import android.graphics.Paint;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
-
-import zina_eliran.app.API.ServerAPI;
 import zina_eliran.app.BusinessEntities.BEResponse;
 import zina_eliran.app.BusinessEntities.BEResponseStatusEnum;
 import zina_eliran.app.BusinessEntities.BEUser;
@@ -31,9 +28,15 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
     EditText nameEditText;
     EditText emailEditText;
     EditText verificationCodeEditText;
+    TextView resendEmailTv;
     Button registerBtn;
     Button verifyBtn;
     ProgressBar pBar;
+    String email;
+    String name;
+    String verificationCode;
+
+    BEUser user = new BEUser();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +66,8 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
             verificationCodeEditText = (EditText) findViewById(R.id.register_verification_code_et);
             registerBtn = (Button) findViewById(R.id.register_register_btn);
             verifyBtn = (Button) findViewById(R.id.register_verify_btn);
+            resendEmailTv = (TextView) findViewById(R.id.register_resendEmail_tv);
+            resendEmailTv.setPaintFlags(resendEmailTv.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
             pBar = (ProgressBar) findViewById(R.id.register_pbar);
             pBar.setVisibility(View.INVISIBLE);
             pBar.bringToFront();
@@ -73,6 +78,12 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
 
             registerBtn.setOnClickListener(this);
             verifyBtn.setOnClickListener(this);
+            resendEmailTv.setOnClickListener(this);
+
+            // init registration data
+            email = readFromSharedPreferences(_getString(R.string.user_email));
+            name = readFromSharedPreferences(_getString(R.string.user_name));
+            verificationCode = readFromSharedPreferences(_getString(R.string.user_verification_code));
 
         } catch (Exception e) {
             CMNLogHelper.logError("RegisterActivity", e.getMessage());
@@ -104,7 +115,6 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
                     sApi.setActionResponse(null);
 
                     //register user into db. a user update view
-                    BEUser user = new BEUser();
                     user.setName(nameEditText.getText().toString());
                     user.setEmail(emailEditText.getText().toString());
                     user.setPrivateProfile(true);
@@ -118,23 +128,39 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
                     //set spinner on
                     pBar.setVisibility(View.VISIBLE);
 
-                    if (sApi.getAppUser() != null &&
-                            verificationCodeEditText.getText().toString().equals(sApi.getAppUser().getVerificationCode())) {
+                    if (verificationCodeEditText.getText().toString().equals(verificationCode)) {
 
+                        writeToSharedPreferences(_getString(R.string.user_verification_code), verificationCode);
+                        writeToSharedPreferences(_getString(R.string.user_verification_permission), "true");
 
-                            writeToSharedPreferences(_getString(R.string.user_verification_code), sApi.getAppUser().getVerificationCode());
-                            writeToSharedPreferences(_getString(R.string.user_verification_permission), "true");
+                        Toast.makeText(this, String.format(_getString(R.string.verification_success_message), name), Toast.LENGTH_LONG).show();
 
-                            Toast.makeText(this, String.format(_getString(R.string.verification_success_message), sApi.getAppUser().getName() ), Toast.LENGTH_LONG).show();
-
-                            //navigate to lobby when user verified his account
-                            navigateToActivity(this, LobbyActivity.class, true, null);
+                        //navigate to lobby when user verified his account
+                        navigateToActivity(this, LobbyActivity.class, true, null);
 
                     } else {
                         pBar.setVisibility(View.GONE);
                         verifyBtn.setEnabled(true);
                         Toast.makeText(this, _getString(R.string.verification_error_message), Toast.LENGTH_LONG).show();
                     }
+                    break;
+                case R.id.register_resendEmail_tv:
+                    //Send verification code by email again
+                    if (readFromSharedPreferences(_getString(R.string.user_id)) != "") {
+
+                        sApi.resendUserRegistrationEmail(email, name, verificationCode);
+                    }
+                    //something went wrong with the registration - init the app
+                    else {
+                        Toast.makeText(this, _getString(R.string.registration_error_message), Toast.LENGTH_LONG).show();
+
+                        //refresh the current activity
+                        clearSharedPreferences();
+                        finish();
+                        startActivity(getIntent());
+                        return;
+                    }
+
                     break;
             }
 
@@ -167,17 +193,19 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
     @Override
     public void onActionCallback(BEResponse response) {
         //handle async response.
-        if(response!=null && response.getStatus() == BEResponseStatusEnum.success){
-            if(response.getActionType() == DALActionTypeEnum.registerUser){
+        if (response != null && response.getStatus() == BEResponseStatusEnum.success) {
+            if (response.getActionType() == DALActionTypeEnum.registerUser) {
 
                 sApi.setAppUser((BEUser) response.getEntities().get(0));
+                name = sApi.getAppUser().getName();
+                email = sApi.getAppUser().getEmail();
+                verificationCode = sApi.getAppUser().getVerificationCode();
                 writeToSharedPreferences(_getString(R.string.user_id), sApi.getAppUser().getId().toString());
+                writeToSharedPreferences(_getString(R.string.user_name), sApi.getAppUser().getName());
+                writeToSharedPreferences(_getString(R.string.user_email), sApi.getAppUser().getEmail());
                 writeToSharedPreferences(_getString(R.string.user_verification_code), sApi.getAppUser().getVerificationCode());
                 writeToSharedPreferences(_getString(R.string.user_registration_permission), "true");
                 Toast.makeText(_getAppContext(), _getString(R.string.registration_success_message), Toast.LENGTH_LONG).show();
-
-                //this will be removed after we handle with email verification
-                //verificationCodeEditText.setText("" + sApi.getAppUser().getVerificationCode());
 
                 //set spinner off
                 pBar.setVisibility(View.GONE);
@@ -186,10 +214,8 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
                 setLayoutMode(true);
 
             }
-        }
-        else {
+        } else {
             //handle error
-
             registerBtn.setEnabled(true);
 
             //set spinner off

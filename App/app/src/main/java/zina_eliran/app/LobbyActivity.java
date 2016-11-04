@@ -4,6 +4,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import java.util.HashMap;
@@ -25,12 +28,19 @@ public class LobbyActivity extends BaseActivity implements View.OnClickListener,
     Button myTrainingsBtn;
     Button startTrainingBtn;
     Button myProgressBtn;
-
+    ProgressBar pBar;
+    RelativeLayout pBarRl;
+    LinearLayout mainLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lobby);
+        pBar = (ProgressBar) findViewById(R.id.lobby_pbar);
+        pBar.setVisibility(View.VISIBLE);
+        pBar.bringToFront();
+        pBarRl = (RelativeLayout)findViewById(R.id.lobby_pbar_rl);
+        mainLayout = (LinearLayout) findViewById(R.id.lobby_ll);
         handleLoginState();
 
     }
@@ -106,15 +116,19 @@ public class LobbyActivity extends BaseActivity implements View.OnClickListener,
     public void onActionCallback(BEResponse response) {
         try {
 
+
             if (response != null) {
                 if (response.getStatus() == BEResponseStatusEnum.error) {
                     CMNLogHelper.logError("LobbyActivity", "error in get user callback on app load | err:" + response.getMessage());
                     Toast.makeText(_getAppContext(), "Error while retrieving user data, please try again later.", Toast.LENGTH_LONG).show();
-                } else  if (response.getActionType() == DALActionTypeEnum.getUser && response.getEntityType() == BETypesEnum.Users) {
+                } else if (response.getActionType() == DALActionTypeEnum.getUser && response.getEntityType() == BETypesEnum.Users) {
                     sApi.setAppUser((BEUser) response.getEntities().get(0));
+
+                    pBar.setVisibility(View.GONE);
+                    pBarRl.setVisibility(View.GONE);
+                    mainLayout.setVisibility(View.VISIBLE);
                     onCreateUI();
-                }
-                else {
+                } else {
                     CMNLogHelper.logError("LobbyActivity", "wrong action type in callback" + response.getEntityType() + ", " + response.getActionType());
                 }
             }
@@ -128,6 +142,7 @@ public class LobbyActivity extends BaseActivity implements View.OnClickListener,
     private void handleLoginState() {
         try {
             if (isVerified()) {
+
                 sApi.getUser(readFromSharedPreferences(_getString(R.string.user_id)), this);
             }
             //navigate to Lobby if the user is verified

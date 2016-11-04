@@ -30,8 +30,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingLeft="50dp"
-            android:paddingRight="50dp">
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp">
 
 
             <EditText
@@ -85,7 +85,6 @@
                         android:id="@+id/training_details_date_tv"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_marginRight="1dp"
                         android:layout_weight="1"
                         android:background="#ffffff"
                         android:gravity="center_vertical"
@@ -99,7 +98,7 @@
                         android:id="@+id/training_details_time_tv"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_marginRight="1dp"
+                        android:layout_marginLeft="2dp"
                         android:layout_weight="1"
                         android:background="#ffffff"
                         android:gravity="center_vertical"
@@ -139,7 +138,7 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_marginLeft="1dp"
+                        android:layout_marginLeft="2dp"
                         android:layout_weight="1"
                         android:background="#ffffff">
 
@@ -161,23 +160,41 @@
                     android:layout_marginTop="20dp"
                     android:background="#eeFF6600" />
 
-                <TextView
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginBottom="5dp"
-                    android:layout_marginLeft="4dp"
-                    android:text="Training location:"
-                    android:textColor="#ffffff"
-                    android:textSize="18dp"
-                    android:textStyle="bold" />
+                    android:layout_height="wrap_content">
 
-                <ImageButton
-                    android:id="@+id/training_details_location_map_ibtn"
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="5dp"
+                        android:layout_marginLeft="4dp"
+                        android:text="Training location:"
+                        android:textColor="#ffffff"
+                        android:textSize="18dp"
+                        android:textStyle="bold"
+                        android:layout_weight="1"/>
+
+                    <TextView
+                        android:id="@+id/training_details_update_location_tv"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="4"
+                        android:textColor="#eeFF6600"
+                        android:textSize="18dp"
+                        android:textStyle="bold"
+                        android:text="Update"/>
+
+                </LinearLayout>
+
+                <fragment
+                    android:id="@+id/training_details_location_map_f"
+                    class="com.google.android.gms.maps.MapFragment"
                     android:layout_width="match_parent"
-                    android:layout_height="200dp"
                     android:layout_weight="1"
-                    android:background="@drawable/training_location_map" />
+                    android:layout_height="200dp" >
 
+                </fragment>
 
             </LinearLayout>
 

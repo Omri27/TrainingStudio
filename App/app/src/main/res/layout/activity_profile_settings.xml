@@ -30,8 +30,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingLeft="50dp"
-            android:paddingRight="50dp">
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp">
 
 
             <ImageButton
@@ -252,6 +252,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:background="#ffffff"
+                        android:layout_marginLeft="2dp"
                         android:layout_weight="1">
 
                         <Spinner
@@ -304,7 +305,7 @@
                         <CheckBox android:id="@+id/profile_settings_sunday_check_box"
                             android:layout_width="wrap_content"
                             android:layout_height="20dp"
-                            android:text="Sonday"
+                            android:text="Sunday"
                             android:textColor="#ffffff"/>
 
                         <CheckBox android:id="@+id/profile_settings_monday_check_box"

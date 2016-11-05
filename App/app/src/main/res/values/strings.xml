@@ -2,6 +2,8 @@
     <string name="app_name">Training Studio</string>
     <!--app common values-->
     <string name="user_id">user_id</string>
+    <string name="user_name">user_name</string>
+    <string name="user_email">user_email</string>
     <string name="general_error_message"></string>
     <string name="training_list_manage_training_permission">training_list_manage_training_permission</string>
     <string name="inputs_missing_or_invalid">Some of the values are missing or incorrect, please fix and try again..</string>
@@ -11,7 +13,7 @@
     <string name="user_registration_permission">user_registration_permission</string>
     <string name="user_verification_permission">user_verification_permission</string>
     <string name="user_verification_code">user_verification_code</string>
-    <string name="registration_success_message">Registration succeed! please check your email and insert your verification code.</string>
+    <string name="registration_success_message">Welcome! please check your email and insert your verification code.</string>
     <string name="registration_error_message">We can\'t register your profile, please try again.</string>
     <string name="verification_success_message">Hi %s, Welcome!</string>
     <string name="verification_error_message">We can\'t verify your registration, please try again.</string>
@@ -42,5 +44,6 @@
     <string name="training_details_cancel_mode">training_details_cancel_mode</string>
     <string name="training_details_leave_mode">training_details_leave_mode</string>
     <string name="training_details_view_mode">training_details_view_mode</string>
+    <string name="title_activity_training_maps">Map</string>
 
 </resources>

@@ -69,9 +69,10 @@ public class BETrainingAdapter extends RecyclerView.Adapter<BETrainingAdapter.Tr
                 holder.id.setVisibility(View.VISIBLE);
                 holder.id.setText(training.getId().substring(training.getId().length() - 7));
             }
+
             holder.description.setText(training.getDescription());
             holder.level.setText((training.getLevel() == null ? "" : training.getLevel().toString()));
-            holder.duration.setText(String.valueOf(training.getDuration()));
+            holder.duration.setText(String.valueOf(training.getDuration()) + " Min");
             holder.trainingDate.setText(dateFormatter.format(training.getTrainingDateTimeCalender().getTime()));
             holder.trainingTime.setText(timeFormatter.format(training.getTrainingDateTimeCalender().getTime()));
             holder.trainingCreationDate.setText("CREATION DATE: " + dateFormatter.format(training.getCreationDateTimeCalender().getTime()));

@@ -104,11 +104,20 @@
             android:layout_height="3dp"
             android:background="#ddFFA330" />
 
+        <TextView
+            android:id="@+id/register_resendEmail_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Didn't got our Email, Click here."
+            android:textSize="13dp"
+            android:textColor="#ff0000"
+            android:layout_marginTop="5dp"/>
+
         <Button
             android:id="@+id/register_verify_btn"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="10dp"
             android:background="@drawable/app_rect_buttons_shape"
             android:elevation="2dp"
             android:text="complete registration"

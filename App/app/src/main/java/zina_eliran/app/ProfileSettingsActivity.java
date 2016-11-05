@@ -4,9 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -18,6 +18,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Switch;
@@ -25,18 +26,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
-
-import zina_eliran.app.API.ServerAPI;
 import zina_eliran.app.BusinessEntities.BEResponse;
 import zina_eliran.app.BusinessEntities.BEResponseStatusEnum;
-import zina_eliran.app.BusinessEntities.BETrainingLevelEnum;
 import zina_eliran.app.BusinessEntities.BETypesEnum;
 import zina_eliran.app.BusinessEntities.BEUser;
 import zina_eliran.app.BusinessEntities.CMNLogHelper;
@@ -45,7 +45,7 @@ import zina_eliran.app.Utils.FireBaseHandler;
 
 public class ProfileSettingsActivity extends BaseActivity implements View.OnClickListener, FireBaseHandler, CompoundButton.OnCheckedChangeListener {
 
-    private static int RESULT_LOAD_IMG = 1;
+
     ImageButton myPicIBtn;
     Switch privateProfileSwitch;
     TextView nameTv;
@@ -287,6 +287,7 @@ public class ProfileSettingsActivity extends BaseActivity implements View.OnClic
 
                     //update the app user object with the activity data & send to server
                     BEUser user = sApi.getAppUser();
+                    user.setActive(true);
                     user.setPrivateProfile(privateProfileSwitch.isChecked());
                     user.setCountry("Israel");
                     //user.setCountry(countryEt.getText().toString());//currently disabled, set only to israel.
@@ -334,44 +335,39 @@ public class ProfileSettingsActivity extends BaseActivity implements View.OnClic
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == RESULT_LOAD_IMG && resultCode == Activity.RESULT_OK) {
-            if (data == null) {
-                //Display an error
-                return;
+        if (resultCode == Activity.RESULT_OK && data != null) {
+
+            switch (requestCode) {
+                case RESULT_LOAD_IMG:
+                    try {
+                        Uri selectedImage = data.getData();
+                        //start crop activity on the selected picture
+                        CropImage.activity(selectedImage)
+                                .setGuidelines(CropImageView.Guidelines.ON)
+                                .start(this);
+
+                    } catch (Exception e) {
+                        CMNLogHelper.logError("ProfileSettingsActivity", e.getMessage());
+                    }
+                    break;
+                case CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE:
+                    try {
+
+                        Bitmap b = MediaStore.Images.Media.getBitmap(this.getContentResolver(), CropImage.getActivityResult(data).getUri());
+                        saveProfileImageToInternalStorage(b);
+                        myPicIBtn.setImageBitmap(b);
+                        myPicIBtn.setBackgroundColor(Color.TRANSPARENT);
+                        myPicIBtn.setScaleType(ImageView.ScaleType.FIT_XY);
+                    } catch (Exception e) {
+                        CMNLogHelper.logError("ProfileSettingsActivity", e.getMessage());
+                    }
+
+                    break;
             }
-            try {
-                InputStream inputStream =  getBaseContext().getContentResolver().openInputStream(data.getData());
-                Bitmap b = BitmapFactory.decodeStream(inputStream);
-                saveProfileImageToInternalStorage(b);
-                myPicIBtn.setImageBitmap(b);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-            //Now you can do whatever you want with your inpustream, save it as file, upload to a server, decode a bitmap...
         }
     }
 
-   /* @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        try {
-            super.onActivityResult(requestCode, resultCode, data);
-            if (requestCode == RESULT_LOAD_IMG && resultCode == RESULT_OK && null != data) {
-                Uri selectedImage = data.getData();
-                String[] filePathColumn = {MediaStore.Images.Media.DATA};
-                Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
-                cursor.moveToFirst();
-                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                String picturePath = cursor.getString(columnIndex);
-                cursor.close();
-                Bitmap b = BitmapFactory.decodeFile(picturePath);
-                saveProfileImageToInternalStorage(b);
-                myPicIBtn.setImageBitmap(b);
-            }
-        } catch (Exception e) {
-            CMNLogHelper.logError("ProfileSettingsActivity", e.getMessage());
-        }
-    }
-*/
+
     private String saveProfileImageToInternalStorage(Bitmap bitmapImage) {
         ContextWrapper cw = new ContextWrapper(getApplicationContext());
         // path to /data/data/<app>/app_data/appImagesDir

@@ -42,6 +42,12 @@ public class DAL {
             cannotPerformAction(fbHandler, DALActionTypeEnum.registerUser, "Cannot create null user");
     }
 
+    public static void resendUserRegistrationEmail(String email, String name, String verificationCode) {
+            //Send verification code
+            EmailSendThread thread = new EmailSendThread(email, name, verificationCode);
+            new Thread(thread).start();
+    }
+
 
     public static void createTraining(BETraining training, FireBaseHandler fireBaseHandler) {
         if (training != null) {

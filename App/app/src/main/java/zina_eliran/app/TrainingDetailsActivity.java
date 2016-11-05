@@ -1,28 +1,23 @@
 package zina_eliran.app;
 
 import android.app.DialogFragment;
-import android.location.Location;
+import android.content.Intent;
+import android.graphics.Paint;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,7 +34,12 @@ import zina_eliran.app.BusinessEntities.DALActionTypeEnum;
 import zina_eliran.app.Utils.DatePickerFragment;
 import zina_eliran.app.Utils.DateTimeFragmentHandler;
 import zina_eliran.app.Utils.FireBaseHandler;
+import zina_eliran.app.Utils.GoogleMapHandler;
 import zina_eliran.app.Utils.TimePickerFragment;
+
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.gms.maps.MapFragment;
 
 public class TrainingDetailsActivity extends BaseFragmentActivity
         implements View.OnClickListener, FireBaseHandler, CompoundButton.OnCheckedChangeListener, DateTimeFragmentHandler {
@@ -57,13 +57,20 @@ public class TrainingDetailsActivity extends BaseFragmentActivity
     Spinner durationSpinner;
     ArrayAdapter<CharSequence> durationAdapter;
 
-    ImageButton locationIBtn;
+    GoogleMapHandler gmh;
+    MapFragment trainingMapFragment;
+    TextView updateLocationTv;
+
     Button actionBtn;
     BETrainingDetailsModeEnum activityMode;
     boolean isDirty;
     BETraining training;
     Calendar trainingCalender;
-    Location trainingLocation;
+    Place trainingLocation;
+    ProgressBar pBar;
+    boolean isDoneBinding = false;
+    int PLACE_PICKER_REQUEST = 1;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,12 +103,20 @@ public class TrainingDetailsActivity extends BaseFragmentActivity
         }
     }
 
+    private void initTrainingLocation(Place place) {
+        try {
+            gmh = new GoogleMapHandler(this, trainingMapFragment, place);
+        } catch (Exception e) {
+            CMNLogHelper.logError("TrainingDetailsActivity", e.getMessage());
+        }
+
+    }
+
     private void initActivityElements() {
         try {
 
 
             descriptionEt = (EditText) findViewById(R.id.training_details_training_name_et);
-            locationIBtn = (ImageButton) findViewById(R.id.training_details_location_map_ibtn);
             dateTv = (TextView) findViewById(R.id.training_details_date_tv);
             timeTv = (TextView) findViewById(R.id.training_details_time_tv);
 
@@ -135,6 +150,14 @@ public class TrainingDetailsActivity extends BaseFragmentActivity
             participatesSpinner.setSelection(0, true);
             participatesAdapter.notifyDataSetChanged();
 
+            trainingMapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.training_details_location_map_f);
+            updateLocationTv = (TextView) findViewById(R.id.training_details_update_location_tv);
+            updateLocationTv.setPaintFlags(updateLocationTv.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+            updateLocationTv.setOnClickListener(this);
+
+            pBar = (ProgressBar) findViewById(R.id.training_details_pbar);
+            pBar.setVisibility(View.INVISIBLE);
+            pBar.bringToFront();
 
         } catch (Exception e) {
             CMNLogHelper.logError("TrainingDetailsActivity", e.getMessage());
@@ -209,9 +232,12 @@ public class TrainingDetailsActivity extends BaseFragmentActivity
                 activityMode = BETrainingDetailsModeEnum.valueOf(_activityMode);
             }
 
-
             if (activityMode != BETrainingDetailsModeEnum.training_details_create_mode) {
                 sApi.getTraining(getIntentParam(intent, _getString(R.string.training_details_training_id)), this);
+            }
+            else {
+                //init the map with the current location
+                initTrainingLocation(null);
             }
 
             switch (activityMode) {
@@ -221,6 +247,10 @@ public class TrainingDetailsActivity extends BaseFragmentActivity
                     notificationsSwitchesLayout.setVisibility(View.GONE);
                 case training_details_cancel_mode:
                     disableTrainingElements();
+                    break;
+                case training_details_create_mode:
+                    //ask for permission : ACCESS_FINE_LOCATION
+                    askForPermission(android.Manifest.permission.ACCESS_FINE_LOCATION, LOCATION);
                     break;
             }
 
@@ -236,9 +266,9 @@ public class TrainingDetailsActivity extends BaseFragmentActivity
             dateTv.setEnabled(false);
             timeTv.setEnabled(false);
             participatesSpinner.setEnabled(false);
-            locationIBtn.setEnabled(false);
             levelSpinner.setEnabled(false);
             durationSpinner.setEnabled(false);
+            updateLocationTv.setVisibility(View.GONE);
 
         } catch (Exception e) {
             CMNLogHelper.logError("TrainingsListActivity", e.getMessage());
@@ -269,12 +299,18 @@ public class TrainingDetailsActivity extends BaseFragmentActivity
                             training.setTrainingDateTimeCalender(trainingCalender);
                             training.setMaxNumberOfParticipants(Integer.parseInt(participatesSpinner.getSelectedItem().toString().replace("Runners", "").trim()));
                             training.setCurrentNumberOfParticipants(0);
-                            //training.setLocation(trainingLocation);
+                            training.setLocation(trainingLocation);
+                            training.setCreationDateTimeCalender(Calendar.getInstance());
                             training.setCreatorId(sApi.getAppUser().getId());
                             training.setPatricipatedUserIds(new ArrayList<String>());
                             training.setStatus(BETrainingStatusEnum.open);
                             training.setJoinTrainingNotificationFlag(userJoinedNotificationSwitch.isChecked());
                             training.setTrainingFullNotificationFlag(trainingFullNotificationSwitch.isChecked());
+
+
+                            //set spinner on
+                            pBar.setVisibility(View.VISIBLE);
+                            sApi.setActionResponse(null);
 
                             sApi.createTraining(training, this);
 
@@ -307,6 +343,14 @@ public class TrainingDetailsActivity extends BaseFragmentActivity
                     DialogFragment dateFragment = new DatePickerFragment(this, trainingCalender);
                     dateFragment.show(getFragmentManager(), "datePicker");
                     break;
+                case R.id.training_details_update_location_tv:
+                    if (activityMode == BETrainingDetailsModeEnum.training_details_create_mode) {
+                        PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+                        startActivityForResult(builder.build(this), PLACE_PICKER_REQUEST);
+                    }
+                    //go to activity & select the location
+
+                    break;
             }
 
         } catch (Exception e) {
@@ -325,6 +369,10 @@ public class TrainingDetailsActivity extends BaseFragmentActivity
                 isValid = false;
             }
             if (timeTv.getText().toString().isEmpty() || timeTv.getText().toString().contains("Pick")) {
+                isValid = false;
+            }
+
+            if(trainingLocation == null){
                 isValid = false;
             }
 
@@ -364,11 +412,18 @@ public class TrainingDetailsActivity extends BaseFragmentActivity
                         timeTv.setText(timeFormatter.format(training.getTrainingDateTimeCalender().getTime()));
                         userJoinedNotificationSwitch.setChecked(training.isJoinTrainingNotificationFlag());
                         trainingFullNotificationSwitch.setChecked(training.isTrainingFullNotificationFlag());
+                        initTrainingLocation(training.getLocation());
+
+                        isDoneBinding = true;
 
                     } else if (response.getActionType() == DALActionTypeEnum.joinTraining ||
                             response.getActionType() == DALActionTypeEnum.leaveTraining ||
                             response.getActionType() == DALActionTypeEnum.createTraining ||
                             response.getActionType() == DALActionTypeEnum.updateTraining) {
+
+                        //set spinner off
+                        pBar.setVisibility(View.GONE);
+
                         Map<String, String> intentParams = new HashMap<>();
                         switch (activityMode) {
                             case training_details_create_mode:
@@ -387,6 +442,7 @@ public class TrainingDetailsActivity extends BaseFragmentActivity
                                 break;
                             case training_details_cancel_mode:
                                 if (isDirty) {
+                                    Toast.makeText(_getAppContext(), "Your data saved successfully.", Toast.LENGTH_LONG).show();
                                     isDirty = false;
                                     setActionButtonState("Cancel Training", true, true);
                                 } else {
@@ -411,7 +467,7 @@ public class TrainingDetailsActivity extends BaseFragmentActivity
     @Override
     public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
         try {
-            if (activityMode == BETrainingDetailsModeEnum.training_details_cancel_mode) {
+            if (activityMode == BETrainingDetailsModeEnum.training_details_cancel_mode && isDoneBinding) {
                 isDirty = true;
                 setActionButtonState("Update", false, true);
             }
@@ -464,8 +520,7 @@ public class TrainingDetailsActivity extends BaseFragmentActivity
 
                     if (value.get(Calendar.HOUR_OF_DAY) > 12) {
                         trainingCalender.set(Calendar.AM_PM, Calendar.PM);
-                    }
-                    else {
+                    } else {
                         trainingCalender.set(Calendar.AM_PM, Calendar.AM);
                     }
 
@@ -496,5 +551,20 @@ public class TrainingDetailsActivity extends BaseFragmentActivity
             CMNLogHelper.logError("TrainingDetailsActivity", e.getMessage());
         }
         return false;
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        try {
+            if (requestCode == PLACE_PICKER_REQUEST) {
+                if (resultCode == RESULT_OK) {
+                    Place selectedLocation = PlacePicker.getPlace(data, this);
+                    trainingLocation = selectedLocation;
+                    initTrainingLocation(selectedLocation);
+                    Toast.makeText(this, String.format("%s was selected successfully.", selectedLocation.getName()), Toast.LENGTH_LONG).show();
+                }
+            }
+        } catch (Exception e) {
+            CMNLogHelper.logError("TrainingDetailsActivity", e.getMessage());
+        }
     }
 }

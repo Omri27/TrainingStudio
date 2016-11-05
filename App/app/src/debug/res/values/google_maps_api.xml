@@ -1,0 +1,24 @@
+<resources>
+    <!--
+    TODO: Before you run your application, you need a Google Maps API key.
+
+    To get one, follow this link, follow the directions and press "Create" at the end:
+
+    https://console.developers.google.com/flows/enableapi?apiid=maps_android_backend&keyType=CLIENT_SIDE_ANDROID&r=89:F0:F5:7F:6C:2D:6E:BA:AA:73:A6:66:2F:26:8A:78:76:29:34:1B%3Bzina_eliran.app
+
+    You can also add your credentials to an existing key, using this line:
+    89:F0:F5:7F:6C:2D:6E:BA:AA:73:A6:66:2F:26:8A:78:76:29:34:1B;zina_eliran.app
+
+    Alternatively, follow the directions here:
+    https://developers.google.com/maps/documentation/android/start#get-key
+
+    Once you have your key (it starts with "AIza"), replace the "google_maps_key"
+    string in this file.
+
+    https://console.developers.google.com/apis/credentials?project=trainingstudio-1478269235498
+
+    -->
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">
+        AIzaSyBLEzj-Xyiluoumk3z5Uj7wcb6s9hRpZe4
+    </string>
+</resources>

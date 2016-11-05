@@ -45,7 +45,7 @@ public class EmailSender {
             message.setSubject("Training • Studio | registration confirmation");
             String htmlBody =
                     "<div style='width:80%; height:400px; margin-auto;'>" +
-                            "<div style='width: 100%; height: 28px; background:orange; color:white; font-weight:bold; text-align: center; padding-top:10px;'>" +
+                            "<div style='width: 100%; height: 28px; background:orange; color:white; font-size:18px; font-weight:bold; text-align: center; padding-top:10px;'>" +
                             "TRAINING &middot; STUDIO" +
                             "</div>" +
                             "<div style='padding-left:25px; padding-top: 20px;'>" +

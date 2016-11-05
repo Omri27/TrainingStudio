@@ -4,11 +4,223 @@
     android:id="@+id/activity_training_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:background="@drawable/app_bg2"
+    android:background="@drawable/app_bg2_bottom"
+    android:orientation="vertical"
     tools:context="zina_eliran.app.TrainingViewActivity">
+
+    <include
+        android:id="@+id/training_view_header"
+        layout="@layout/app_header_title"></include>
+
+    <fragment
+        android:id="@+id/training_details_location_map_f"
+        class="com.google.android.gms.maps.MapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="170dp"
+        android:layout_marginTop="60dp" />
+
+
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/training_details_action_btn"
+            android:layout_width="60dp"
+            android:layout_height="40dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/app_rect_buttons_shape"
+            android:elevation="2dp"
+            android:text="Pause"
+            android:textSize="15dp" />
+
+
+        <Button
+            android:id="@+id/training_details_end_btn"
+            android:layout_width="60dp"
+            android:layout_height="40dp"
+            android:background="@drawable/app_rect_buttons_shape"
+            android:elevation="2dp"
+            android:text="End"
+            android:textSize="15dp" />
+
+
+    </LinearLayout>
+
+
+
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="50dp"
+        android:layout_marginTop="230dp">
+
+        <LinearLayout
+            android:id="@+id/training_view_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="10dp"
+            android:paddingBottom="20dp"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/training_view_date_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="#ffffff"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="20dp"
+                    android:text="Date"
+                    android:textColor="#555555"
+                    android:textSize="18dp" />
+
+                <TextView
+                    android:id="@+id/training_view_time_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="2dp"
+                    android:layout_weight="1"
+                    android:background="#ffffff"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="20dp"
+                    android:text="Time"
+                    android:textColor="#555555"
+                    android:textSize="18dp" />
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="#00000000" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/training_view_level_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="#ffffff"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="20dp"
+                    android:text="Level"
+                    android:textColor="#555555"
+                    android:textSize="18dp" />
+
+                <TextView
+                    android:id="@+id/training_view_duration_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="2dp"
+                    android:layout_weight="1"
+                    android:background="#ffffff"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="20dp"
+                    android:text="Duration"
+                    android:textColor="#555555"
+                    android:textSize="18dp" />
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="#00000000" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/training_view_avg_speed_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="#ffffff"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="20dp"
+                    android:text="Avg Speed"
+                    android:textColor="#555555"
+                    android:textSize="18dp" />
+
+                <TextView
+                    android:id="@+id/training_view_max_speed_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="2dp"
+                    android:layout_weight="1"
+                    android:background="#ffffff"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="20dp"
+                    android:text="Max Speed"
+                    android:textColor="#555555"
+                    android:textSize="18dp" />
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="#00000000" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/training_view_calories_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="#ffffff"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="20dp"
+                    android:text="Calories"
+                    android:textColor="#555555"
+                    android:textSize="18dp" />
+
+                <TextView
+                    android:id="@+id/training_view_Distance_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="2dp"
+                    android:layout_weight="1"
+                    android:background="#ffffff"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="20dp"
+                    android:text="Distance"
+                    android:textColor="#555555"
+                    android:textSize="18dp" />
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="#00000000" />
+
+        </LinearLayout>
+
+    </ScrollView>
 
 </RelativeLayout>

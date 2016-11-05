@@ -27,6 +27,7 @@ import zina_eliran.app.BusinessEntities.BEResponseStatusEnum;
 import zina_eliran.app.BusinessEntities.BETraining;
 import zina_eliran.app.BusinessEntities.BETrainingDetailsModeEnum;
 import zina_eliran.app.BusinessEntities.BETrainingLevelEnum;
+import zina_eliran.app.BusinessEntities.BETrainingLocation;
 import zina_eliran.app.BusinessEntities.BETrainingStatusEnum;
 import zina_eliran.app.BusinessEntities.BETypesEnum;
 import zina_eliran.app.BusinessEntities.CMNLogHelper;
@@ -36,7 +37,6 @@ import zina_eliran.app.Utils.DateTimeFragmentHandler;
 import zina_eliran.app.Utils.FireBaseHandler;
 import zina_eliran.app.Utils.GoogleMapHandler;
 import zina_eliran.app.Utils.TimePickerFragment;
-
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.MapFragment;
@@ -66,7 +66,7 @@ public class TrainingDetailsActivity extends BaseFragmentActivity
     boolean isDirty;
     BETraining training;
     Calendar trainingCalender;
-    Place trainingLocation;
+    BETrainingLocation trainingLocation;
     ProgressBar pBar;
     boolean isDoneBinding = false;
     int PLACE_PICKER_REQUEST = 1;
@@ -103,7 +103,7 @@ public class TrainingDetailsActivity extends BaseFragmentActivity
         }
     }
 
-    private void initTrainingLocation(Place place) {
+    private void initTrainingLocation(BETrainingLocation place) {
         try {
             gmh = new GoogleMapHandler(this, trainingMapFragment, place);
         } catch (Exception e) {
@@ -558,8 +558,12 @@ public class TrainingDetailsActivity extends BaseFragmentActivity
             if (requestCode == PLACE_PICKER_REQUEST) {
                 if (resultCode == RESULT_OK) {
                     Place selectedLocation = PlacePicker.getPlace(data, this);
-                    trainingLocation = selectedLocation;
-                    initTrainingLocation(selectedLocation);
+                    trainingLocation = new BETrainingLocation();
+                    trainingLocation.setLatitude(selectedLocation.getLatLng().latitude);
+                    trainingLocation.setLongitude(selectedLocation.getLatLng().longitude);
+                    trainingLocation.setLocationName(selectedLocation.getName().toString());
+                    trainingLocation.setLocationAddress(selectedLocation.getAddress().toString());
+                    initTrainingLocation(trainingLocation);
                     Toast.makeText(this, String.format("%s was selected successfully.", selectedLocation.getName()), Toast.LENGTH_LONG).show();
                 }
             }

@@ -17,7 +17,7 @@ public class BETraining extends BEBaseEntity{
     private int duration;
     private Calendar trainingDateTimeCalender;
     private Calendar creationDateTimeCalender;
-    private Place location;
+    private BETrainingLocation location;
     private int maxNumberOfParticipants;
     private int currentNumberOfParticipants;
     private BETrainingStatusEnum status;
@@ -88,11 +88,11 @@ public class BETraining extends BEBaseEntity{
         this.creationDateTimeCalender = creationDateTimeCalender;
     }
 
-    public Place getLocation() {
+    public BETrainingLocation getLocation() {
         return location;
     }
 
-    public void setLocation(Place location) {
+    public void setLocation(BETrainingLocation location) {
         this.location = location;
     }
 

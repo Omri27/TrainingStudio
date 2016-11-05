@@ -25,7 +25,6 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
-
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
@@ -361,7 +360,6 @@ public class ProfileSettingsActivity extends BaseActivity implements View.OnClic
                     } catch (Exception e) {
                         CMNLogHelper.logError("ProfileSettingsActivity", e.getMessage());
                     }
-
                     break;
             }
         }

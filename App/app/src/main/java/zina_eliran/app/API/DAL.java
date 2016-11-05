@@ -24,6 +24,8 @@ import zina_eliran.app.Utils.FireBaseHandler;
 
 public class DAL {
 
+    //db link: https://console.firebase.google.com/project/trainingstudiofb/database/data
+
     private static Firebase rootRef = new Firebase("https://trainingstudiofb.firebaseio.com");
     private static Firebase usersRef = rootRef.child("Users");
     private static Firebase trainingsRef = rootRef.child("Trainings");

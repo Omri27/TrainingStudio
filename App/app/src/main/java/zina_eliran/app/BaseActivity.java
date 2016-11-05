@@ -206,7 +206,7 @@ public class BaseActivity extends AppCompatActivity {
 
     public void askForPermission(String permission, Integer requestCode) {
         try {
-            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+            //if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
 
                 // Should we show an explanation?
                 if (ActivityCompat.shouldShowRequestPermissionRationale(this, permission)) {
@@ -219,9 +219,9 @@ public class BaseActivity extends AppCompatActivity {
 
                     ActivityCompat.requestPermissions(this, new String[]{permission}, requestCode);
                 }
-            } else {
-                CMNLogHelper.logError("BaseActivity", permission + " is already granted.");
-            }
+            //} else {
+             //   CMNLogHelper.logError("BaseActivity", permission + " is already granted.");
+            //}
         } catch (Exception e) {
             CMNLogHelper.logError("BaseActivity", e.getMessage());
         }

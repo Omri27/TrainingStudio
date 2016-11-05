@@ -30,6 +30,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.util.List;
 import java.util.Locale;
 
+import zina_eliran.app.BusinessEntities.BETrainingLocation;
+
 
 public class GoogleMapHandler implements
         OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
@@ -42,7 +44,7 @@ public class GoogleMapHandler implements
     GoogleMap mMap;
     LocationRequest mLocationRequest;
     LatLng mLastlatLng;
-    Place place;
+    BETrainingLocation trainingLocation;
     Marker mCurrLocationMarker;
     MapFragment mfMap;
     Context context;
@@ -63,10 +65,10 @@ public class GoogleMapHandler implements
         mfMap.getMapAsync(this);
     }
 
-    public GoogleMapHandler(Context context, MapFragment mfMap, Place place) {
+    public GoogleMapHandler(Context context, MapFragment mfMap, BETrainingLocation trainingLocation) {
         this.context = context;
         this.mfMap = mfMap;
-        this.place = place;
+        this.trainingLocation = trainingLocation;
 
         //"force" LTR alignment + english language
         String languageToLoad = "en";
@@ -112,7 +114,7 @@ public class GoogleMapHandler implements
             mCurrLocationMarker.remove();
         }
 
-        if(this.place == null){
+        if(this.trainingLocation == null){
             //Place current location marker
             mLastlatLng = new LatLng(location.getLatitude(), location.getLongitude());
         }
@@ -120,7 +122,7 @@ public class GoogleMapHandler implements
             //remove old markers
             mMap.clear();
             //Place current location marker
-            mLastlatLng = new LatLng(place.getLatLng().latitude, place.getLatLng().longitude);
+            mLastlatLng = new LatLng(trainingLocation.getLatitude(), trainingLocation.getLongitude());
         }
 
         mCurrLocationMarker = addMarker(mLastlatLng);

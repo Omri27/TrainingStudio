@@ -345,6 +345,9 @@ public class TrainingDetailsActivity extends BaseFragmentActivity
                     break;
                 case R.id.training_details_update_location_tv:
                     if (activityMode == BETrainingDetailsModeEnum.training_details_create_mode) {
+
+
+
                         PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
                         startActivityForResult(builder.build(this), PLACE_PICKER_REQUEST);
                     }

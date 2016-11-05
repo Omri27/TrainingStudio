@@ -49,6 +49,15 @@ dependencies {
 //    compile 'com.google.android.gms:play-services:9.8.0'
     compile 'com.theartofdev.edmodo:android-image-cropper:2.3.+'
 
+    compile 'com.google.firebase:firebase-database:9.8.0'
+    compile 'com.google.android.gms:play-services-gcm:9.8.0'
+    //    //compile 'com.google.firebase:firebase-core:9.8.0'
+    compile 'com.google.android.gms:play-services-appindexing:9.8.0'
+    compile 'com.google.android.gms:play-services-location:9.8.0'
+    compile 'com.google.android.gms:play-services-maps:9.8.0'
+    compile 'com.google.android.gms:play-services-places:9.8.0'
+    compile 'com.google.android.gms:play-services-nearby:9.8.0'
+    compile 'com.google.android.gms:play-services-panorama:9.8.0'
     testCompile 'junit:junit:4.12'
 }
 

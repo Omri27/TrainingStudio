@@ -143,9 +143,6 @@ public class LobbyActivity extends BaseActivity implements View.OnClickListener,
         try {
             if (isVerified()) {
 
-                //ask for permission : ACCESS_FINE_LOCATION
-                askForPermission(android.Manifest.permission.ACCESS_FINE_LOCATION, LOCATION);
-
                 sApi.getUser(readFromSharedPreferences(_getString(R.string.user_id)), this);
             }
             //navigate to Lobby if the user is verified

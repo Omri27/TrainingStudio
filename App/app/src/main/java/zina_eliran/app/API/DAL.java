@@ -1,31 +1,25 @@
 package zina_eliran.app.API;
 
-import com.firebase.client.DataSnapshot;
+import android.content.Intent;
+
 import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.MutableData;
-import com.firebase.client.Transaction;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 
 import zina_eliran.app.API.EmailSender.EmailSendThread;
-import zina_eliran.app.API.EmailSender.EmailSender;
 import zina_eliran.app.API.Listeners.JoinLeaveThread;
 import zina_eliran.app.API.Listeners.OnSetValueCompleteListener;
 import zina_eliran.app.API.Listeners.GetBEObjectEventListener;
-import zina_eliran.app.API.Listeners.UpdateTransactionHandler;
 import zina_eliran.app.BusinessEntities.BEBaseEntity;
 import zina_eliran.app.BusinessEntities.BEResponse;
 import zina_eliran.app.BusinessEntities.BEResponseStatusEnum;
 import zina_eliran.app.BusinessEntities.BETraining;
-import zina_eliran.app.BusinessEntities.BETrainingLevelEnum;
-import zina_eliran.app.BusinessEntities.BETrainingStatusEnum;
 import zina_eliran.app.BusinessEntities.BETypesEnum;
 import zina_eliran.app.BusinessEntities.BEUser;
 import zina_eliran.app.BusinessEntities.CMNLogHelper;
 import zina_eliran.app.BusinessEntities.DALActionTypeEnum;
+import zina_eliran.app.Notifications.DBMonitoringService;
 import zina_eliran.app.Utils.FireBaseHandler;
 
 public class DAL {
@@ -346,6 +340,10 @@ public class DAL {
     //Zina's tests
 
     public static void tests(FireBaseHandler fireBaseHandler) {
+
+//        Intent intent = new Intent(this, DBMonitoringService.class);
+//        startService(intent);
+
 
         //Create user test
 //        BEUser user = new BEUser();

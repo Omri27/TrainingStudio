@@ -57,7 +57,7 @@ public class BaseActivity extends AppCompatActivity {
                 getBaseContext().getResources().getDisplayMetrics());
 
         //run this once when you want to "init" the registration process
-        clearSharedPreferences();
+        //clearSharedPreferences();
     }
 
 

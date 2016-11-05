@@ -22,6 +22,7 @@ import zina_eliran.app.BusinessEntities.BEResponseStatusEnum;
 import zina_eliran.app.BusinessEntities.BETraining;
 import zina_eliran.app.BusinessEntities.BETrainingLevelEnum;
 import zina_eliran.app.BusinessEntities.BETrainingStatusEnum;
+import zina_eliran.app.BusinessEntities.BETrainingViewDetails;
 import zina_eliran.app.BusinessEntities.BETypesEnum;
 import zina_eliran.app.BusinessEntities.BEUser;
 import zina_eliran.app.BusinessEntities.CMNLogHelper;
@@ -93,6 +94,19 @@ public class DAL {
     public static void getTraining(String trainingId, FireBaseHandler fireBaseHandler) {
         getObject(BETypesEnum.Trainings, DALActionTypeEnum.getTraining, trainingId, fireBaseHandler);
     }
+
+
+    public static void getTrainingView(String trainingId,String userId,  FireBaseHandler fireBaseHandler) {
+        //Zina - please add here this implementation:
+        //getObject(BETypesEnum.Trainings, DALActionTypeEnum.getTrainingViewDetails, trainingId, userId, fireBaseHandler);
+    }
+
+    public static void createTrainingView(BETrainingViewDetails trainingView, FireBaseHandler fbHandler) {
+        //Zina - please add here implementation
+    }
+
+
+
 
     //*
     public static void getUsersByTraining(String trainingId, FireBaseHandler fireBaseHandler) {
@@ -445,4 +459,6 @@ public class DAL {
     public static Firebase getTrainingsRef() {
         return trainingsRef;
     }
+
+
 }

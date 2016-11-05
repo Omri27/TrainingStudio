@@ -346,7 +346,8 @@ public class TrainingDetailsActivity extends BaseFragmentActivity
                 case R.id.training_details_update_location_tv:
                     if (activityMode == BETrainingDetailsModeEnum.training_details_create_mode) {
 
-
+                        //ask for permission : ACCESS_FINE_LOCATION
+                        askForPermission(android.Manifest.permission.ACCESS_FINE_LOCATION, LOCATION);
 
                         PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
                         startActivityForResult(builder.build(this), PLACE_PICKER_REQUEST);

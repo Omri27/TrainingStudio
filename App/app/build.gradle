@@ -54,6 +54,10 @@ dependencies {
     compile 'com.google.android.gms:play-services-nearby:9.8.0'
     compile 'com.google.android.gms:play-services-panorama:9.8.0'
     testCompile 'junit:junit:4.12'
+
+    //https://github.com/PhilJay/MPAndroidChart#usage
+    compile 'com.github.PhilJay:MPAndroidChart:v3.0.0'
+
 }
 
 

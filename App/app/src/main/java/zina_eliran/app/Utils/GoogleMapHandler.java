@@ -27,6 +27,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -45,6 +46,7 @@ public class GoogleMapHandler implements
     LocationRequest mLocationRequest;
     LatLng mLastlatLng;
     BETrainingLocation trainingLocation;
+    ArrayList<BETrainingLocation> trainingLocations;
     Marker mCurrLocationMarker;
     MapFragment mfMap;
     Context context;
@@ -53,15 +55,7 @@ public class GoogleMapHandler implements
         this.context = context;
         this.mfMap = mfMap;
 
-        //"force" LTR alignment + english language
-        String languageToLoad = "en";
-        Locale locale = new Locale(languageToLoad);
-        Locale.setDefault(locale);
-        Configuration config = new Configuration();
-        config.locale = locale;
-        this.context.getResources().updateConfiguration(config,
-                this.context.getResources().getDisplayMetrics());
-
+        setEngLocale();
         mfMap.getMapAsync(this);
     }
 
@@ -70,6 +64,21 @@ public class GoogleMapHandler implements
         this.mfMap = mfMap;
         this.trainingLocation = trainingLocation;
 
+        setEngLocale();
+        mfMap.getMapAsync(this);
+    }
+
+
+    public GoogleMapHandler(Context context, MapFragment mfMap, ArrayList<BETrainingLocation> trainingLocations) {
+        this.context = context;
+        this.mfMap = mfMap;
+        this.trainingLocations = trainingLocations;
+
+        setEngLocale();
+        mfMap.getMapAsync(this);
+    }
+
+    private void setEngLocale(){
         //"force" LTR alignment + english language
         String languageToLoad = "en";
         Locale locale = new Locale(languageToLoad);
@@ -78,8 +87,6 @@ public class GoogleMapHandler implements
         config.locale = locale;
         this.context.getResources().updateConfiguration(config,
                 this.context.getResources().getDisplayMetrics());
-
-        mfMap.getMapAsync(this);
     }
 
 
@@ -96,8 +103,6 @@ public class GoogleMapHandler implements
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
 
         }
-
-
     }
 
     @Override
@@ -143,8 +148,6 @@ public class GoogleMapHandler implements
         markerOptions.position(latlng);
         markerOptions.title(getAddressString(latlng));
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE));
-
-
         return mMap.addMarker(markerOptions);
     }
 
@@ -179,7 +182,6 @@ public class GoogleMapHandler implements
     private String getAddressString(LatLng latLng) {
         Geocoder geocoder = new Geocoder(context, Locale.getDefault());
         List<Address> addresses = null;
-        String errorMessage;
         try {
             addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
         } catch (Exception ex) {

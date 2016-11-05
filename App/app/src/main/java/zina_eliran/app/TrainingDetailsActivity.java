@@ -90,9 +90,6 @@ public class TrainingDetailsActivity extends BaseFragmentActivity
 
         try {
 
-            //ask for permission : ACCESS_FINE_LOCATION
-            askForPermission(android.Manifest.permission.ACCESS_FINE_LOCATION, LOCATION);
-
             initActivityElements();
 
             initNotificationsSwithces();

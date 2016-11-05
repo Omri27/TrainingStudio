@@ -29,6 +29,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.Map;
+
 import zina_eliran.app.API.ServerAPI;
 import zina_eliran.app.BusinessEntities.CMNLogHelper;
 
@@ -57,6 +58,8 @@ public class BaseActivity extends AppCompatActivity {
     static final Integer CAMERA = 0x5;
     static final Integer ACCOUNTS = 0x6;
     static final Integer GPS_SETTINGS = 0x7;
+
+    static final int RESULT_LOAD_IMG = 0x8;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

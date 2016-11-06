@@ -10,7 +10,6 @@
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
 
-
     <application
         android:allowBackup="true"
         android:icon="@drawable/app_icon_new"
@@ -63,19 +62,9 @@
             android:name=".TrainingViewActivity"
             android:configChanges="screenSize"
             android:theme="@style/Theme.AppCompat.NoActionBar"></activity>
-            android:name="zina_eliran.app.TrainingMapsActivity"
-            android:label="@string/title_activity_training_maps"></activity>
-            android:theme="@style/Theme.AppCompat.NoActionBar" />
-
-        <!-- FirebaseInstanceIdService performs security checks at runtime,
-      no need for explicit permissions despite exported="true"             -->
         <service
-            android:name=".Notifications.MyFirebaseInstanceIdService"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
-            </intent-filter>
+            android:name=".Notifications.DBMonitoringService"
+            android:label="DBMonitoringService" >
         </service>
     </application>
 

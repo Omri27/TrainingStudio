@@ -1,5 +1,8 @@
 package zina_eliran.app.Notifications;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Handler;
@@ -9,9 +12,59 @@ import android.os.Looper;
 import android.os.Message;
 import android.widget.Toast;
 
-public class DBMonitoringService extends Service {
+import zina_eliran.app.API.DAL;
+import zina_eliran.app.API.ServerAPI;
+import zina_eliran.app.BusinessEntities.BEResponse;
+import zina_eliran.app.BusinessEntities.BEResponseStatusEnum;
+import zina_eliran.app.BusinessEntities.BETraining;
+import zina_eliran.app.BusinessEntities.BEUser;
+import zina_eliran.app.BusinessEntities.DALActionTypeEnum;
+import zina_eliran.app.LobbyActivity;
+import zina_eliran.app.R;
+import zina_eliran.app.Utils.FireBaseHandler;
+
+public class DBMonitoringService extends Service implements FireBaseHandler{
     private Looper mServiceLooper;
     private ServiceHandler mServiceHandler;
+    private BEUser user;
+    private BETraining training;
+
+    @Override
+    public void onActionCallback(BEResponse response) {
+        if (response != null && response.getStatus() != BEResponseStatusEnum.error){
+            if (response.getActionType() == DALActionTypeEnum.getUser  && response.getEntities().get(0) != null){
+                setUser((BEUser)response.getEntities().get(0));
+                Toast.makeText(this, user.toString(), Toast.LENGTH_LONG).show();
+                DAL.addListenerToUser(user);
+
+            }
+            else if (response.getActionType() == DALActionTypeEnum.getTraining && response.getEntities().get(0) != null){
+                setTraining((BETraining)response.getEntities().get(0));
+                DAL.addListenerToTraining(training.getId(),this);
+
+            }
+
+            else if (response.getActionType() == DALActionTypeEnum.trainingCancelled){
+                sendNotification("Training " + training.getName() + " has been cancelled", NotificationTypeEnum.trainingIsCancelled);
+            }
+
+            else if (response.getActionType() == DALActionTypeEnum.trainingFull){
+                sendNotification("Training " + training.getName() + " is full", NotificationTypeEnum.trainingIsFull);
+            }
+
+
+
+        }
+    }
+
+
+    public void setUser(BEUser user){
+        this.user = user;
+    }
+
+    public void setTraining(BETraining training){
+        this.training = training;
+    }
 
     // Handler that receives messages from the thread
     private final class ServiceHandler extends Handler {
@@ -42,10 +95,11 @@ public class DBMonitoringService extends Service {
         // background priority so CPU-intensive work will not disrupt our UI.
         HandlerThread thread = new HandlerThread("ServiceStartArguments", 10);
         thread.start();
-
+        Toast.makeText(this, "service create done", Toast.LENGTH_LONG).show();
         // Get the HandlerThread's Looper and use it for our Handler
         mServiceLooper = thread.getLooper();
         mServiceHandler = new ServiceHandler(mServiceLooper);
+
     }
 
     @Override
@@ -61,9 +115,56 @@ public class DBMonitoringService extends Service {
         // If we get killed, after returning from here, restart
         Toast.makeText(this, "service start done", Toast.LENGTH_LONG).show();
 
+        ServerAPI serverAPI = ServerAPI.getInstance();
+        serverAPI.getUser("-KVoIEcajMpGLDg71_RR", this);
+        serverAPI.getTraining("-KVoJcrD1NDO1SC9UX83", this);
+
+
+
+
+
+// build notification
+// the addAction re-use the same intent to keep the example short
+
+
         Toast.makeText(this, "service is running", Toast.LENGTH_LONG).show();
 
         return START_STICKY;
+    }
+
+
+    public boolean shouldSendNotification(NotificationTypeEnum notificationType){
+        if (notificationType == NotificationTypeEnum.trainingIsFull && user.isTrainingFullNotification())
+            return true;
+        else if (notificationType == NotificationTypeEnum.trainingIsCancelled && user.isTrainingCancelledNotification())
+            return true;
+        else if (notificationType == NotificationTypeEnum.reminder && user.isTrainingRemainderNotification())
+            return true;
+        return false;
+
+    }
+
+
+
+    private void sendNotification(String message, NotificationTypeEnum notificationType) {
+        if (shouldSendNotification(notificationType)){
+            NotificationManager nm = (NotificationManager)this.getSystemService(NOTIFICATION_SERVICE);
+            Notification.Builder builder = new Notification.Builder(this);
+            Intent notificationIntent = new Intent(this, LobbyActivity.class);
+            PendingIntent contentIntent = PendingIntent.getActivity(this,0,notificationIntent,0);
+
+            //set notification details
+            builder.setContentIntent(contentIntent);
+            builder.setSmallIcon(R.drawable.app_icon);
+            builder.setContentText(message);
+            builder.setContentTitle("Training Studio");
+            builder.setAutoCancel(true);
+            builder.setDefaults(Notification.DEFAULT_ALL);
+
+            //send notification
+            Notification notification = builder.build();
+            nm.notify((int)System.currentTimeMillis(),notification);
+        }
     }
 
     @Override

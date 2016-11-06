@@ -1,9 +1,6 @@
 package zina_eliran.app.API;
 
-import android.content.Intent;
-
 import com.firebase.client.Firebase;
-import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.util.ArrayList;
 
@@ -11,6 +8,8 @@ import zina_eliran.app.API.EmailSender.EmailSendThread;
 import zina_eliran.app.API.Listeners.JoinLeaveThread;
 import zina_eliran.app.API.Listeners.OnSetValueCompleteListener;
 import zina_eliran.app.API.Listeners.GetBEObjectEventListener;
+import zina_eliran.app.API.Listeners.OnTrainingChangeListener;
+import zina_eliran.app.API.Listeners.OnUserChangeListener;
 import zina_eliran.app.BusinessEntities.BEBaseEntity;
 import zina_eliran.app.BusinessEntities.BEResponse;
 import zina_eliran.app.BusinessEntities.BEResponseStatusEnum;
@@ -19,7 +18,6 @@ import zina_eliran.app.BusinessEntities.BETypesEnum;
 import zina_eliran.app.BusinessEntities.BEUser;
 import zina_eliran.app.BusinessEntities.CMNLogHelper;
 import zina_eliran.app.BusinessEntities.DALActionTypeEnum;
-import zina_eliran.app.Notifications.DBMonitoringService;
 import zina_eliran.app.Utils.FireBaseHandler;
 
 public class DAL {
@@ -442,5 +440,13 @@ public class DAL {
     }
     public static Firebase getTrainingsRef() {
         return trainingsRef;
+    }
+    public static void addListenerToTraining(String trainingID, FireBaseHandler fbHandler){
+        Firebase tRef = trainingsRef.child(trainingID);
+        tRef.addChildEventListener(new OnTrainingChangeListener(fbHandler));
+    }
+    public static void addListenerToUser(BEUser user){
+        Firebase uRef = usersRef.child(user.getId());
+        uRef.addChildEventListener(new OnUserChangeListener(user));
     }
 }

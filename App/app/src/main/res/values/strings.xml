@@ -46,4 +46,9 @@
     <string name="training_details_view_mode">training_details_view_mode</string>
     <string name="title_activity_training_maps">Map</string>
 
+
+    <!--********************************************************************************************-->
+    <!--training view values-->
+    <string name="training_view_training_id">training_view_training_id</string>
+
 </resources>

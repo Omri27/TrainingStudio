@@ -6,6 +6,7 @@ public class BETrainingLocation extends BEBaseEntity {
     private String locationAddress;
     private double longitude;
     private double latitude;
+    private double altitude;
 
     public String getLocationName() {
         return locationName;
@@ -37,5 +38,13 @@ public class BETrainingLocation extends BEBaseEntity {
 
     public void setLatitude(double latitude) {
         this.latitude = latitude;
+    }
+
+    public double getAltitude() {
+        return altitude;
+    }
+
+    public void setAltitude(double altitude) {
+        this.altitude = altitude;
     }
 }

@@ -18,4 +18,6 @@ public enum DALActionTypeEnum {
     getAllTrainings,
     trainingCancelled,
     trainingFull
+    getAllTrainings,
+    getTrainingViewDetails
 }

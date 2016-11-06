@@ -7,6 +7,7 @@ import zina_eliran.app.BusinessEntities.BEBaseEntity;
 import zina_eliran.app.BusinessEntities.BEResponse;
 import zina_eliran.app.BusinessEntities.BETraining;
 import zina_eliran.app.BusinessEntities.BETrainingStatusEnum;
+import zina_eliran.app.BusinessEntities.BETrainingViewDetails;
 import zina_eliran.app.BusinessEntities.BEUser;
 import zina_eliran.app.Utils.FireBaseHandler;
 
@@ -78,6 +79,14 @@ public class ServerAPI {
 
     public void getTraining(String trainingId, FireBaseHandler fbHandler) {
         DAL.getTraining(trainingId, fbHandler);
+    }
+
+    public void getTrainingView(String trainingId, String userId,  FireBaseHandler fbHandler) {
+        DAL.getTrainingView(trainingId,userId, fbHandler);
+    }
+
+    public static void createTrainingView(BETrainingViewDetails trainingView, FireBaseHandler fbHandler) {
+        DAL.createTrainingView(trainingView, fbHandler);
     }
 
 

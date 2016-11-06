@@ -50,6 +50,10 @@ dependencies {
     compile 'com.theartofdev.edmodo:android-image-cropper:2.3.+'
 
     testCompile 'junit:junit:4.12'
+
+    //https://github.com/PhilJay/MPAndroidChart#usage
+    compile 'com.github.PhilJay:MPAndroidChart:v3.0.0'
+
 }
 
 

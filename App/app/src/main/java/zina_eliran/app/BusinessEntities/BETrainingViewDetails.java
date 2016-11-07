@@ -106,6 +106,22 @@ public class BETrainingViewDetails extends BEBaseEntity {
         this.totalCalories = totalCalories;
     }
 
+    @Override
+    public String toString() {
+        return "BETrainingViewDetails{" +
+                "trainingId='" + trainingId + '\'' +
+                ", userId='" + userId + '\'' +
+                ", trainingStartDateTimeCalender=" + trainingStartDateTimeCalender +
+                ", trainingEndDateTimeCalender=" + trainingEndDateTimeCalender +
+                ", trainingLocationRoute=" + trainingLocationRoute +
+                ", status=" + status +
+                ", avgSpeed=" + avgSpeed +
+                ", maxSpeed=" + maxSpeed +
+                ", totalDistance=" + totalDistance +
+                ", totalCalories=" + totalCalories +
+                '}';
+    }
+
     public int getActualDuration() {
         return actualDuration;
     }

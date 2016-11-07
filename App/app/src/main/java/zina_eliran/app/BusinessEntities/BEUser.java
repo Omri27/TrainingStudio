@@ -15,7 +15,7 @@ public class BEUser extends BEBaseEntity {
     private boolean isMale;
     private BETrainingLevelEnum trainingLevel;
     private float heigth;
-    private float weigth;
+    public float weigth;
     private int age;
     private boolean isPrivateProfile;
     private Location myLocation;
@@ -200,10 +200,17 @@ public class BEUser extends BEBaseEntity {
                 "name='" + name + '\'' +
                 ", email='" + email + '\'' +
                 ", verificationCode='" + verificationCode + '\'' +
-                ", isActive=" + isActive +
+                ", trainingLevel=" + trainingLevel +
+                ", heigth=" + heigth +
+                ", weigth=" + weigth +
+                ", registeredDate=" + registeredDate +
+                ", isTrainingCancelledNotification=" + isTrainingCancelledNotification +
+                ", isTrainingFullNotification=" + isTrainingFullNotification +
+                ", isTrainingRemainderNotification=" + isTrainingRemainderNotification +
+                ", age=" + age +
+                ", isPrivateProfile=" + isPrivateProfile +
                 '}';
     }
-
 
     public void addTrainingToTrainingList(String trainingId) {
         this.myTrainingIds.add(trainingId);

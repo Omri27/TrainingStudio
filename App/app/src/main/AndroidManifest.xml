@@ -64,6 +64,10 @@
             android:name=".TrainingViewActivity"
             android:configChanges="screenSize"
             android:theme="@style/Theme.AppCompat.NoActionBar"></activity>
+        <service
+            android:name=".Notifications.DBMonitoringService"
+            android:label="DBMonitoringService" >
+        </service>
     </application>
 
 </manifest>

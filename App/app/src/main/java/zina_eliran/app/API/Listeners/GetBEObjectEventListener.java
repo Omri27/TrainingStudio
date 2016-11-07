@@ -16,6 +16,7 @@ import zina_eliran.app.BusinessEntities.BEBaseEntity;
 import zina_eliran.app.BusinessEntities.BEResponse;
 import zina_eliran.app.BusinessEntities.BEResponseStatusEnum;
 import zina_eliran.app.BusinessEntities.BETraining;
+import zina_eliran.app.BusinessEntities.BETrainingViewDetails;
 import zina_eliran.app.BusinessEntities.BETypesEnum;
 import zina_eliran.app.BusinessEntities.BEUser;
 import zina_eliran.app.BusinessEntities.CMNLogHelper;
@@ -60,11 +61,13 @@ public class GetBEObjectEventListener implements ValueEventListener {
         String errorMessage = null;
 
 
-        if (action == DALActionTypeEnum.getTraining || action == DALActionTypeEnum.getUser){
+        if (action == DALActionTypeEnum.getTraining || action == DALActionTypeEnum.getUser || action == DALActionTypeEnum.getTrainingViewDetails){
             if (dataType == BETypesEnum.Trainings)
                 objects.add(dataSnapshot.getValue(BETraining.class));
             else if (dataType == BETypesEnum.Users)
                 objects.add(dataSnapshot.getValue(BEUser.class));
+            else if (dataType == BETypesEnum.TrainingViewDetails)
+                objects.add(dataSnapshot.getValue(BETrainingViewDetails.class));
             else {
                 status = BEResponseStatusEnum.error;
                 errorMessage = "Unknown data type";
@@ -76,6 +79,9 @@ public class GetBEObjectEventListener implements ValueEventListener {
 //                CMNLogHelper.logError("GetUserListener", "[[" + action.toString()  + "]]"  + " " + ((BEUser)objects.get(0)).toString());
 //            else if (objects.get(0) instanceof BETraining)
 //                CMNLogHelper.logError("GetTrainingListener", "[[" + action.toString() + "]]" + " " + ((BETraining)objects.get(0)).toString());
+//            else if (objects.get(0) instanceof BETrainingViewDetails)
+//                CMNLogHelper.logError("GetTrainingViewDetailsListener", "[[" + action.toString() + "]]" + " " + ((BETrainingViewDetails)objects.get(0)).toString());
+
         }
 
         else if (action == DALActionTypeEnum.getAllTrainings){

@@ -18,6 +18,7 @@ import zina_eliran.app.BusinessEntities.BEResponse;
 import zina_eliran.app.BusinessEntities.BEResponseStatusEnum;
 import zina_eliran.app.BusinessEntities.BETraining;
 import zina_eliran.app.BusinessEntities.BEUser;
+import zina_eliran.app.BusinessEntities.CMNLogHelper;
 import zina_eliran.app.BusinessEntities.DALActionTypeEnum;
 import zina_eliran.app.LobbyActivity;
 import zina_eliran.app.R;
@@ -116,8 +117,8 @@ public class DBMonitoringService extends Service implements FireBaseHandler{
         Toast.makeText(this, "service start done", Toast.LENGTH_LONG).show();
 
         ServerAPI serverAPI = ServerAPI.getInstance();
-        serverAPI.getUser("-KVoIEcajMpGLDg71_RR", this);
-        serverAPI.getTraining("-KVoJcrD1NDO1SC9UX83", this);
+        serverAPI.getUser("-KVnVQJFbX7DtWIlEAIS", this);
+        serverAPI.getTraining("-KVzSvgE-pw_Ver-H2An", this);
 
 
 
@@ -134,13 +135,22 @@ public class DBMonitoringService extends Service implements FireBaseHandler{
 
 
     public boolean shouldSendNotification(NotificationTypeEnum notificationType){
-        if (notificationType == NotificationTypeEnum.trainingIsFull && user.isTrainingFullNotification())
-            return true;
-        else if (notificationType == NotificationTypeEnum.trainingIsCancelled && user.isTrainingCancelledNotification())
-            return true;
-        else if (notificationType == NotificationTypeEnum.reminder && user.isTrainingRemainderNotification())
-            return true;
-        return false;
+        try{
+            if (user!= null){
+                if (notificationType == NotificationTypeEnum.trainingIsFull && user.isTrainingFullNotification())
+                    return true;
+                else if (notificationType == NotificationTypeEnum.trainingIsCancelled && user.isTrainingCancelledNotification())
+                    return true;
+                else if (notificationType == NotificationTypeEnum.reminder && user.isTrainingRemainderNotification())
+                    return true;
+                return false;
+            }
+        } catch (Exception e){
+            CMNLogHelper.logError("CheckNotificationFailed", e.getMessage());
+        }
+        //Zina change this to true
+        return true;
+
 
     }
 

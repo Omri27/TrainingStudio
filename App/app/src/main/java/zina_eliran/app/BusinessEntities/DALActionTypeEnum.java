@@ -15,9 +15,9 @@ public enum DALActionTypeEnum {
     updateTraining,
     getPublicTrainings,
     getMyTrainings,
-    getAllTrainings,
     trainingCancelled,
-    trainingFull
+    trainingFull,
     getAllTrainings,
-    getTrainingViewDetails
+    getTrainingViewDetails,
+    createTrainingViewDetails
 }

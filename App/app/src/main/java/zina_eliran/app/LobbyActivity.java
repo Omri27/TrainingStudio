@@ -1,5 +1,8 @@
 package zina_eliran.app;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -12,12 +15,14 @@ import android.widget.Toast;
 import java.util.HashMap;
 import java.util.Map;
 
+import zina_eliran.app.API.DAL;
 import zina_eliran.app.BusinessEntities.BEResponse;
 import zina_eliran.app.BusinessEntities.BEResponseStatusEnum;
 import zina_eliran.app.BusinessEntities.BETypesEnum;
 import zina_eliran.app.BusinessEntities.BEUser;
 import zina_eliran.app.BusinessEntities.CMNLogHelper;
 import zina_eliran.app.BusinessEntities.DALActionTypeEnum;
+import zina_eliran.app.Notifications.DBMonitoringService;
 import zina_eliran.app.Utils.FireBaseHandler;
 
 public class LobbyActivity extends BaseActivity implements View.OnClickListener, FireBaseHandler {
@@ -42,6 +47,13 @@ public class LobbyActivity extends BaseActivity implements View.OnClickListener,
         pBarRl = (RelativeLayout)findViewById(R.id.lobby_pbar_rl);
         mainLayout = (LinearLayout) findViewById(R.id.lobby_ll);
         handleLoginState();
+
+
+        Intent intent = new Intent(this, DBMonitoringService.class);
+        startService(intent);
+
+        DAL.tests(this);
+
 
     }
 

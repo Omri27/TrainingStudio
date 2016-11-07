@@ -16,6 +16,7 @@ public class BETrainingViewDetails extends BEBaseEntity {
     private float maxSpeed;
     private float totalDistance;
     private int totalCalories;
+    private int actualDuration;
 
 
     public String getTrainingId() {
@@ -58,6 +59,13 @@ public class BETrainingViewDetails extends BEBaseEntity {
         this.trainingLocationRoute = trainingLocationRoute;
     }
 
+    public void addTrainingLocationRoute(BETrainingLocation trainingLocation) {
+        if(this.trainingLocationRoute == null){
+            this.trainingLocationRoute = new ArrayList<>();
+        }
+        this.trainingLocationRoute.add(trainingLocation);
+    }
+
     public BETrainingViewStatusEnum getStatus() {
         return status;
     }
@@ -96,5 +104,13 @@ public class BETrainingViewDetails extends BEBaseEntity {
 
     public void setTotalCalories(int totalCalories) {
         this.totalCalories = totalCalories;
+    }
+
+    public int getActualDuration() {
+        return actualDuration;
+    }
+
+    public void setActualDuration(int actualDuration) {
+        this.actualDuration = actualDuration;
     }
 }

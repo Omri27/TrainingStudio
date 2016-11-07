@@ -9,11 +9,13 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import zina_eliran.app.BusinessEntities.BEResponse;
 import zina_eliran.app.BusinessEntities.BEResponseStatusEnum;
+import zina_eliran.app.BusinessEntities.BETraining;
 import zina_eliran.app.BusinessEntities.BETypesEnum;
 import zina_eliran.app.BusinessEntities.BEUser;
 import zina_eliran.app.BusinessEntities.CMNLogHelper;
@@ -39,7 +41,7 @@ public class LobbyActivity extends BaseActivity implements View.OnClickListener,
         pBar = (ProgressBar) findViewById(R.id.lobby_pbar);
         pBar.setVisibility(View.VISIBLE);
         pBar.bringToFront();
-        pBarRl = (RelativeLayout)findViewById(R.id.lobby_pbar_rl);
+        pBarRl = (RelativeLayout) findViewById(R.id.lobby_pbar_rl);
         mainLayout = (LinearLayout) findViewById(R.id.lobby_ll);
         handleLoginState();
 
@@ -97,13 +99,15 @@ public class LobbyActivity extends BaseActivity implements View.OnClickListener,
                     break;
 
                 case R.id.lobby_start_training_btn:
-                    //disables in phase 1
                     //will enable to start recording data while running
+                    intentParams.put(_getString(R.string.training_view_activity_mode), _getString(R.string.training_view_run_mode));
+                    navigateToActivity(this, TrainingViewActivity.class, false, intentParams);
                     break;
 
                 case R.id.lobby_my_progress_btn:
                     //disables in phase 1
                     //will enable to see data about past trainings, progress etc.
+                    navigateToActivity(this, TrainingProgressActivity.class, false, null);
                     break;
 
             }
@@ -116,7 +120,6 @@ public class LobbyActivity extends BaseActivity implements View.OnClickListener,
     public void onActionCallback(BEResponse response) {
         try {
 
-
             if (response != null) {
                 if (response.getStatus() == BEResponseStatusEnum.error) {
                     CMNLogHelper.logError("LobbyActivity", "error in get user callback on app load | err:" + response.getMessage());
@@ -124,10 +127,34 @@ public class LobbyActivity extends BaseActivity implements View.OnClickListener,
                 } else if (response.getActionType() == DALActionTypeEnum.getUser && response.getEntityType() == BETypesEnum.Users) {
                     sApi.setAppUser((BEUser) response.getEntities().get(0));
 
+                    //get next training here, using my training ids and update server api
+                    sApi.getAllTrainings(this);
+
+                } else if (response.getActionType() == DALActionTypeEnum.getAllTrainings && response.getEntityType() == BETypesEnum.Trainings) {
+
+                    //get next training here and update server api
+                    ArrayList<BETraining> myJoinedTrainingsList = sApi.filterMyTrainings(sApi.getAppUser().getId(), response.getEntities(), false);
+                    BETraining nextTraining = sApi.getMyNextTraining(myJoinedTrainingsList);
+
+                    onCreateUI();
+
+                    if (myJoinedTrainingsList.size() > 0) {
+                        startTrainingBtn.setEnabled(true);
+                        sApi.setNextTraining(myJoinedTrainingsList.get(0));
+                    }
+
+
+                   /* if (nextTraining != null) {
+                        sApi.setNextTraining(nextTraining);
+                        if (isNext10MinSelectedDate(nextTraining.getTrainingDateTimeCalender())) {
+                            startTrainingBtn.setEnabled(true);
+                        }
+                    }*/
+
                     pBar.setVisibility(View.GONE);
                     pBarRl.setVisibility(View.GONE);
                     mainLayout.setVisibility(View.VISIBLE);
-                    onCreateUI();
+
                 } else {
                     CMNLogHelper.logError("LobbyActivity", "wrong action type in callback" + response.getEntityType() + ", " + response.getActionType());
                 }
@@ -163,4 +190,6 @@ public class LobbyActivity extends BaseActivity implements View.OnClickListener,
             CMNLogHelper.logError("LobbyActivity", e.getMessage());
         }
     }
+
+
 }

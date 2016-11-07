@@ -1,9 +1,8 @@
 package zina_eliran.app;
 
 import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
@@ -16,6 +15,7 @@ import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.MapFragment;
 
 import java.util.ArrayList;
@@ -24,19 +24,20 @@ import java.util.List;
 import zina_eliran.app.BusinessEntities.BEResponse;
 import zina_eliran.app.BusinessEntities.BEResponseStatusEnum;
 import zina_eliran.app.BusinessEntities.BETraining;
-import zina_eliran.app.BusinessEntities.BETrainingDetailsModeEnum;
 import zina_eliran.app.BusinessEntities.BETrainingLocation;
 import zina_eliran.app.BusinessEntities.BETrainingViewDetails;
 import zina_eliran.app.BusinessEntities.BETrainingViewModeEnum;
+import zina_eliran.app.BusinessEntities.BETrainingViewStatusEnum;
 import zina_eliran.app.BusinessEntities.BETypesEnum;
 import zina_eliran.app.BusinessEntities.CMNLogHelper;
 import zina_eliran.app.BusinessEntities.DALActionTypeEnum;
+import zina_eliran.app.Utils.AppLocationChangedHandler;
 import zina_eliran.app.Utils.FireBaseHandler;
 import zina_eliran.app.Utils.GoogleMapHandler;
 
 public class TrainingViewActivity extends BaseActivity
         implements View.OnClickListener, FireBaseHandler, CompoundButton.OnCheckedChangeListener,
-        SensorEventListener {
+        AppLocationChangedHandler {
 
     TextView trainingDescriptionTv;
     TextView trainingDateTv;
@@ -49,8 +50,7 @@ public class TrainingViewActivity extends BaseActivity
     TextView trainingDistanceTv;
 
     Button endTrainingBtn;
-    Button startPauseTrainingBtn;
-
+    Button startTrainingBtn;
 
     LineChart chart;
     LineDataSet chartDataSet;
@@ -60,17 +60,19 @@ public class TrainingViewActivity extends BaseActivity
     MapFragment trainingMapFragment;
     SensorManager sensorManager;
     Sensor sensor;
-    float altitude = 0;
-
 
     BETrainingViewModeEnum activityMode;
     BETraining training;
-    BETrainingViewDetails trainingView;
+    BETrainingViewDetails trainingView = new BETrainingViewDetails();
+    boolean isAllowBackButton;
+    int locationChangedCount = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_training_view);
+
+        intent = getIntent();
 
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE);
@@ -91,10 +93,13 @@ public class TrainingViewActivity extends BaseActivity
 
         try {
 
+            String _activityMode = getIntentParam(intent, _getString(R.string.training_view_activity_mode));
+            activityMode = BETrainingViewModeEnum.valueOf(_activityMode);
+
             if (activityMode != BETrainingViewModeEnum.training_view_run_mode ||
                     activityMode != BETrainingViewModeEnum.training_view_read_only_mode) {
-                sApi.getTraining(getIntentParam(intent, _getString(R.string.training_view_training_id)), this);
-                //sApi.getTrainingView(getIntentParam(intent, _getString(R.string.training_view_training_id)), sApi.getAppUser().getId(), this);
+                sApi.getTraining(sApi.getNextTraining().getId(), this);
+                //sApi.getTrainingView(sApi.getNextTraining().getId(), sApi.getAppUser().getId(), this);
             } else {
                 //handle error
             }
@@ -116,31 +121,28 @@ public class TrainingViewActivity extends BaseActivity
             trainingMaxSpeedTv = (TextView) findViewById(R.id.training_view_max_speed_tv);
             trainingCaloriesTv = (TextView) findViewById(R.id.training_view_calories_tv);
             trainingDistanceTv = (TextView) findViewById(R.id.training_view_Distance_tv);
-
             endTrainingBtn = (Button) findViewById(R.id.training_view_end_btn);
-            startPauseTrainingBtn = (Button) findViewById(R.id.training_view_action_btn);
-
-            endTrainingBtn.setOnClickListener(this);
-            startPauseTrainingBtn.setOnClickListener(this);
-
-        } catch (Exception e) {
-            CMNLogHelper.logError("TrainingViewActivity", e.getMessage());
-        }
-    }
-
-    private void initTrainingRouteMap() {
-        try {
-
+            startTrainingBtn = (Button) findViewById(R.id.training_view_start_btn);
             trainingMapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.training_view_location_map_f);
 
+
+            //set events
+            endTrainingBtn.setOnClickListener(this);
+            endTrainingBtn.setEnabled(false);
+            startTrainingBtn.setOnClickListener(this);
+
         } catch (Exception e) {
             CMNLogHelper.logError("TrainingViewActivity", e.getMessage());
         }
     }
 
-    private void initTrainingLocation(ArrayList<BETrainingLocation> trainingLocations) {
+    private void initTrainingLocation() {
         try {
-            gmh = new GoogleMapHandler(this, trainingMapFragment, trainingLocations);
+            if (activityMode == BETrainingViewModeEnum.training_view_run_mode) {
+                gmh = new GoogleMapHandler(this, trainingMapFragment, training.getLocation());
+            } else {
+                gmh = new GoogleMapHandler(this, trainingMapFragment, trainingView.getTrainingLocationRoute());
+            }
         } catch (Exception e) {
             CMNLogHelper.logError("TrainingDetailsActivity", e.getMessage());
         }
@@ -158,14 +160,49 @@ public class TrainingViewActivity extends BaseActivity
         }
     }
 
+    protected void createLocationRequest() {
+        LocationRequest mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(15000);
+        mLocationRequest.setFastestInterval(8000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    }
+
+
     @Override
     public void onClick(View view) {
         try {
 
             switch (view.getId()) {
-                case R.id.training_view_action_btn:
+                case R.id.training_view_start_btn:
+                    //create location changed listener
+                    gmh = new GoogleMapHandler(this, this, trainingMapFragment, training.getLocation(), 5000, 2000);
+                    startTrainingBtn.setEnabled(false);
+                    trainingView.setStatus(BETrainingViewStatusEnum.started);
+                    endTrainingBtn.setEnabled(true);
+
                     break;
                 case R.id.training_view_end_btn:
+
+                    //TODO Eliran remove after zina push
+                    isAllowBackButton = true;
+                    endTrainingBtn.setEnabled(false);
+                    gmh.drawOnMap(BETrainingLocation.getLatLngList(trainingView.getTrainingLocationRoute()));
+                    gmh.stopListener();
+                    //calculate all here:
+                    //max speed
+
+                    //avg speed
+
+                    //distance
+
+                    //calories
+
+                    //actual duration
+
+                    //status
+                    trainingView.setStatus(BETrainingViewStatusEnum.ended);
+
+                    sApi.updateTrainingView(trainingView, this);
                     break;
             }
 
@@ -201,15 +238,22 @@ public class TrainingViewActivity extends BaseActivity
                     trainingDateTv.setText(dateFormatter.format(training.getTrainingDateTimeCalender().getTime()));
                     trainingTimeTv.setText(timeFormatter.format(training.getTrainingDateTimeCalender().getTime()));
 
+                    //TODO Eliran - remove this after zina push
+                    //after we init the training objects - init the map & location service
+                    initTrainingLocation();
+
                 } else if (response.getEntityType() == BETypesEnum.Trainings && response.getActionType() == DALActionTypeEnum.getTrainingViewDetails) {
 
                     trainingView = ((BETrainingViewDetails) response.getEntities().get(0));
                     trainingMaxSpeedTv.setText(trainingView.getMaxSpeed() + "");
                     trainingAvgSpeedTv.setText(trainingView.getAvgSpeed() + "");
                     trainingCaloriesTv.setText(trainingView.getTotalCalories() + "");
-                    initTrainingLocation(trainingView.getTrainingLocationRoute());
                     initChartData(trainingView.getTrainingLocationRoute());
 
+                    //after we init the training objects - init the map & location service
+                    initTrainingLocation();
+                } else if (response.getEntityType() == BETypesEnum.Trainings && response.getActionType() == DALActionTypeEnum.updateTrainingViewDetails) {
+                    isAllowBackButton = true;
                 } else {
                     CMNLogHelper.logError("TrainingViewActivity", "error in training view callbacks | err:" + response.getMessage());
                 }
@@ -219,6 +263,7 @@ public class TrainingViewActivity extends BaseActivity
             CMNLogHelper.logError("TrainingViewActivity", e.getMessage());
         }
     }
+
 
     private void setChartData() {
         try {
@@ -240,61 +285,55 @@ public class TrainingViewActivity extends BaseActivity
     }
 
     @Override
-    public void onSensorChanged(SensorEvent sensorEvent) {
-        try {
-            float presure = sensorEvent.values[0];
-            altitude = SensorManager.getAltitude(SensorManager.PRESSURE_STANDARD_ATMOSPHERE, presure);
-        } catch (Exception e) {
-            CMNLogHelper.logError("TrainingViewActivity", e.getMessage());
-        }
-    }
-
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int i) {
-
-    }
-
-
-    @Override
-    protected void onResume() {
-
-        super.onResume();
-        try {
-            if (sensor != null)
-                sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL);
-        } catch (Exception e) {
-            CMNLogHelper.logError("TrainingViewActivity", e.getMessage());
-        }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        try {
-            sensorManager.unregisterListener(this);
-        } catch (Exception e) {
-            CMNLogHelper.logError("TrainingViewActivity", e.getMessage());
-        }
-    }
-
-    @Override
     public void onBackPressed() {
-        // your code.
-
-//!!!!!!!!!!!!!!!!!!
-        //TODO Eliran
-        //handle "end training if need here before close
+        try {
+            if (!isAllowBackButton) {  //we don't allow user to go back
+                Toast.makeText(this, "Please End the training or wait until we save your training data successfully.", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(this, "Yes!!! Great training, Well Done " + sApi.getAppUser().getName() + "!", Toast.LENGTH_LONG).show();
+                super.onBackPressed(); // Process Back key default behavior.
+            }
+        } catch (Exception e) {
+            CMNLogHelper.logError("TrainingViewActivity", e.getMessage());
+        }
 
     }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            // your code
-            onBackPressed();
-            return true;
+        try {
+            if (keyCode == KeyEvent.KEYCODE_BACK) {
+                // your code
+                onBackPressed();
+            }
+        } catch (Exception e) {
+            CMNLogHelper.logError("TrainingViewActivity", e.getMessage());
         }
-
         return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public void onLocationChangedCallback(Location location) {
+        try {
+            if (location != null) {
+                BETrainingLocation trainingLocation = new BETrainingLocation();
+                trainingLocation = new BETrainingLocation();
+                trainingLocation.setLatitude(location.getLatitude());
+                trainingLocation.setLongitude(location.getLongitude());
+                trainingLocation.setAltitude(location.getAltitude());
+
+                trainingView.addTrainingLocationRoute(trainingLocation);
+
+                locationChangedCount++;
+
+                if (locationChangedCount == 5) {
+                    gmh.drawOnMap(BETrainingLocation.getLatLngList(trainingView.getTrainingLocationRoute()));
+                    locationChangedCount = 0;
+                }
+            }
+
+        } catch (Exception e) {
+            CMNLogHelper.logError("TrainingViewActivity", e.getMessage());
+        }
     }
 }

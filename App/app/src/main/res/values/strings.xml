@@ -50,5 +50,9 @@
     <!--********************************************************************************************-->
     <!--training view values-->
     <string name="training_view_training_id">training_view_training_id</string>
+    <string name="training_view_activity_mode">training_view_activity_mode</string>
+    <string name="training_view_run_mode">training_view_run_mode</string>
+    <string name="training_view_read_only_mode">training_view_read_only_mode</string>
+
 
 </resources>

@@ -439,6 +439,13 @@ public class TrainingDetailsActivity extends BaseFragmentActivity
                             case training_details_join_mode:
                             case training_details_leave_mode:
                                 //navigate to my joined trainings list
+
+
+                                //test data only!!
+                                if(activityMode == BETrainingDetailsModeEnum.training_details_join_mode) {
+                                    sApi.setNextTraining(training);
+                                }
+
                                 intentParams.put(_getString(R.string.training_list_manage_training_permission), "true");
                                 intentParams.put(_getString(R.string.training_list_my_trainings_mode), "true");
                                 intentParams.put(_getString(R.string.training_list_join_mode), "true");
@@ -538,25 +545,6 @@ public class TrainingDetailsActivity extends BaseFragmentActivity
 
     }
 
-    private boolean isTodaySelectedDate(Calendar cal) {
-        try {
-
-            Calendar today = Calendar.getInstance();
-
-            today.set(Calendar.HOUR_OF_DAY, 0);
-            today.set(Calendar.MINUTE, 0);
-            today.set(Calendar.SECOND, 0);
-            today.set(Calendar.MILLISECOND, 0);
-
-            return (cal.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
-                    cal.get(Calendar.MONTH) == today.get(Calendar.MONTH) &&
-                    cal.get(Calendar.DAY_OF_MONTH) == today.get(Calendar.DAY_OF_MONTH));
-        } catch (Exception e) {
-            CMNLogHelper.logError("TrainingDetailsActivity", e.getMessage());
-        }
-        return false;
-    }
-
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         try {
             if (requestCode == PLACE_PICKER_REQUEST) {
@@ -565,8 +553,6 @@ public class TrainingDetailsActivity extends BaseFragmentActivity
                     trainingLocation = new BETrainingLocation();
                     trainingLocation.setLatitude(selectedLocation.getLatLng().latitude);
                     trainingLocation.setLongitude(selectedLocation.getLatLng().longitude);
-                    trainingLocation.setLocationName(selectedLocation.getName().toString());
-                    trainingLocation.setLocationAddress(selectedLocation.getAddress().toString());
                     initTrainingLocation(trainingLocation);
                     Toast.makeText(this, String.format("%s was selected successfully.", selectedLocation.getName()), Toast.LENGTH_LONG).show();
                 }

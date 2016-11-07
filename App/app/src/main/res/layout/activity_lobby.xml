@@ -137,7 +137,6 @@
                     android:elevation="2dp"
                     android:text="training\nprogress"
                     android:textSize="17dp"
-                    android:enabled="false"
                     android:textStyle="bold"></Button>
 
             </TableRow>

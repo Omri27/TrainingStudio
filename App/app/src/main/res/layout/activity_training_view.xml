@@ -16,7 +16,7 @@
         android:id="@+id/training_view_location_map_f"
         class="com.google.android.gms.maps.MapFragment"
         android:layout_width="match_parent"
-        android:layout_height="170dp"
+        android:layout_height="160dp"
         android:layout_marginTop="60dp" />
 
 
@@ -27,14 +27,14 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/training_view_action_btn"
+            android:id="@+id/training_view_start_btn"
             android:layout_width="60dp"
             android:layout_height="40dp"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:background="@drawable/app_rect_buttons_shape"
             android:elevation="2dp"
-            android:text="Pause"
+            android:text="Start"
             android:textSize="15dp" />
 
 
@@ -55,7 +55,7 @@
         android:layout_width="fill_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="50dp"
-        android:layout_marginTop="230dp">
+        android:layout_marginTop="220dp">
 
         <LinearLayout
             android:id="@+id/training_view_layout"
@@ -66,6 +66,24 @@
             android:paddingLeft="15dp"
             android:paddingRight="15dp"
             android:paddingTop="10dp">
+
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginBottom="15dp"
+                android:layout_marginTop="10dp"
+                android:background="#eeFF6600" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="4dp"
+                android:text="Training Details:"
+                android:textColor="#ffffff"
+                android:textSize="18dp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/training_view_description_tv"
@@ -177,7 +195,9 @@
             <com.github.mikephil.charting.charts.LineChart
                 android:id="@+id/training_view_chart"
                 android:layout_width="match_parent"
-                android:layout_height="200dp" />
+                android:layout_height="190dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"/>
 
 
             <View

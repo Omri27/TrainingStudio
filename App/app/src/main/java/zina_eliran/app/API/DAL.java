@@ -461,4 +461,7 @@ public class DAL {
     }
 
 
+    public static void updateTrainingView(BETrainingViewDetails trainingView, FireBaseHandler fbHandler) {
+        //Zina, please implement this.
+    }
 }

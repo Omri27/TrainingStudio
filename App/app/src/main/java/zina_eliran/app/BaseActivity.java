@@ -28,6 +28,7 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Locale;
 import java.util.Map;
 
@@ -295,6 +296,36 @@ public class BaseActivity extends AppCompatActivity {
         } catch (Exception e) {
             CMNLogHelper.logError("BaseActivity", e.getMessage());
         }
+    }
+
+
+    public boolean isTodaySelectedDate(Calendar cal) {
+        try {
+
+            Calendar today = Calendar.getInstance();
+            return (cal.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
+                    cal.get(Calendar.MONTH) == today.get(Calendar.MONTH) &&
+                    cal.get(Calendar.DAY_OF_MONTH) == today.get(Calendar.DAY_OF_MONTH));
+        } catch (Exception e) {
+            CMNLogHelper.logError("BaseActivity", e.getMessage());
+        }
+        return false;
+    }
+
+
+    public boolean isNext10MinSelectedDate(Calendar cal) {
+        try {
+            Calendar now = Calendar.getInstance();
+            long minute10 = 1000*60*10;
+
+            return (isTodaySelectedDate(now) &&
+                    cal.getTimeInMillis() >= now.getTimeInMillis() &&
+                    cal.getTimeInMillis() <= (now.getTimeInMillis() - minute10));
+
+        } catch (Exception e) {
+            CMNLogHelper.logError("BaseActivity", e.getMessage());
+        }
+        return false;
     }
 
 

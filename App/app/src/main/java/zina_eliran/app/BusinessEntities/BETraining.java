@@ -1,15 +1,22 @@
 package zina_eliran.app.BusinessEntities;
 
 
+import android.content.Context;
+import android.location.Address;
+import android.location.Geocoder;
+
 import com.google.android.gms.location.places.Place;
+
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
+import java.util.Locale;
 
 
 /**
  * Created by Zina K on 9/10/2016.
  */
-public class BETraining extends BEBaseEntity{
+public class BETraining extends BEBaseEntity {
     private String creatorId;
     private String name;
     private String description;
@@ -24,7 +31,6 @@ public class BETraining extends BEBaseEntity{
     private boolean isJoinTrainingNotificationFlag;
     private boolean isTrainingFullNotificationFlag;
     private ArrayList<String> patricipatedUserIds;
-
 
 
     public BETraining() {
@@ -121,7 +127,7 @@ public class BETraining extends BEBaseEntity{
     }
 
     public ArrayList<String> getPatricipatedUserIds() {
-        if(patricipatedUserIds == null){
+        if (patricipatedUserIds == null) {
             setPatricipatedUserIds(new ArrayList<String>());
         }
         return patricipatedUserIds;
@@ -158,7 +164,7 @@ public class BETraining extends BEBaseEntity{
                 '}';
     }
 
-    public void addUserToUsersList(String userId){
+    public void addUserToUsersList(String userId) {
         this.patricipatedUserIds.add(userId);
     }
 
@@ -170,4 +176,5 @@ public class BETraining extends BEBaseEntity{
     public boolean isUserParticipateInTraining(String userId) {
         return getPatricipatedUserIds().contains(userId);
     }
+
 }

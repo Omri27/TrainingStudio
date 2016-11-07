@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
@@ -166,6 +167,8 @@ public class DBMonitoringService extends Service implements FireBaseHandler{
             //set notification details
             builder.setContentIntent(contentIntent);
             builder.setSmallIcon(R.drawable.app_notification_icon);
+            builder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.app_notification_icon));
+            builder.setSmallIcon(R.drawable.app_notification_small_icon);
             builder.setContentText(message);
             builder.setContentTitle("Training Studio");
             builder.setAutoCancel(true);

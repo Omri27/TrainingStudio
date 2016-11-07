@@ -165,7 +165,7 @@ public class DBMonitoringService extends Service implements FireBaseHandler{
 
             //set notification details
             builder.setContentIntent(contentIntent);
-            builder.setSmallIcon(R.drawable.app_icon);
+            builder.setSmallIcon(R.drawable.app_notification_icon);
             builder.setContentText(message);
             builder.setContentTitle("Training Studio");
             builder.setAutoCancel(true);

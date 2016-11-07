@@ -104,12 +104,12 @@ public class BETrainingLocation extends BEBaseEntity {
         return (l1.getLocationMeasureTime().getTimeInMillis() - Calendar.getInstance().getTimeInMillis())/(timePart*1000);
     }
 
-    public static float getLocationRouteDistance(List<BETrainingLocation> locationsList) {
+    public static float getLocationRouteDistance(List<BETrainingLocation> locationsList, boolean isKilometer) {
         //in Meters
         float distance = 0;
         for (int i = 0; i < locationsList.size() - 1; i++) {
            distance += getDistance(locationsList.get(i), locationsList.get(i+1));
         }
-        return distance;
+        return !isKilometer ? distance : distance/1000;
     }
 }

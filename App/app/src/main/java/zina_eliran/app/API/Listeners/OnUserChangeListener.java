@@ -28,17 +28,23 @@ public class OnUserChangeListener implements ChildEventListener {
 
     @Override
     public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-        String str = dataSnapshot.getKey();
-        CMNLogHelper.logError("OnChildChange", str);
-        CMNLogHelper.logError("What is s??", s);
-        try {
-            BEUser.class.getDeclaredField(str).set(user, dataSnapshot.getValue());
-            CMNLogHelper.logError("modified, printing user:", user.toString());
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
+        try{
+            String str = dataSnapshot.getKey();
+            CMNLogHelper.logError("OnChildChange", str);
+            CMNLogHelper.logError("What is s??", s);
+            try {
+                BEUser.class.getDeclaredField(str).set(user, dataSnapshot.getValue());
+                CMNLogHelper.logError("modified, printing user:", user.toString());
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
+        catch(Exception e){
+            CMNLogHelper.logError("OnUserListenerFailed", e.getMessage());
+        }
+
 //        BETrainingStatusEnum status = dataSnapshot.getValue(BETrainingStatusEnum.class);
 //        if (status == BETrainingStatusEnum.cancelled){
 //            //update user if he registered to this training and notification flag in on

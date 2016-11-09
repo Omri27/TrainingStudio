@@ -111,15 +111,16 @@ public class GoogleMapHandler implements
     @Override
     public void onLocationChanged(Location location) {
 
-        if (mCurrLocationMarker != null) {
-            mCurrLocationMarker.remove();
-        }
-
         if (activity != null) {
             if (isDrawFirstTime) {
                 activity.onLocationChangedCallback(location);
                 return;
             } else {
+
+                if (mCurrLocationMarker != null) {
+                    mCurrLocationMarker.remove();
+                }
+
                 //Place current location marker
                 mLastlatLng = new LatLng(trainingLocation.getLatitude(), trainingLocation.getLongitude());
                 mCurrLocationMarker = addMarker(mLastlatLng);
@@ -127,6 +128,10 @@ public class GoogleMapHandler implements
             }
 
         } else {
+
+            if (mCurrLocationMarker != null) {
+                mCurrLocationMarker.remove();
+            }
 
             if (this.trainingLocation != null) {
                 //remove old markers
@@ -236,5 +241,22 @@ public class GoogleMapHandler implements
         } catch (Exception ex) {
         }
     }
+
+
+    public void drawNextLocationOnMap(LatLng l1, LatLng l2) {
+        try {
+            mMap.clear();
+            Polyline line = mMap.addPolyline(new PolylineOptions()
+                    .add(l1)
+                    .add(l2)
+                    .width(14)
+                    .color(Color.parseColor("#ddFFA330"))//Google maps blue color
+                    .geodesic(true)
+            );
+        } catch (Exception ex) {
+        }
+    }
+
+
 
 }

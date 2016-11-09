@@ -55,6 +55,7 @@ public class GoogleMapHandler implements
     int interval = 1000;
     int fastInterval = 1000;
     boolean isDrawOnMap = false;
+    boolean isDrawFirstTime = false;
 
     AppLocationChangedHandler activity;
 
@@ -111,8 +112,21 @@ public class GoogleMapHandler implements
     public void onLocationChanged(Location location) {
 
         if (activity != null) {
-            activity.onLocationChangedCallback(location);
-            return;
+            if (isDrawFirstTime) {
+                activity.onLocationChangedCallback(location);
+                return;
+            } else {
+
+                if (mCurrLocationMarker != null) {
+                    mCurrLocationMarker.remove();
+                }
+
+                //Place current location marker
+                mLastlatLng = new LatLng(trainingLocation.getLatitude(), trainingLocation.getLongitude());
+                mCurrLocationMarker = addMarker(mLastlatLng);
+                isDrawFirstTime = true;
+            }
+
         } else {
 
             if (mCurrLocationMarker != null) {
@@ -135,17 +149,17 @@ public class GoogleMapHandler implements
                 mLastlatLng = new LatLng(location.getLatitude(), location.getLongitude());
                 mCurrLocationMarker = addMarker(mLastlatLng);
             }
-
-
-            //move map camera
-            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(mLastlatLng, 16);
-            mMap.animateCamera(cameraUpdate);
-
-            //stop location updates
-            if (mGoogleApiClient != null) {
-                LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
-            }
         }
+
+        //move map camera
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(mLastlatLng, 16);
+        mMap.animateCamera(cameraUpdate);
+
+        //stop location updates
+        if (mGoogleApiClient != null) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+        }
+
     }
 
     @Override
@@ -227,5 +241,22 @@ public class GoogleMapHandler implements
         } catch (Exception ex) {
         }
     }
+
+
+    public void drawNextLocationOnMap(LatLng l1, LatLng l2) {
+        try {
+            mMap.clear();
+            Polyline line = mMap.addPolyline(new PolylineOptions()
+                    .add(l1)
+                    .add(l2)
+                    .width(14)
+                    .color(Color.parseColor("#ddFFA330"))//Google maps blue color
+                    .geodesic(true)
+            );
+        } catch (Exception ex) {
+        }
+    }
+
+
 
 }

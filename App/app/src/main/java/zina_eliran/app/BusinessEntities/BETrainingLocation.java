@@ -88,11 +88,11 @@ public class BETrainingLocation extends BEBaseEntity {
         return list;
     }
 
-    public static float getDistance(BETrainingLocation location1, BETrainingLocation location2) {
+    public float getDistance(BETrainingLocation location2) {
         Location l1 = new Location("l1");
-        l1.setLatitude(location1.getLatitude());
-        l1.setLongitude(location1.getLongitude());
-        l1.setAltitude(location1.getAltitude());
+        l1.setLatitude(this.getLatitude());
+        l1.setLongitude(this.getLongitude());
+        l1.setAltitude(this.getAltitude());
         Location l2 = new Location("l2");
         l2.setLatitude(location2.getLatitude());
         l2.setLongitude(location2.getLongitude());
@@ -100,16 +100,26 @@ public class BETrainingLocation extends BEBaseEntity {
         return l1.distanceTo(l2);
     }
 
-    public static float getTimeMeasureDiff(BETrainingLocation l1, BETrainingLocation l2, int timePart) {
-        return (l1.getLocationMeasureTime().getTimeInMillis() - Calendar.getInstance().getTimeInMillis())/(timePart*1000);
+    public float getTimeMeasureDiff( BETrainingLocation l2, int timePart) {
+        return (l2.getLocationMeasureTime().getTimeInMillis() - this.getLocationMeasureTime().getTimeInMillis()) / (timePart * 1000);
     }
 
     public static float getLocationRouteDistance(List<BETrainingLocation> locationsList, boolean isKilometer) {
         //in Meters
         float distance = 0;
-        for (int i = 0; i < locationsList.size() - 1; i++) {
-           distance += getDistance(locationsList.get(i), locationsList.get(i+1));
+        if (locationsList.size() >= 2) {
+            for (int i = 0; i < locationsList.size() - 1; i++) {
+                distance += locationsList.get(i).getDistance(locationsList.get(i + 1));
+            }
         }
-        return !isKilometer ? distance : distance/1000;
+        return !isKilometer ? distance : distance / 1000;
+    }
+
+    public static float getLocationRouteDuration(List<BETrainingLocation> locationsList, int timePart) {
+        float time = 0;
+        if (locationsList.size() >= 2) {
+            time = locationsList.get(locationsList.size()-1).getTimeMeasureDiff(locationsList.get(0), timePart);
+        }
+        return time;
     }
 }

@@ -108,14 +108,12 @@ public class ProfileSettingsActivity extends BaseActivity implements View.OnClic
 
                 levelSpinner.setSelection(levelAdapter.getPosition(user.getTrainingLevel().toString()));
                 levelAdapter.notifyDataSetChanged();
-                ageSpinner.setSelection(ageAdapter.getPosition("Age: " + user.getAge()));
+                ageSpinner.setSelection(ageAdapter.getPosition("Age: " + Integer.toString(user.getAge())));
                 ageAdapter.notifyDataSetChanged();
-                weightSpinner.setSelection(weightAdapter.getPosition("" + user.getWeigth() + " KG"));
+                weightSpinner.setSelection(weightAdapter.getPosition(Float.toString(user.getWeigth()) + " KG"));
                 weightAdapter.notifyDataSetChanged();
-                heightSpinner.setSelection(heightAdapter.getPosition("" + user.getHeigth() + " (m)"));
+                heightSpinner.setSelection(heightAdapter.getPosition(Float.toString(user.getHeigth()) + " (m)"));
                 heightAdapter.notifyDataSetChanged();
-                levelSpinner.setSelection(levelAdapter.getPosition(user.getTrainingLevel().toString()));
-                levelAdapter.notifyDataSetChanged();
 
                 saturdayCbox.setChecked(user.getMyPreferredDays().contains(7));
                 sundayCbox.setChecked(user.getMyPreferredDays().contains(1));

@@ -3,6 +3,7 @@ package zina_eliran.app.BusinessEntities;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.jar.Pack200;
 
 public class BETrainingViewDetails extends BEBaseEntity {
 
@@ -128,5 +129,15 @@ public class BETrainingViewDetails extends BEBaseEntity {
 
     public void setActualDuration(int actualDuration) {
         this.actualDuration = actualDuration;
+    }
+
+    public int setTrainingCaloriesBurn(BEUser user){
+        float poundFactor = 22/10;
+        float distanceFactor = (10/16)*this.totalDistance;
+        float speedFactor = (10/8)*this.avgSpeed;
+        float calManFactor = 63/100;
+        float calWomanFactor = 57/100;
+        return  (int)(user.getWeigth()* poundFactor*(user.isMale() ? calManFactor : calWomanFactor)*speedFactor*distanceFactor);
+
     }
 }

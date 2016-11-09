@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
-    android:layout_height="200dp"
-    android:layout_marginBottom="7dp"
+    android:layout_height="180dp"
+    android:layout_marginBottom="4dp"
     android:paddingTop="8dp"
     android:background="#ffffff"
     android:clickable="true"
@@ -168,7 +168,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="4"
+            android:layout_weight="5"
             android:background="#33000000"
             android:orientation="horizontal"
             android:paddingLeft="5dp"
@@ -181,8 +181,8 @@
                 android:orientation="vertical"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp">
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp">
 
                 <TextView
                     android:id="@+id/training_list_duration_tv"
@@ -192,17 +192,18 @@
                     android:gravity="center_horizontal|center_vertical"
                     android:text="5"
                     android:textColor="#333333"
-                    android:textSize="18dp"
+                    android:textSize="17dp"
+                    android:paddingBottom="3dp"
                     android:textStyle="bold"/>
 
                 <TextView
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="30dp"
                     android:layout_weight="1"
                     android:gravity="center_horizontal|center_vertical"
                     android:text="DURATION"
                     android:textColor="#555555"
-                    android:textSize="13dp" />
+                    android:textSize="11dp" />
 
             </LinearLayout>
 
@@ -234,8 +235,8 @@
                 android:orientation="vertical"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp">
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp">
 
                 <TextView
                     android:id="@+id/training_list_training_level_tv"
@@ -245,17 +246,17 @@
                     android:gravity="center_horizontal|center_vertical"
                     android:text="5"
                     android:textColor="#333333"
-                    android:textSize="18dp"
+                    android:textSize="17dp"
                     android:textStyle="bold"/>
 
                 <TextView
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="30dp"
                     android:layout_weight="1"
                     android:gravity="center_horizontal|center_vertical"
                     android:text="LEVEL"
                     android:textColor="#555555"
-                    android:textSize="13dp" />
+                    android:textSize="11dp" />
 
             </LinearLayout>
 
@@ -269,7 +270,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="5"
+            android:layout_weight="6"
             android:orientation="horizontal">
 
             <TextView

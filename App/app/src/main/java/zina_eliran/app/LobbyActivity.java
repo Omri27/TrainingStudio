@@ -48,15 +48,16 @@ public class LobbyActivity extends BaseActivity implements View.OnClickListener,
         pBar.bringToFront();
         pBarRl = (RelativeLayout) findViewById(R.id.lobby_pbar_rl);
         mainLayout = (LinearLayout) findViewById(R.id.lobby_ll);
+
+
+
+        onCreateUI();
         handleLoginState();
 
 
         Intent intent = new Intent(this, DBMonitoringService.class);
         startService(intent);
-
         DAL.tests(this);
-
-
     }
 
     private void onCreateUI() {
@@ -139,25 +140,25 @@ public class LobbyActivity extends BaseActivity implements View.OnClickListener,
                 } else if (response.getActionType() == DALActionTypeEnum.getUser && response.getEntityType() == BETypesEnum.Users) {
                     sApi.setAppUser((BEUser) response.getEntities().get(0));
 
+                    //*****************************************
+                    //Zina = we have here the user id for the first time.
+                    //START again the Service here.
+
                     //get next training here, using my training ids and update server api
                     sApi.getAllTrainings(this);
 
                 } else if (response.getActionType() == DALActionTypeEnum.getAllTrainings && response.getEntityType() == BETypesEnum.Trainings) {
 
-                    //get next training here and update server api
-                    ArrayList<BETraining> myJoinedTrainingsList = sApi.filterMyTrainings(sApi.getAppUser().getId(), response.getEntities(), false);
-                    BETraining nextTraining = sApi.getMyNextTraining(myJoinedTrainingsList);
+                    sApi.updateAppTrainingsData(response.getEntities());
 
-                    onCreateUI();
-
-                    if (myJoinedTrainingsList.size() > 0) {
+                    if (sApi.getMyJoinedTrainingsList().size() > 0) {
                         startTrainingBtn.setEnabled(true);
-                        sApi.setNextTraining(myJoinedTrainingsList.get(0));
+                        sApi.setNextTraining(sApi.getMyJoinedTrainingsList().get(0));
                     }
 
 
-                   /* if (nextTraining != null) {
-                        sApi.setNextTraining(nextTraining);
+                   /*  BETraining nextTraining = sApi.getNextTraining();
+                   if (nextTraining != null) {
                         if (isNext10MinSelectedDate(nextTraining.getTrainingDateTimeCalender())) {
                             startTrainingBtn.setEnabled(true);
                         }
@@ -202,6 +203,5 @@ public class LobbyActivity extends BaseActivity implements View.OnClickListener,
             CMNLogHelper.logError("LobbyActivity", e.getMessage());
         }
     }
-
 
 }

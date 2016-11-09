@@ -55,6 +55,7 @@ public class GoogleMapHandler implements
     int interval = 1000;
     int fastInterval = 1000;
     boolean isDrawOnMap = false;
+    boolean isDrawFirstTime = false;
 
     AppLocationChangedHandler activity;
 
@@ -110,14 +111,22 @@ public class GoogleMapHandler implements
     @Override
     public void onLocationChanged(Location location) {
 
-        if (activity != null) {
-            activity.onLocationChangedCallback(location);
-            return;
-        } else {
+        if (mCurrLocationMarker != null) {
+            mCurrLocationMarker.remove();
+        }
 
-            if (mCurrLocationMarker != null) {
-                mCurrLocationMarker.remove();
+        if (activity != null) {
+            if (isDrawFirstTime) {
+                activity.onLocationChangedCallback(location);
+                return;
+            } else {
+                //Place current location marker
+                mLastlatLng = new LatLng(trainingLocation.getLatitude(), trainingLocation.getLongitude());
+                mCurrLocationMarker = addMarker(mLastlatLng);
+                isDrawFirstTime = true;
             }
+
+        } else {
 
             if (this.trainingLocation != null) {
                 //remove old markers
@@ -135,17 +144,17 @@ public class GoogleMapHandler implements
                 mLastlatLng = new LatLng(location.getLatitude(), location.getLongitude());
                 mCurrLocationMarker = addMarker(mLastlatLng);
             }
-
-
-            //move map camera
-            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(mLastlatLng, 16);
-            mMap.animateCamera(cameraUpdate);
-
-            //stop location updates
-            if (mGoogleApiClient != null) {
-                LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
-            }
         }
+
+        //move map camera
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(mLastlatLng, 16);
+        mMap.animateCamera(cameraUpdate);
+
+        //stop location updates
+        if (mGoogleApiClient != null) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+        }
+
     }
 
     @Override

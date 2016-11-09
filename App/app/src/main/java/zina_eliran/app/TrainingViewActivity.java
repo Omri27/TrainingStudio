@@ -1,5 +1,6 @@
 package zina_eliran.app;
 
+import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.location.Location;
@@ -62,9 +63,10 @@ public class TrainingViewActivity extends BaseActivity
     Sensor sensor;
 
     BETrainingViewModeEnum activityMode;
+    List<Entry> chartData;
     BETraining training;
     BETrainingViewDetails trainingView = new BETrainingViewDetails();
-    boolean isAllowBackButton;
+    boolean isAllowBackButton = true;
     int locationChangedCount = 0;
 
     @Override
@@ -73,7 +75,7 @@ public class TrainingViewActivity extends BaseActivity
         setContentView(R.layout.activity_training_view);
 
         intent = getIntent();
-
+        chartData = new ArrayList<>();
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE);
 
@@ -99,7 +101,6 @@ public class TrainingViewActivity extends BaseActivity
             if (activityMode != BETrainingViewModeEnum.training_view_run_mode ||
                     activityMode != BETrainingViewModeEnum.training_view_read_only_mode) {
                 sApi.getTraining(sApi.getNextTraining().getId(), this);
-                //sApi.getTrainingView(sApi.getNextTraining().getId(), sApi.getAppUser().getId(), this);
             } else {
                 //handle error
             }
@@ -139,9 +140,11 @@ public class TrainingViewActivity extends BaseActivity
     private void initTrainingLocation() {
         try {
             if (activityMode == BETrainingViewModeEnum.training_view_run_mode) {
-                gmh = new GoogleMapHandler(this, trainingMapFragment, training.getLocation());
+                gmh = new GoogleMapHandler(this, this, trainingMapFragment, training.getLocation(), 100, 50);
             } else {
+                //in case of view only
                 gmh = new GoogleMapHandler(this, trainingMapFragment, trainingView.getTrainingLocationRoute());
+                sApi.getTrainingView(sApi.getNextTraining().getId(), sApi.getAppUser().getId(), this);
             }
         } catch (Exception e) {
             CMNLogHelper.logError("TrainingDetailsActivity", e.getMessage());
@@ -174,9 +177,8 @@ public class TrainingViewActivity extends BaseActivity
 
             switch (view.getId()) {
                 case R.id.training_view_start_btn:
-                    //create location changed listener
-                    gmh = new GoogleMapHandler(this, this, trainingMapFragment, training.getLocation(), 5000, 2000);
                     startTrainingBtn.setEnabled(false);
+                    isAllowBackButton = false;
                     trainingView.setStatus(BETrainingViewStatusEnum.started);
                     endTrainingBtn.setEnabled(true);
 
@@ -194,11 +196,14 @@ public class TrainingViewActivity extends BaseActivity
                     //avg speed
 
                     //distance
+                    trainingView.setTotalDistance(BETrainingLocation.getLocationRouteDistance(trainingView.getTrainingLocationRoute(), true));
+                    trainingDistanceTv.setText(trainingView.getTotalDistance() + " Km");
 
                     //calories
 
                     //actual duration
-
+                    trainingView.setActualDuration((int)BETrainingLocation.getLocationRouteDuration(trainingView.getTrainingLocationRoute(), 3600));
+                    trainingDurationTv.setText(trainingView.getActualDuration() + " Hr");
                     //status
                     trainingView.setStatus(BETrainingViewStatusEnum.ended);
 
@@ -240,6 +245,7 @@ public class TrainingViewActivity extends BaseActivity
 
                     //TODO Eliran - remove this after zina push
                     //after we init the training objects - init the map & location service
+                    trainingView = new BETrainingViewDetails();
                     initTrainingLocation();
 
                 } else if (response.getEntityType() == BETypesEnum.Trainings && response.getActionType() == DALActionTypeEnum.getTrainingViewDetails) {
@@ -265,20 +271,19 @@ public class TrainingViewActivity extends BaseActivity
     }
 
 
-    private void setChartData() {
+    private void setChartData(BETrainingLocation l1, BETrainingLocation l2) {
         try {
 
-            List<Entry> entries = new ArrayList<>();
 
-            //for (YourData data : dataObjects) {
+            float distance = BETrainingLocation.getDistance(l1, l2);
+            float time = BETrainingLocation.getTimeMeasureDiff(l1, l2, 3600);
+            float speed = (float)(distance/(time + 0.0001));
 
-            // turn your data into Entry objects
-            //entries.add(new Entry(data.getValueX(), data.getValueY()));
-            //}
 
-            chartDataSet = new LineDataSet(entries, "Label"); // add entries to dataset
-            //chartDataSet.setColor(...);
-            //chartDataSet.setValueTextColor(...); // styling, ...
+            chartData.add(new Entry(time, speed));
+            chartDataSet = new LineDataSet(chartData, "Route | Time"); // add entries to dataset
+            chartDataSet.setColor(Color.argb(159, 255, 106, 0));
+            chartDataSet.setValueTextColor(Color.WHITE);
         } catch (Exception e) {
             CMNLogHelper.logError("TrainingViewActivity", e.getMessage());
         }
@@ -287,7 +292,7 @@ public class TrainingViewActivity extends BaseActivity
     @Override
     public void onBackPressed() {
         try {
-            if (!isAllowBackButton) {  //we don't allow user to go back
+            if (!isAllowBackButton && trainingView.getStatus() == BETrainingViewStatusEnum.started) {  //we don't allow user to go back
                 Toast.makeText(this, "Please End the training or wait until we save your training data successfully.", Toast.LENGTH_LONG).show();
             } else {
                 Toast.makeText(this, "Yes!!! Great training, Well Done " + sApi.getAppUser().getName() + "!", Toast.LENGTH_LONG).show();
@@ -315,7 +320,7 @@ public class TrainingViewActivity extends BaseActivity
     @Override
     public void onLocationChangedCallback(Location location) {
         try {
-            if (location != null) {
+            if (location != null && trainingView.getStatus() == BETrainingViewStatusEnum.started) {
                 BETrainingLocation trainingLocation = new BETrainingLocation();
                 trainingLocation = new BETrainingLocation();
                 trainingLocation.setLatitude(location.getLatitude());
@@ -326,7 +331,9 @@ public class TrainingViewActivity extends BaseActivity
 
                 locationChangedCount++;
 
-                if (locationChangedCount == 5) {
+                int listSize = trainingView.getTrainingLocationRoute().size();
+                if (locationChangedCount == 2) {
+                    //setChartData(trainingView.getTrainingLocationRoute().get(listSize-2),trainingView.getTrainingLocationRoute().get(listSize-1));
                     gmh.drawOnMap(BETrainingLocation.getLatLngList(trainingView.getTrainingLocationRoute()));
                     locationChangedCount = 0;
                 }

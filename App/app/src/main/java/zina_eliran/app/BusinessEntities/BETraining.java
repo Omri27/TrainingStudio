@@ -160,7 +160,7 @@ public class BETraining extends BEBaseEntity {
                 "creatorId='" + creatorId + '\'' +
                 ", name='" + description + '\'' +
                 ", duration=" + duration +
-                ", trainingDate=" + trainingDateTimeCalender.getTime().toString() +
+                ", trainingDate=" + trainingDateTimeCalender +
                 '}';
     }
 

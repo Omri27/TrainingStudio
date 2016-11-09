@@ -36,8 +36,6 @@ public class TrainingsListActivity extends BaseActivity implements View.OnClickL
 
     RecyclerView trainingRv;
     List<BETraining> trainingsList = new ArrayList<>();
-    List<BETraining> myJoinedTrainingsList = new ArrayList<>();
-    List<BETraining> myCreatedTrainingList = new ArrayList<>();
     BETrainingAdapter trainingAdapter;
     RelativeLayout trainingListRl;
     FloatingActionButton createTrainingFab;
@@ -61,9 +59,7 @@ public class TrainingsListActivity extends BaseActivity implements View.OnClickL
 
             initActivityFlags();
             initFabButton();
-            initActivityHeader();
-            initTrainingAdapter();
-            initTrainingRecycleView();
+            sApi.getAllTrainings(this);
 
         } catch (Exception e) {
             CMNLogHelper.logError("TrainingsListActivity", e.getMessage());
@@ -105,31 +101,35 @@ public class TrainingsListActivity extends BaseActivity implements View.OnClickL
         }
     }
 
-    public void initActivityHeader() {
+    public void initActivityMode() {
         try {
 
             trainingListRl = (RelativeLayout) findViewById(R.id.training_list_relative_layout);
             //call invalidate in order to float the create button in front of the list
             trainingListRl.invalidate();
 
-
             publicTrainingHeaderView = findViewById(R.id.training_list_public_trainings_header_view);
             myTrainingHeaderView = findViewById(R.id.training_list_my_trainings_header_view);
             myTrainingListModeTb = (ToggleButton) findViewById(R.id.training_list_my_training_header_title_tb);
-            myTrainingListModeTb.setChecked(true);
+            myTrainingListModeTb.setChecked(false);
 
             if (isPublicTrainingMode) {
+                trainingsList = sApi.getPublicTrainingsList();
                 myTrainingHeaderView.setVisibility(View.INVISIBLE);
                 publicTrainingHeaderView.setVisibility(View.VISIBLE);
-                myTrainingListModeTb.setChecked(false);
-            }
-            else {
-                if(isMyTrainingJoinMode){
-                    myTrainingListModeTb.setChecked(false);
+
+            } else {
+                if (!isMyTrainingJoinMode) {
+                    trainingsList = sApi.getMyCreatedTrainingsList();
+                    myTrainingListModeTb.setChecked(true);
+                } else {
+                    trainingsList = sApi.getMyJoinedTrainingsList();
                 }
+                myTrainingListModeTb.setOnCheckedChangeListener(this);
             }
 
-            myTrainingListModeTb.setOnCheckedChangeListener(this);
+            trainingAdapter.setTrainingList(trainingsList);
+            trainingAdapter.notifyDataSetChanged();
 
         } catch (Exception e) {
             CMNLogHelper.logError("TrainingsListActivity", e.getMessage());
@@ -157,11 +157,11 @@ public class TrainingsListActivity extends BaseActivity implements View.OnClickL
                     if (isMyTrainingMode) {
                         //created mode
                         if (myTrainingListModeTb.isChecked()) {
-                            intentParams.put(_getString(R.string.training_details_activity_mode),_getString(R.string.training_details_cancel_mode));
+                            intentParams.put(_getString(R.string.training_details_activity_mode), _getString(R.string.training_details_cancel_mode));
                         }
                         //joined mode
                         else {
-                            intentParams.put(_getString(R.string.training_details_activity_mode),_getString(R.string.training_details_leave_mode));
+                            intentParams.put(_getString(R.string.training_details_activity_mode), _getString(R.string.training_details_leave_mode));
                         }
                     }
                     //public mode
@@ -186,21 +186,11 @@ public class TrainingsListActivity extends BaseActivity implements View.OnClickL
     public void initTrainingAdapter() {
         try {
             trainingAdapter = new BETrainingAdapter(trainingsList);
-            setAdapterTrainingData();
         } catch (Exception e) {
             CMNLogHelper.logError("TrainingsListActivity", e.getMessage());
         }
     }
 
-    public void setAdapterTrainingData() {
-
-        try {
-            sApi.setActionResponse(null);
-            sApi.getAllTrainings(this);
-        } catch (Exception e) {
-            CMNLogHelper.logError("TrainingsListActivity", e.getMessage());
-        }
-    }
 
     @Override
     public void onClick(View v) {
@@ -220,31 +210,11 @@ public class TrainingsListActivity extends BaseActivity implements View.OnClickL
                     Toast.makeText(_getAppContext(), "Error while retrieving trainings data, please try again later.", Toast.LENGTH_LONG).show();
                 } else if (response.getEntityType() == BETypesEnum.Trainings) {
                     if (response.getActionType() == DALActionTypeEnum.getAllTrainings) {
-                        if (isMyTrainingMode) {
-
-                            myCreatedTrainingList = sApi.filterMyTrainings(sApi.getAppUser().getId(), response.getEntities(), true);
-                            myJoinedTrainingsList = sApi.filterMyTrainings(sApi.getAppUser().getId(), response.getEntities(), false);
-
-                            if (myTrainingListModeTb.isChecked()) {
-                                trainingsList = myCreatedTrainingList;
-                                //set the switch button status here
-                            } else {
-                                trainingsList = myJoinedTrainingsList;
-                                //set the switch button status here
-                            }
-
-                            trainingAdapter.setTrainingList(trainingsList);
-                            trainingAdapter.notifyDataSetChanged();
-
-                        } else if (isPublicTrainingMode) {
-
-                            trainingsList = sApi.filterPublicTrainings(sApi.getAppUser().getId(), response.getEntities());
-                            trainingAdapter.setTrainingList(trainingsList);
-                            trainingAdapter.notifyDataSetChanged();
-
-                        }
-                    }
-                    else {
+                        sApi.updateAppTrainingsData(response.getEntities());
+                        initActivityMode();
+                        initTrainingAdapter();
+                        initTrainingRecycleView();
+                    } else {
                         CMNLogHelper.logError("TrainingsListActivity", "wrong action type in callback" + response.getActionType());
                     }
                 } else {
@@ -262,10 +232,11 @@ public class TrainingsListActivity extends BaseActivity implements View.OnClickL
         try {
 
             if (myTrainingListModeTb.isChecked()) {
-                trainingsList = myCreatedTrainingList;
+                trainingsList = sApi.getMyCreatedTrainingsList();
                 //set the switch button status here
             } else {
-                trainingsList = myJoinedTrainingsList;
+                trainingsList = sApi.getMyJoinedTrainingsList();
+                ;
                 //set the switch button status here
             }
 

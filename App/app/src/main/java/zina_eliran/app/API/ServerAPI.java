@@ -25,8 +25,19 @@ public class ServerAPI {
 
     private BETraining nextTraining;
 
+    ArrayList<BETraining> myJoinedTrainingsList;
+
+    ArrayList<BETraining> myCreatedTrainingsList;
+
+    ArrayList<BETraining> publicTrainingsList;
+
     protected ServerAPI() {
         // Exists only to defeat instantiation.
+        appUser = new BEUser();
+        nextTraining = new BETraining();
+        myJoinedTrainingsList = new ArrayList<>();
+        myCreatedTrainingsList = new ArrayList<>();
+        publicTrainingsList = new ArrayList<>();
     }
 
     public static ServerAPI getInstance() {
@@ -50,6 +61,30 @@ public class ServerAPI {
 
     public void setNextTraining(BETraining nextTraining) {
         this.nextTraining = nextTraining;
+    }
+
+    public ArrayList<BETraining> getMyJoinedTrainingsList() {
+        return myJoinedTrainingsList;
+    }
+
+    public void setMyJoinedTrainingsList(ArrayList<BETraining> myJoinedTrainingsList) {
+        this.myJoinedTrainingsList = myJoinedTrainingsList;
+    }
+
+    public ArrayList<BETraining> getMyCreatedTrainingsList() {
+        return myCreatedTrainingsList;
+    }
+
+    public void setMyCreatedTrainingsList(ArrayList<BETraining> myCreatedTrainingsList) {
+        this.myCreatedTrainingsList = myCreatedTrainingsList;
+    }
+
+    public ArrayList<BETraining> getPublicTrainingsList() {
+        return publicTrainingsList;
+    }
+
+    public void setPublicTrainingsList(ArrayList<BETraining> publicTrainingsList) {
+        this.publicTrainingsList = publicTrainingsList;
     }
 
     public BEResponse getActionResponse() {
@@ -216,6 +251,11 @@ public class ServerAPI {
     }
 
 
-
-
+    public void updateAppTrainingsData(ArrayList<BEBaseEntity> entities) {
+        //update server api
+        setMyJoinedTrainingsList(filterMyTrainings(getAppUser().getId(), entities, false));
+        setMyCreatedTrainingsList(filterMyTrainings(getAppUser().getId(), entities, true));
+        setPublicTrainingsList(filterPublicTrainings(getAppUser().getId(), entities));
+        setNextTraining(getMyNextTraining(getMyJoinedTrainingsList()));
+    }
 }

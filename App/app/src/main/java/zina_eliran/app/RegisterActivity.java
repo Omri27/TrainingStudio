@@ -197,6 +197,12 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
             if (response.getActionType() == DALActionTypeEnum.registerUser) {
 
                 sApi.setAppUser((BEUser) response.getEntities().get(0));
+
+                //*****************************************
+                //Zina = we have here the user id for the first time.
+                //init the Service here.
+
+
                 name = sApi.getAppUser().getName();
                 email = sApi.getAppUser().getEmail();
                 verificationCode = sApi.getAppUser().getVerificationCode();

@@ -30,7 +30,6 @@ import zina_eliran.app.Utils.FireBaseHandler;
 
 public class DAL {
 
-    //db link: https://console.firebase.google.com/project/trainingstudiofb/database/data
 
     private static Firebase rootRef = new Firebase("https://trainingstudiofb.firebaseio.com");
     private static Firebase usersRef = rootRef.child("Users");
@@ -428,11 +427,11 @@ public class DAL {
     }
     public static void addListenerToTraining(String trainingID, FireBaseHandler fbHandler){
         Firebase tRef = trainingsRef.child(trainingID);
-        tRef.addChildEventListener(new OnTrainingChangeListener(fbHandler));
+        tRef.addChildEventListener(new OnTrainingChangeListener(fbHandler, trainingID));
     }
-    public static void addListenerToUser(BEUser user){
+    public static void addListenerToUser(BEUser user, FireBaseHandler fireBaseHandler){
         Firebase uRef = usersRef.child(user.getId());
-        uRef.addChildEventListener(new OnUserChangeListener(user));
+        uRef.addChildEventListener(new OnUserChangeListener(user, fireBaseHandler));
     }
 
 }

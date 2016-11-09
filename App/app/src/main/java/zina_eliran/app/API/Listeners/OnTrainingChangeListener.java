@@ -19,9 +19,11 @@ import zina_eliran.app.Utils.FireBaseHandler;
 
 public class OnTrainingChangeListener implements ChildEventListener {
     private FireBaseHandler fireBaseHandler;
+    private String trainingID;
 
-    public OnTrainingChangeListener(FireBaseHandler fireBaseHandler){
+    public OnTrainingChangeListener(FireBaseHandler fireBaseHandler,String trainingID){
         this.fireBaseHandler = fireBaseHandler;
+        this.trainingID = trainingID;
     }
 
     @Override
@@ -32,16 +34,26 @@ public class OnTrainingChangeListener implements ChildEventListener {
     @Override
     public void onChildChanged(DataSnapshot dataSnapshot, String s) {
         try {
-            BETrainingStatusEnum status = dataSnapshot.getValue(BETrainingStatusEnum.class);
-            if (status == BETrainingStatusEnum.cancelled) {
-                //update user if he registered to this training and notification flag in on
-                CMNLogHelper.logError("TrainingSTATUSchangedTO", BETrainingStatusEnum.cancelled.toString());
-                forwardResponse(DALActionTypeEnum.trainingCancelled);
-            } else if (status == BETrainingStatusEnum.full) {
-                //update training owner
-                CMNLogHelper.logError("TrainingSTATUSchangedTO", BETrainingStatusEnum.full.toString());
-                forwardResponse(DALActionTypeEnum.trainingFull);
 
+            CMNLogHelper.logError("OnTrainingChangeListener", dataSnapshot.getKey().toString());
+
+
+            if (dataSnapshot.getKey().toString().equals("currentNumberOfParticipants")){
+                Integer currentNumberOfParticipants = dataSnapshot.getValue(Integer.class);
+                CMNLogHelper.logError("TrainingJoinedUsersChange", currentNumberOfParticipants.toString());
+                forwardResponse(DALActionTypeEnum.numberOfParticipantsChanged, currentNumberOfParticipants);
+            }
+            else if (dataSnapshot.getKey().toString().equals("status")){
+                BETrainingStatusEnum status = dataSnapshot.getValue(BETrainingStatusEnum.class);
+                if (status == BETrainingStatusEnum.cancelled) {
+                    //update user if he registered to this training and notification flag in on
+                    CMNLogHelper.logError("TrainingSTATUSchangedTO", BETrainingStatusEnum.cancelled.toString());
+                    forwardResponse(DALActionTypeEnum.trainingCancelled, -1);
+                } else if (status == BETrainingStatusEnum.full) {
+                    //update training owner
+                    CMNLogHelper.logError("TrainingSTATUSchangedTO", BETrainingStatusEnum.full.toString());
+                    forwardResponse(DALActionTypeEnum.trainingFull, -1);
+                }
             }
         }
         catch (Exception e){
@@ -66,11 +78,19 @@ public class OnTrainingChangeListener implements ChildEventListener {
 
     }
 
-    public void forwardResponse(DALActionTypeEnum action){
+    public void forwardResponse(DALActionTypeEnum action, Integer number){
         try{
             BEResponse res = new BEResponse();
             res.setActionType(action);
             res.setStatus(BEResponseStatusEnum.success);
+            //Put training id in response
+            res.setMessage(trainingID);
+
+            //On change of joined user number should be 0 or more
+            if (number >= 0)
+                //send training id and new number of joined user in message field with ; delimiter
+                res.setMessage(trainingID + ";" + number.toString());
+            CMNLogHelper.logError("TrainingListenerMessage", res.getMessage());
 
             if (fireBaseHandler != null)
                 fireBaseHandler.onActionCallback(res);

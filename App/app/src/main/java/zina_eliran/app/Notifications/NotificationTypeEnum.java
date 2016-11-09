@@ -7,5 +7,6 @@ package zina_eliran.app.Notifications;
 public enum NotificationTypeEnum {
     trainingIsFull,
     trainingIsCancelled,
+    userJoinedToTraining,
     reminder
 }

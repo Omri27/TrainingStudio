@@ -183,6 +183,12 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
             } else {
                 //verification callback
                 writeToSharedPreferences(_getString(R.string.user_verification_permission), "true");
+
+//                //Zina: Start service for the first time
+//                Intent serviceIntent = new Intent(getBaseContext(), DBMonitoringService.class);
+//                serviceIntent.putExtra("UserID", user.getId());
+//                CMNLogHelper.logError("STARTING SERVICE WITH ID", user.getId());
+//                startService(serviceIntent);
             }
 
         } catch (Exception e) {

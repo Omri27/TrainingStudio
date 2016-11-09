@@ -12,6 +12,7 @@ import zina_eliran.app.BusinessEntities.BETraining;
 import zina_eliran.app.BusinessEntities.BETrainingStatusEnum;
 import zina_eliran.app.BusinessEntities.BETrainingViewDetails;
 import zina_eliran.app.BusinessEntities.BEUser;
+import zina_eliran.app.BusinessEntities.CMNLogHelper;
 import zina_eliran.app.Utils.FireBaseHandler;
 
 //singleton class
@@ -170,7 +171,7 @@ public class ServerAPI {
         //Filter all trainings that user participeted in or creator
         Calendar cal = Calendar.getInstance();
         long minute30 = 1000*60*30;
-        if (!trainings.isEmpty()) {
+        if (trainings != null && !trainings.isEmpty()) {
             for (int i = 0; i < trainings.size(); i++) {
                 BETraining currentTraining = ((BETraining) trainings.get(i));
                 if (((currentTraining.getPatricipatedUserIds().contains(userId) && !isCreatedByMe &&
@@ -182,6 +183,9 @@ public class ServerAPI {
 //                    CMNLogHelper.logError("myTrainings", currentTraining.toString());
                 }
             }
+        }
+        else {
+            CMNLogHelper.logError("myTrainingsFilter", "No training found");
         }
         return myTrainings;
 

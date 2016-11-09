@@ -51,10 +51,18 @@ public class LobbyActivity extends BaseActivity implements View.OnClickListener,
         handleLoginState();
 
 
-        Intent intent = new Intent(this, DBMonitoringService.class);
-        startService(intent);
+//        Intent intent = new Intent(getBaseContext(), DBMonitoringService.class);
+//
+//        startService(intent);
+//
+//        DAL.tests(this);
 
-        DAL.tests(this);
+        //Zina: Start service for the first time
+        Intent serviceIntent = new Intent(getBaseContext(), DBMonitoringService.class);
+        String user_id = readFromSharedPreferences("user_id");
+        serviceIntent.putExtra("UserID", user_id);
+        CMNLogHelper.logError("STARTING SERVICE WITH ID", user_id);
+        startService(serviceIntent);
 
 
     }

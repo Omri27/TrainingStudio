@@ -31,19 +31,23 @@ public class OnTrainingChangeListener implements ChildEventListener {
 
     @Override
     public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-        BETrainingStatusEnum status = dataSnapshot.getValue(BETrainingStatusEnum.class);
-        if (status == BETrainingStatusEnum.cancelled){
-            //update user if he registered to this training and notification flag in on
-            CMNLogHelper.logError("TrainingSTATUSchangedTO",BETrainingStatusEnum.cancelled.toString());
-            forwardResponse(DALActionTypeEnum.trainingCancelled);
+        try {
+            BETrainingStatusEnum status = dataSnapshot.getValue(BETrainingStatusEnum.class);
+            if (status == BETrainingStatusEnum.cancelled) {
+                //update user if he registered to this training and notification flag in on
+                CMNLogHelper.logError("TrainingSTATUSchangedTO", BETrainingStatusEnum.cancelled.toString());
+                forwardResponse(DALActionTypeEnum.trainingCancelled);
+            } else if (status == BETrainingStatusEnum.full) {
+                //update training owner
+                CMNLogHelper.logError("TrainingSTATUSchangedTO", BETrainingStatusEnum.full.toString());
+                forwardResponse(DALActionTypeEnum.trainingFull);
+
+            }
+        }
+        catch (Exception e){
+            CMNLogHelper.logError("TrainingListener", e.getMessage());
         }
 
-        else if (status == BETrainingStatusEnum.full){
-            //update training owner
-            CMNLogHelper.logError("TrainingSTATUSchangedTO",BETrainingStatusEnum.full.toString() );
-            forwardResponse(DALActionTypeEnum.trainingFull);
-
-        }
 
     }
 
@@ -63,11 +67,17 @@ public class OnTrainingChangeListener implements ChildEventListener {
     }
 
     public void forwardResponse(DALActionTypeEnum action){
-        BEResponse res = new BEResponse();
-        res.setActionType(action);
-        res.setStatus(BEResponseStatusEnum.success);
+        try{
+            BEResponse res = new BEResponse();
+            res.setActionType(action);
+            res.setStatus(BEResponseStatusEnum.success);
 
-        if (fireBaseHandler != null)
-            fireBaseHandler.onActionCallback(res);
+            if (fireBaseHandler != null)
+                fireBaseHandler.onActionCallback(res);
+        }
+        catch (Exception e){
+            CMNLogHelper.logError("TrainingListenerFailedToForward", e.getMessage());
+        }
+
     }
 }

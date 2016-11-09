@@ -51,40 +51,48 @@ public class JoinLeaveThread implements FireBaseHandler {
     private void startJoinLeaveOperation(BETraining training, BEUser user) {
         BEResponseStatusEnum actionStatus = BEResponseStatusEnum.success;
         String message = "";
-        if (action == DALActionTypeEnum.joinTraining && canJoin(training, user))
-            joinOperation(training, user);
-        else if (action == DALActionTypeEnum.leaveTraining && canLeave(training,user))
-            leaveOperation(training,user);
-        else {
-            actionStatus = BEResponseStatusEnum.error;
-            message = action.toString() + " failed, action cannot be performed";
+
+        try{
+            if (action == DALActionTypeEnum.joinTraining && canJoin(training, user))
+                joinOperation(training, user);
+            else if (action == DALActionTypeEnum.leaveTraining && canLeave(training,user))
+                leaveOperation(training,user);
+            else {
+                actionStatus = BEResponseStatusEnum.error;
+                message = action.toString() + " failed, action cannot be performed";
+            }
+
+
+            //commit to DB
+            Firebase trainingRef = DAL.getTrainingsRef().child(training.getId());
+            trainingRef.setValue(training);
+            Firebase userRef = DAL.getUsersRef().child(user.getId());
+            userRef.setValue(user);
+
+            //Add updated objects to array for response
+            ArrayList<BEBaseEntity> e = new ArrayList<>();
+            e.add(training);
+            e.add(user);
+
+            //Generate a response
+            BEResponse res = new BEResponse();
+            res.setEntityType(BETypesEnum.Trainings);
+            res.setStatus(actionStatus);
+            res.setActionType(action);
+            res.setEntities(e);
+            res.setMessage(message);
+
+            //For test
+            CMNLogHelper.logError("Response ", res.toString());
+            if (fb != null)
+                fb.onActionCallback(res);
+
+        }
+        catch (Exception e){
+            CMNLogHelper.logError("JoinLeaveFailed", e.getMessage());
         }
 
 
-        //commit to DB
-        Firebase trainingRef = DAL.getTrainingsRef().child(training.getId());
-        trainingRef.setValue(training);
-        Firebase userRef = DAL.getUsersRef().child(user.getId());
-        userRef.setValue(user);
-
-        //Add updated objects to array for response
-        ArrayList<BEBaseEntity> e = new ArrayList<>();
-        e.add(training);
-        e.add(user);
-
-        //Generate a response
-        BEResponse res = new BEResponse();
-        res.setEntityType(BETypesEnum.Trainings);
-        res.setStatus(actionStatus);
-        res.setActionType(action);
-        res.setEntities(e);
-        res.setMessage(message);
-
-        //For test
-        CMNLogHelper.logError("Response ", res.toString());
-
-        if (fb != null)
-            fb.onActionCallback(res);
 
         training = null;
         user = null;
@@ -92,63 +100,86 @@ public class JoinLeaveThread implements FireBaseHandler {
     }
 
     private void leaveOperation(BETraining training, BEUser user) {
-        //prepare training for commiting to DB: remove userID, update currentParticipantsNumber
-        training.getPatricipatedUserIds().remove(user.getId());
-        int currentNum = training.getCurrentNumberOfParticipants();
-        currentNum--;
-        training.setCurrentNumberOfParticipants(currentNum);
+        try{
+            //prepare training for commiting to DB: remove userID, update currentParticipantsNumber
+            training.getPatricipatedUserIds().remove(user.getId());
+            int currentNum = training.getCurrentNumberOfParticipants();
+            currentNum--;
+            training.setCurrentNumberOfParticipants(currentNum);
 
-        //prepare user for commiting to DB: add trainingID
-        if ( user.getMyTrainingIds() != null)
-            user.getMyTrainingIds().remove(training.getId());
+            //prepare user for commiting to DB: add trainingID
+            if ( user.getMyTrainingIds() != null)
+                user.getMyTrainingIds().remove(training.getId());
+        }
+        catch (Exception e){
+            CMNLogHelper.logError("LeaveFailed", e.getMessage());
+        }
+
     }
 
     private void joinOperation(BETraining training, BEUser user) {
-        //prepare training for commiting to DB: add userID, update currentParticipantsNumber
-        //If reach maxNumOfParticipants, update trainingStatus to full
-        training.getPatricipatedUserIds().add(user.getId());
-        int currentNum = training.getCurrentNumberOfParticipants();
-        currentNum++;
-        training.setCurrentNumberOfParticipants(currentNum);
-        if (training.getMaxNumberOfParticipants() == training.getCurrentNumberOfParticipants())
-            training.setStatus(BETrainingStatusEnum.full);
+        try{
+            //prepare training for commiting to DB: add userID, update currentParticipantsNumber
+            //If reach maxNumOfParticipants, update trainingStatus to full
+            training.getPatricipatedUserIds().add(user.getId());
+            int currentNum = training.getCurrentNumberOfParticipants();
+            currentNum++;
+            training.setCurrentNumberOfParticipants(currentNum);
+            if (training.getMaxNumberOfParticipants() == training.getCurrentNumberOfParticipants())
+                training.setStatus(BETrainingStatusEnum.full);
 
-        //prepare user for commiting to DB: add trainingID
-        if (user.getMyTrainingIds()!= null)
-            user.getMyTrainingIds().add(training.getId());
-        else{
-            user.setMyTrainingIds(new ArrayList<String>());
-            user.getMyTrainingIds().add(training.getId());
-
-
+            //prepare user for commiting to DB: add trainingID
+            if (user.getMyTrainingIds()!= null)
+                user.getMyTrainingIds().add(training.getId());
+            else{
+                user.setMyTrainingIds(new ArrayList<String>());
+                user.getMyTrainingIds().add(training.getId());
+            }
         }
+        catch (Exception e){
+            CMNLogHelper.logError("JoinFailed", e.getMessage());
+        }
+
     }
 
     private boolean canJoin(BETraining training, BEUser user) {
         boolean canJoin = true;
-        //check if training is valid for join
-        if (training.getMaxNumberOfParticipants() == training.getCurrentNumberOfParticipants()
-                || training.getStatus() == BETrainingStatusEnum.cancelled
-                || training.getTrainingDateTimeCalender().after(new Date())
-                || training.getPatricipatedUserIds().contains(user.getId())){
+        try{
+            //check if training is valid for join
+            if (training.getMaxNumberOfParticipants() == training.getCurrentNumberOfParticipants()
+                    || training.getStatus() == BETrainingStatusEnum.cancelled
+                    || training.getTrainingDateTimeCalender().after(new Date())
+                    || training.getPatricipatedUserIds().contains(user.getId())){
+                canJoin = false;
+            }
+
+            //check if user can participate in this training
+            else if (user.getMyTrainingIds() != null && user.getMyTrainingIds().contains(training.getId())){
+                canJoin = false;
+            }
+
+        }
+        catch (Exception e){
+            CMNLogHelper.logError("CanJoinFuncFailed", e.getMessage());
             canJoin = false;
         }
-
-        //check if user can participate in this training
-        else if (user.getMyTrainingIds() != null && user.getMyTrainingIds().contains(training.getId())){
-            canJoin = false;
-        }
-
         return canJoin;
-
     }
 
     private boolean canLeave(BETraining training, BEUser user){
         boolean canLeave = false;
-        if (training.getPatricipatedUserIds() != null && training.getPatricipatedUserIds().contains(user.getId())
-                && user.getMyTrainingIds() != null && user.getMyTrainingIds().contains(training.getId())){
-            canLeave = true;
+        try{
+            //check if user is participared to training, and training appears in list of user's trainings
+            if (training.getPatricipatedUserIds() != null && training.getPatricipatedUserIds().contains(user.getId())
+                    && user.getMyTrainingIds() != null && user.getMyTrainingIds().contains(training.getId())){
+                canLeave = true;
+            }
         }
+        catch (Exception e){
+            CMNLogHelper.logError("CanLeaveFuncFailed", e.getMessage());
+            canLeave = false;
+        }
+
         return canLeave;
     }
 

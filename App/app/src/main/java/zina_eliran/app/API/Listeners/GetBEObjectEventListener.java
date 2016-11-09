@@ -60,20 +60,21 @@ public class GetBEObjectEventListener implements ValueEventListener {
         BEResponseStatusEnum status = BEResponseStatusEnum.success;
         String errorMessage = null;
 
+        try{
 
-        if (action == DALActionTypeEnum.getTraining || action == DALActionTypeEnum.getUser || action == DALActionTypeEnum.getTrainingViewDetails){
-            if (dataType == BETypesEnum.Trainings)
-                objects.add(dataSnapshot.getValue(BETraining.class));
-            else if (dataType == BETypesEnum.Users)
-                objects.add(dataSnapshot.getValue(BEUser.class));
-            else if (dataType == BETypesEnum.TrainingViewDetails)
-                objects.add(dataSnapshot.getValue(BETrainingViewDetails.class));
-            else {
-                status = BEResponseStatusEnum.error;
-                errorMessage = "Unknown data type";
-            }
+            if (action == DALActionTypeEnum.getTraining || action == DALActionTypeEnum.getUser || action == DALActionTypeEnum.getTrainingViewDetails){
+                if (dataType == BETypesEnum.Trainings)
+                    objects.add(dataSnapshot.getValue(BETraining.class));
+                else if (dataType == BETypesEnum.Users)
+                    objects.add(dataSnapshot.getValue(BEUser.class));
+                else if (dataType == BETypesEnum.TrainingViewDetails)
+                    objects.add(dataSnapshot.getValue(BETrainingViewDetails.class));
+                else {
+                    status = BEResponseStatusEnum.error;
+                    errorMessage = "Unknown data type";
+                }
 
-            //Use for tests - Zina
+                //Use for tests - Zina
 //            Log.e("DAL", "ObjectListener");
 //            if( objects.get(0) instanceof BEUser)
 //                CMNLogHelper.logError("GetUserListener", "[[" + action.toString()  + "]]"  + " " + ((BEUser)objects.get(0)).toString());
@@ -82,27 +83,33 @@ public class GetBEObjectEventListener implements ValueEventListener {
 //            else if (objects.get(0) instanceof BETrainingViewDetails)
 //                CMNLogHelper.logError("GetTrainingViewDetailsListener", "[[" + action.toString() + "]]" + " " + ((BETrainingViewDetails)objects.get(0)).toString());
 
-        }
-
-        else if (action == DALActionTypeEnum.getAllTrainings){
-            for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
-                BETraining t = postSnapshot.getValue(BETraining.class);
-                objects.add(t);
             }
 
-            //Use for tests - Zina
+            else if (action == DALActionTypeEnum.getAllTrainings){
+                for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
+                    BETraining t = postSnapshot.getValue(BETraining.class);
+                    objects.add(t);
+                }
+
+                //Use for tests - Zina
 //            for (int i = 0; i < objects.size(); i++)
 //                CMNLogHelper.logError("All trainings listener", objects.get(i).toString());
+            }
+
+            else {
+                status = BEResponseStatusEnum.error;
+                errorMessage = "Unknown action type";
+            }
+
+            if (fbHandler != null)
+                forwardResponse(objects, status, errorMessage);
+
+
         }
-
-        else {
-            status = BEResponseStatusEnum.error;
-            errorMessage = "Unknown action type";
+        catch(Exception e){
+            CMNLogHelper.logError("GET-OBJECT-FAILED", e.getMessage());
+            forwardResponse(objects,status,e.getMessage());
         }
-
-        if (fbHandler != null)
-            forwardResponse(objects, status, errorMessage);
-
 
     }
 

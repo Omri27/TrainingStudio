@@ -35,23 +35,17 @@ public class OnTrainingChangeListener implements ChildEventListener {
     public void onChildChanged(DataSnapshot dataSnapshot, String s) {
         try {
 
-            CMNLogHelper.logError("OnTrainingChangeListener", dataSnapshot.getKey().toString());
-
-
             if (dataSnapshot.getKey().toString().equals("currentNumberOfParticipants")){
                 Integer currentNumberOfParticipants = dataSnapshot.getValue(Integer.class);
-                CMNLogHelper.logError("TrainingJoinedUsersChange", currentNumberOfParticipants.toString());
                 forwardResponse(DALActionTypeEnum.numberOfParticipantsChanged, currentNumberOfParticipants);
             }
             else if (dataSnapshot.getKey().toString().equals("status")){
                 BETrainingStatusEnum status = dataSnapshot.getValue(BETrainingStatusEnum.class);
                 if (status == BETrainingStatusEnum.cancelled) {
                     //update user if he registered to this training and notification flag in on
-                    CMNLogHelper.logError("TrainingSTATUSchangedTO", BETrainingStatusEnum.cancelled.toString());
                     forwardResponse(DALActionTypeEnum.trainingCancelled, -1);
                 } else if (status == BETrainingStatusEnum.full) {
                     //update training owner
-                    CMNLogHelper.logError("TrainingSTATUSchangedTO", BETrainingStatusEnum.full.toString());
                     forwardResponse(DALActionTypeEnum.trainingFull, -1);
                 }
             }

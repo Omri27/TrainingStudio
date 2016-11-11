@@ -3,7 +3,6 @@ package zina_eliran.app.API.Listeners;
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.FirebaseError;
-
 import zina_eliran.app.BusinessEntities.BEResponse;
 import zina_eliran.app.BusinessEntities.BEResponseStatusEnum;
 import zina_eliran.app.BusinessEntities.CMNLogHelper;
@@ -30,16 +29,19 @@ public class UserReminderFlagListener implements ChildEventListener{
     public void onChildChanged(DataSnapshot dataSnapshot, String s) {
         try{
             Boolean reminder;
-            if (dataSnapshot.getKey().equals("isTrainingRemainderNotification")){
+            String key = dataSnapshot.getKey();
+            if (key.equals("isTrainingRemainderNotification")){
                 reminder = (boolean) dataSnapshot.getValue();
-                if (fireBaseHandler != null){
-                    BEResponse res = new BEResponse();
-                    res.setStatus(BEResponseStatusEnum.success);
-                    res.setActionType(DALActionTypeEnum.userRemainderChanged);
-                    res.setMessage(reminder.toString());
-
+                forwardResponse(DALActionTypeEnum.userRemainderChanged,reminder);
                 }
+            else  if (key.equals("isTrainingFullNotification")){
+                reminder = (boolean) dataSnapshot.getValue();
+                forwardResponse(DALActionTypeEnum.userFullNotificationChanged,reminder);
+            }
 
+            else  if (key.equals("isTrainingCancelledNotification")){
+                reminder = (boolean) dataSnapshot.getValue();
+                forwardResponse(DALActionTypeEnum.userCancelledNotificationChanged,reminder);
             }
         }
         catch (Exception e){
@@ -61,5 +63,15 @@ public class UserReminderFlagListener implements ChildEventListener{
     @Override
     public void onCancelled(FirebaseError firebaseError) {
 
+    }
+
+    public void forwardResponse(DALActionTypeEnum actionTypeEnum, Boolean flagValue){
+        if (fireBaseHandler != null){
+            BEResponse res = new BEResponse();
+            res.setStatus(BEResponseStatusEnum.success);
+            res.setActionType(actionTypeEnum);
+            res.setMessage(flagValue.toString());
+
+        }
     }
 }

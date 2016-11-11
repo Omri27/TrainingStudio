@@ -10,7 +10,6 @@ import zina_eliran.app.BusinessEntities.BEBaseEntity;
 import zina_eliran.app.BusinessEntities.BEResponse;
 import zina_eliran.app.BusinessEntities.BEResponseStatusEnum;
 import zina_eliran.app.BusinessEntities.BETraining;
-import zina_eliran.app.BusinessEntities.BEUser;
 import zina_eliran.app.BusinessEntities.CMNLogHelper;
 import zina_eliran.app.BusinessEntities.DALActionTypeEnum;
 import zina_eliran.app.Utils.FireBaseHandler;
@@ -35,11 +34,11 @@ public class AllTrainingsListener implements ChildEventListener{
             BETraining training = dataSnapshot.getValue(BETraining.class);
             if (training.getCreatorId().equals(userID)){
                 forwardResponse(DALActionTypeEnum.iCreatedTraining,training);
-                CMNLogHelper.logError("AllTrainingsListener", DALActionTypeEnum.iCreatedTraining.toString());
+                //CMNLogHelper.logError("AllTrainingsListener", DALActionTypeEnum.iCreatedTraining.toString());
             }
             else if (training.getPatricipatedUserIds()!= null && training.getPatricipatedUserIds().contains(userID)){
                 forwardResponse(DALActionTypeEnum.iJoinedToTraining,training);
-                CMNLogHelper.logError("AllTrainingsListener", DALActionTypeEnum.iJoinedToTraining.toString());
+                //CMNLogHelper.logError("AllTrainingsListener", DALActionTypeEnum.iJoinedToTraining.toString());
             }
         }
         catch(Exception e){

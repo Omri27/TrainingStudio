@@ -26,5 +26,6 @@ public enum DALActionTypeEnum {
     userCancelledNotificationChanged,
     numberOfParticipantsChanged,
     iCreatedTraining,
-    iJoinedToTraining
+    iJoinedToTraining,
+    getAllTrainingsViews
 }

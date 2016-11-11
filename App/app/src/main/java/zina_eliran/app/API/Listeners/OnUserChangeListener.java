@@ -59,13 +59,6 @@ public class OnUserChangeListener implements ChildEventListener {
         catch(Exception e){
             CMNLogHelper.logError("OnUserListenerFailed", e.getMessage());
         }
-
-//        BETrainingStatusEnum status = dataSnapshot.getValue(BETrainingStatusEnum.class);
-//        if (status == BETrainingStatusEnum.cancelled){
-//            //update user if he registered to this training and notification flag in on
-//            CMNLogHelper.logError("TrainingSTATUSchangedTO",BETrainingStatusEnum.cancelled.toString());
-//            forwardResponse(DALActionTypeEnum.trainingCancelled);
-//        }
     }
 
     private void forwardResponse(DALActionTypeEnum action) {

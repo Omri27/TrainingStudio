@@ -40,6 +40,7 @@ public class DBMonitoringService extends Service implements FireBaseHandler {
     private BEUser user;
     private BETraining training;
     private TimerThread reminderThread;
+    private PeriodicalUpdateTrainingListThread periodicalUpdateTrainingListThread;
     private static ArrayList<BETraining> myCreatedTrainings;
     private static ArrayList<BETraining> myJoinedTrainings;
     private static ArrayList<BETraining> myTrainings;
@@ -52,7 +53,8 @@ public class DBMonitoringService extends Service implements FireBaseHandler {
         if (response != null && response.getStatus() != BEResponseStatusEnum.error) {
             if (response.getActionType() == DALActionTypeEnum.getUser && response.getEntities().get(0) != null) {
                 setUser((BEUser) response.getEntities().get(0));
-                Toast.makeText(this, user.toString(), Toast.LENGTH_LONG).show();
+                //Toast.makeText(this, user.toString(), Toast.LENGTH_LONG).show();
+                CMNLogHelper.logError("SERVICEgetUser", user.toString());
                 DAL.addListenerToUser(user, this);
 
 
@@ -65,7 +67,6 @@ public class DBMonitoringService extends Service implements FireBaseHandler {
                     String trainingID = response.getMessage();
                     for (BETraining training : myJoinedTrainings) {
                         if (training.getId().equals(trainingID)) {
-//                            sendNotification("Training " + training.getName() + " has been cancelled", NotificationTypeEnum.trainingIsCancelled, user, training);
                             NotificationSender sender = new NotificationSender(user, training, NotificationTypeEnum.trainingIsCancelled, this);
                             new Thread(sender).start();
                         }
@@ -78,16 +79,13 @@ public class DBMonitoringService extends Service implements FireBaseHandler {
 
                 try {
                     String trainingID = response.getMessage();
-                    BETraining trainingObjFound = new BETraining();
-                    trainingObjFound = findTrainingByID(trainingID, myCreatedTrainings);
+                    BETraining trainingObjFound = findTrainingByID(trainingID, myCreatedTrainings);
                     if (trainingObjFound != null) {
-//                        sendNotification("Training " + trainingObjFound.getName() + " is full.", NotificationTypeEnum.trainingIsFull, user, training);
                         NotificationSender sender = new NotificationSender(user, trainingObjFound, NotificationTypeEnum.trainingIsFull, this);
                         new Thread(sender).start();
                     } else {
                         trainingObjFound = findTrainingByID(trainingID, myJoinedTrainings);
                         if (trainingObjFound != null) {
-//                            sendNotification("Training " + trainingObjFound.getName() + " is full.", NotificationTypeEnum.trainingIsFull, user, training);
                             NotificationSender sender = new NotificationSender(user, trainingObjFound, NotificationTypeEnum.trainingIsFull, this);
                             new Thread(sender).start();
                         }
@@ -115,7 +113,7 @@ public class DBMonitoringService extends Service implements FireBaseHandler {
 
             else if (response.getActionType() == DALActionTypeEnum.userCancelledNotificationChanged){
                 try{
-                    if ((BEUser)response.getEntities().get(0) != null){
+                    if (response.getEntities().get(0) != null){
                         BEUser userFromResponse = (BEUser)response.getEntities().get(0);
                         user.setTrainingCancelledNotification(userFromResponse.isTrainingCancelledNotification());
                         reminderThread.updateUser(user);
@@ -130,7 +128,7 @@ public class DBMonitoringService extends Service implements FireBaseHandler {
 
             else if (response.getActionType() == DALActionTypeEnum.userFullNotificationChanged){
                 try{
-                    if ((BEUser)response.getEntities().get(0) != null){
+                    if (response.getEntities().get(0) != null){
                         BEUser userFromResponse = (BEUser)response.getEntities().get(0);
                         user.setTrainingCancelledNotification(userFromResponse.isTrainingFullNotification());
                         reminderThread.updateUser(user);
@@ -184,8 +182,6 @@ public class DBMonitoringService extends Service implements FireBaseHandler {
                     for (BETraining training : myCreatedTrainings) {
                         if (training.getId().equals(trainingID)) {
                             if (training.getCurrentNumberOfParticipants() < numOfJoined) {
-//                                sendNotification("User joined to training" + training.getName() + ". Current number of participants is " + numOfJoined,
-//                                        NotificationTypeEnum.userJoinedToTraining, user, training);
                                 training.setCurrentNumberOfParticipants(numOfJoined);
                                 NotificationSender sender = new NotificationSender(user, training, NotificationTypeEnum.userJoinedToTraining, this);
                                 new Thread(sender).start();
@@ -201,8 +197,20 @@ public class DBMonitoringService extends Service implements FireBaseHandler {
                 try {
                     if (user != null) {
                         CMNLogHelper.logError("SERVICEPrintResponse", response.toString());
-                        myCreatedTrainings = serverAPI.filterMyTrainings(user.getId(), (ArrayList<BEBaseEntity>) response.getEntities(), true);
-                        myJoinedTrainings = serverAPI.filterMyTrainings(user.getId(), (ArrayList<BEBaseEntity>) response.getEntities(), false);
+                        if (myCreatedTrainings != null && !myCreatedTrainings.isEmpty())
+                            addNewTrainings(myCreatedTrainings, serverAPI.filterMyTrainings(user.getId(), (ArrayList<BEBaseEntity>) response.getEntities(), true) );
+                        else{
+                            myCreatedTrainings = serverAPI.filterMyTrainings(user.getId(), (ArrayList<BEBaseEntity>) response.getEntities(), true);
+                            registerToNotifications(myCreatedTrainings);
+                        }
+
+
+                        if (myJoinedTrainings != null && !myJoinedTrainings.isEmpty())
+                            addNewTrainings(myJoinedTrainings, serverAPI.filterMyTrainings(user.getId(), (ArrayList<BEBaseEntity>) response.getEntities(), false) );
+                        else{
+                            myJoinedTrainings = serverAPI.filterMyTrainings(user.getId(), (ArrayList<BEBaseEntity>) response.getEntities(), false);
+                            registerToNotifications(myJoinedTrainings);
+                        }
 
 //                        CMNLogHelper.logError("SERVICE", "myCreatedTrainings");
 //                        for (BETraining training : myCreatedTrainings)
@@ -216,7 +224,12 @@ public class DBMonitoringService extends Service implements FireBaseHandler {
                             new Thread(reminderThread).start();
                             CMNLogHelper.logError("SERVICE", "Started reminder thread");
                         }
-                        registerToNotifications(joinTrainings(myJoinedTrainings, myCreatedTrainings));
+
+
+                        periodicalUpdateTrainingListThread = PeriodicalUpdateTrainingListThread.getInstance(this);
+                        if (!periodicalUpdateTrainingListThread.isRunning())
+                            new Thread(periodicalUpdateTrainingListThread).start();
+
                     } else
                         CMNLogHelper.logError("SERVICE", "User is NULL");
                 } catch (Exception e) {
@@ -229,6 +242,18 @@ public class DBMonitoringService extends Service implements FireBaseHandler {
 
         }
     }
+
+    public ArrayList<BETraining> addNewTrainings(ArrayList<BETraining> oldList, ArrayList<BETraining> newList){
+        for (BETraining training: newList){
+            if (!oldList.contains(training)){
+                oldList.add(training);
+                DAL.addListenerToTraining(training.getId(), this);
+            }
+        }
+        return oldList;
+    }
+
+
 
     private ArrayList<BETraining> joinTrainings(ArrayList<BETraining> myJoinedTrainings, ArrayList<BETraining> myCreatedTrainings) {
         try {
@@ -310,7 +335,7 @@ public class DBMonitoringService extends Service implements FireBaseHandler {
         // background priority so CPU-intensive work will not disrupt our UI.
         HandlerThread thread = new HandlerThread("ServiceStartArguments", 10);
         thread.start();
-        Toast.makeText(this, "service create done", Toast.LENGTH_LONG).show();
+        //Toast.makeText(this, "service create done", Toast.LENGTH_LONG).show();
         // Get the HandlerThread's Looper and use it for our Handler
         mServiceLooper = thread.getLooper();
         mServiceHandler = new ServiceHandler(mServiceLooper);
@@ -323,7 +348,6 @@ public class DBMonitoringService extends Service implements FireBaseHandler {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show();
 
         // For each start request, send a message to start a job and deliver the
         // start ID so we know which request we're stopping when we finish the job
@@ -332,103 +356,44 @@ public class DBMonitoringService extends Service implements FireBaseHandler {
         mServiceHandler.sendMessage(msg);
 
         // If we get killed, after returning from here, restart
-        Toast.makeText(this, "service start done", Toast.LENGTH_LONG).show();
+
+
+
+        // Tapping the notification will open the specified Activity.
+        Intent activityIntent = new Intent(this, LobbyActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0,
+                activityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        // This always shows up in the notifications area when this Service is running.
+        // TODO: String localization
+        Notification not = new Notification.Builder(this).
+                setContentTitle(getText(R.string.app_name)).
+                setContentInfo("Doing stuff in the background...").setSmallIcon(R.drawable.app_icon_new).
+                setContentIntent(pendingIntent).build();
+        startForeground(1, not);
+        //Toast.makeText(this, "service start done", Toast.LENGTH_LONG).show();
+
+        serverAPI = ServerAPI.getInstance();
 
         extras = intent.getExtras();  // <-- this is undefined?
 
         if (extras == null) {
-            Toast.makeText(this, "Service created... extras still null", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "Service created... extras still null", Toast.LENGTH_SHORT).show();
             CMNLogHelper.logError("GET-EXTRA-OnStart", "is null");
         } else {
-            Toast.makeText(this, extras.getString("UserID"), Toast.LENGTH_SHORT).show();
-            CMNLogHelper.logError("GET-EXTRA-OnStart", extras.getString("UserID").toString());
-            DAL.getUserByUID(extras.getString("UserID").toString(), this);
+            serverAPI.getUser(extras.getString("UserID").toString(), this);
+//            DAL.getUserByUID(extras.getString("UserID").toString(), this);
         }
 
-        serverAPI = ServerAPI.getInstance();
-//        serverAPI.getUser("-KVnVQJFbX7DtWIlEAIS", this);
-//        serverAPI.getTraining("-KVzSvgE-pw_Ver-H2An", this);
+        periodicalUpdateTrainingListThread = PeriodicalUpdateTrainingListThread.getInstance(this);
+        new Thread(periodicalUpdateTrainingListThread).start();
 
-        serverAPI.getAllTrainings(this);
+//        serverAPI.getAllTrainings(this);
 
-
-// build notification
-// the addAction re-use the same intent to keep the example short
-
-
-        Toast.makeText(this, "service is running", Toast.LENGTH_LONG).show();
-//        runTimerTask(this);
 
         return START_STICKY;
     }
 
-
-//    public boolean shouldSendNotification(NotificationTypeEnum notificationType, BEUser user, BETraining training) {
-//        try {
-//            CMNLogHelper.logError("SERVICE", "CHECKIfshouldSend");
-//            if (user != null && training != null) {
-//                Boolean shouldSend = false;
-//                //Check if should send trainingIsFull notification
-//                if (notificationType == NotificationTypeEnum.trainingIsFull) {
-//
-//                    //Send trainingIsFull Notification to training participant
-//                    if (user.isTrainingFullNotification() && !training.getCreatorId().equals(user.getId()))
-//                        shouldSend = true;
-//                        //Send trainingIsFull Notification to training to training creator
-//                    else if (training.getCreatorId().equals(user.getId()) && training.isTrainingFullNotificationFlag())
-//                        shouldSend = true;
-//                    CMNLogHelper.logError("SERVICE", "CHECKIfshouldSend " + shouldSend.toString());
-//                    return shouldSend;
-//                }
-//
-//
-//                //Check if should send trainingIsCalcelled notification - only for participants and not for owners
-//                else if (notificationType == NotificationTypeEnum.trainingIsCancelled) {
-//                    if (user.isTrainingCancelledNotification() && !training.getCreatorId().equals(user.getId()))
-//                        return true;
-//                }
-//
-//
-//                //Check if should send userJoinedToTraining notification - only for training creators
-//                else if (notificationType == NotificationTypeEnum.userJoinedToTraining) {
-//                    if (training.getCreatorId().equals(user.getId()) && training.isJoinTrainingNotificationFlag())
-//                        return true;
-//                } else if (notificationType == NotificationTypeEnum.reminder && user.isTrainingRemainderNotification())
-//                    return true;
-//                return false;
-//            }
-//        } catch (Exception e) {
-//            CMNLogHelper.logError("CheckNotificationFailed", e.getMessage());
-//        }
-//        //Zina change this to true
-//        return true;
-//
-//
-//    }
-//
-//
-//    private void sendNotification(String message, NotificationTypeEnum notificationType, BEUser user, BETraining training) {
-//        if (shouldSendNotification(notificationType, user, training)) {
-//            NotificationManager nm = (NotificationManager) this.getSystemService(NOTIFICATION_SERVICE);
-//            Notification.Builder builder = new Notification.Builder(this);
-//            Intent notificationIntent = new Intent(this, LobbyActivity.class);
-//            PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
-//
-//            //set notification details
-//            builder.setContentIntent(contentIntent);
-//            builder.setSmallIcon(R.drawable.app_notification_icon);
-//            builder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.app_notification_icon));
-//            builder.setSmallIcon(R.drawable.app_notification_small_icon);
-//            builder.setContentText(message);
-//            builder.setContentTitle("Training Studio");
-//            builder.setAutoCancel(true);
-//            builder.setDefaults(Notification.DEFAULT_ALL);
-//
-//            //send notification
-//            Notification notification = builder.build();
-//            nm.notify((int) System.currentTimeMillis(), notification);
-//        }
-//    }
 
     @Override
     public IBinder onBind(Intent intent) {

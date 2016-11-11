@@ -514,7 +514,8 @@ public class TrainingDetailsActivity extends BaseFragmentActivity
                 cal.set(Calendar.YEAR, 0);
                 cal.set(Calendar.MONTH, 0);
                 cal.set(Calendar.DAY_OF_MONTH, 0);
-                cal.add(Calendar.HOUR, 6);
+//                cal.add(Calendar.HOUR, 6);
+                cal.add(Calendar.HOUR, 0);
                 if (trainingCalender != null &&
                         isTodaySelectedDate(trainingCalender) &&
                         value.getTime().before(cal.getTime())) {

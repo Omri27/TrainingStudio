@@ -97,13 +97,13 @@ public class TimerThread implements Runnable {
 
 
                 for (BETraining training : trainings) {
-                    //CMNLogHelper.logError("ReminderThreadTrainingCheckedInList", training.toString());
+                    CMNLogHelper.logError("ReminderThreadTrainingCheckedInList", training.toString());
                     //CMNLogHelper.logError("ReminderThread time of training ", training.getTrainingDateTimeCalender().toString());
                     if (training.getTrainingDateTimeCalender().getTime().after(cal1.getTime()) && training.getTrainingDateTimeCalender().getTime().before(cal.getTime())){
 //                    if (training.getTrainingDateTimeCalender().after(cal) && training.getTrainingDateTimeCalender().before(cal1)) {
                         if (!sentNotifications.contains(training.getId())){
-                            //CMNLogHelper.logError("ReminderThread", "Should send");
-                            //CMNLogHelper.logError("ReminderCheckedTraining", training.toString());
+                            CMNLogHelper.logError("ReminderThread", "Should send");
+                            CMNLogHelper.logError("ReminderCheckedTraining", training.toString());
                             NotificationSender sender = new NotificationSender(user,training,NotificationTypeEnum.reminder,context);
                             new Thread(sender).start();
 

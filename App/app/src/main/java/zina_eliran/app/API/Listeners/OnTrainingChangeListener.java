@@ -87,9 +87,10 @@ public class OnTrainingChangeListener implements ChildEventListener {
             res.setMessage(trainingID);
 
             //On change of joined user number should be 0 or more
-            if (number >= 0)
+            if (number >= 0) {
                 //send training id and new number of joined user in message field with ; delimiter
                 res.setMessage(trainingID + ";" + number.toString());
+            }
             CMNLogHelper.logError("TrainingListenerMessage", res.getMessage());
 
             if (fireBaseHandler != null)

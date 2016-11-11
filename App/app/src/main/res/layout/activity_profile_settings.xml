@@ -75,6 +75,10 @@
                 android:background="#eeFF6600" />
 
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#ddFFA330" />
 
             <TextView
                 android:id="@+id/profile_settings_name_tv"
@@ -86,11 +90,6 @@
                 android:paddingLeft="20dp"
                 android:textColor="#000000"
                 android:textColorHint="#555555" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#ddFFA330" />
 
             <TextView
                 android:id="@+id/profile_settings_email_tv"

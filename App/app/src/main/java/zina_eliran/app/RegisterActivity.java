@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import zina_eliran.app.BusinessEntities.BEResponse;
 import zina_eliran.app.BusinessEntities.BEResponseStatusEnum;
 import zina_eliran.app.BusinessEntities.BEUser;
@@ -148,7 +149,15 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
                     //Send verification code by email again
                     if (readFromSharedPreferences(_getString(R.string.user_id)) != "") {
 
+                        resendEmailTv.setVisibility(View.VISIBLE);
                         sApi.resendUserRegistrationEmail(email, name, verificationCode);
+                        new android.os.Handler().postDelayed(
+                                new Runnable() {
+                                    public void run() {
+                                        Toast.makeText(_getAppContext(), _getString(R.string.registration_resend_email_message), Toast.LENGTH_LONG).show();
+                                        resendEmailTv.setVisibility(View.VISIBLE);
+                                    }
+                                }, 60000);
                     }
                     //something went wrong with the registration - init the app
                     else {

@@ -1,30 +1,24 @@
 package zina_eliran.app;
 
-
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Layout;
 import android.view.View;
 import android.widget.CompoundButton;
-import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 import android.widget.ToggleButton;
-
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import zina_eliran.app.BusinessEntities.BEResponse;
 import zina_eliran.app.BusinessEntities.BEResponseStatusEnum;
 import zina_eliran.app.BusinessEntities.BETraining;
 import zina_eliran.app.BusinessEntities.BETrainingAdapter;
-import zina_eliran.app.BusinessEntities.BETrainingLevelEnum;
 import zina_eliran.app.BusinessEntities.BETypesEnum;
 import zina_eliran.app.BusinessEntities.CMNLogHelper;
 import zina_eliran.app.BusinessEntities.DALActionTypeEnum;
@@ -45,17 +39,26 @@ public class TrainingsListActivity extends BaseActivity implements View.OnClickL
     boolean isMyTrainingMode;
     boolean isPublicTrainingMode;
     boolean isMyTrainingJoinMode;
+    ProgressBar pBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_trainings_list);
-        intent = getIntent();
-        onCreateUI();
+        try {
+
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_trainings_list);
+            intent = getIntent();
+            onCreateUI();
+        } catch (Exception e) {
+            CMNLogHelper.logError("TrainingsListActivity", e.getMessage());
+        }
     }
 
     private void onCreateUI() {
         try {
+
+            pBar = (ProgressBar) findViewById(R.id.training_list_pbar);
+            pBar.bringToFront();
 
             initActivityFlags();
             initFabButton();
@@ -119,6 +122,8 @@ public class TrainingsListActivity extends BaseActivity implements View.OnClickL
                 publicTrainingHeaderView.setVisibility(View.VISIBLE);
 
             } else {
+                myTrainingHeaderView.setVisibility(View.VISIBLE);
+                publicTrainingHeaderView.setVisibility(View.INVISIBLE);
                 if (!isMyTrainingJoinMode) {
                     trainingsList = sApi.getMyCreatedTrainingsList();
                     myTrainingListModeTb.setChecked(true);
@@ -194,10 +199,14 @@ public class TrainingsListActivity extends BaseActivity implements View.OnClickL
 
     @Override
     public void onClick(View v) {
-        //navigate to create new training activity
-        Map<String, String> intentParams = new HashMap<>();
-        intentParams.put(_getString(R.string.training_details_activity_mode), _getString(R.string.training_details_create_mode));
-        navigateToActivity(this, TrainingDetailsActivity.class, true, intentParams);
+        try {
+            //navigate to create new training activity
+            Map<String, String> intentParams = new HashMap<>();
+            intentParams.put(_getString(R.string.training_details_activity_mode), _getString(R.string.training_details_create_mode));
+            navigateToActivity(this, TrainingDetailsActivity.class, true, intentParams);
+        } catch (Exception e) {
+            CMNLogHelper.logError("TrainingsListActivity", e.getMessage());
+        }
     }
 
     @Override
@@ -211,9 +220,11 @@ public class TrainingsListActivity extends BaseActivity implements View.OnClickL
                 } else if (response.getEntityType() == BETypesEnum.Trainings) {
                     if (response.getActionType() == DALActionTypeEnum.getAllTrainings) {
                         sApi.updateAppTrainingsData(response.getEntities());
+
                         initActivityMode();
                         initTrainingAdapter();
                         initTrainingRecycleView();
+                        pBar.setVisibility(View.GONE);
                     } else {
                         CMNLogHelper.logError("TrainingsListActivity", "wrong action type in callback" + response.getActionType());
                     }
@@ -243,6 +254,19 @@ public class TrainingsListActivity extends BaseActivity implements View.OnClickL
             trainingAdapter.setTrainingList(trainingsList);
             trainingAdapter.notifyDataSetChanged();
 
+        } catch (Exception e) {
+            CMNLogHelper.logError("TrainingsListActivity", e.getMessage());
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        sApi.getAllTrainings(this);
+        try {
+            pBar.setVisibility(View.VISIBLE);
+            sApi.getAllTrainings(this);
         } catch (Exception e) {
             CMNLogHelper.logError("TrainingsListActivity", e.getMessage());
         }

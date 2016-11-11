@@ -244,12 +244,18 @@ public class DBMonitoringService extends Service implements FireBaseHandler {
     }
 
     public ArrayList<BETraining> addNewTrainings(ArrayList<BETraining> oldList, ArrayList<BETraining> newList){
-        for (BETraining training: newList){
-            if (!oldList.contains(training)){
-                oldList.add(training);
-                DAL.addListenerToTraining(training.getId(), this);
+        try{
+            for (BETraining training: newList){
+                if (!oldList.contains(training)){
+                    oldList.add(training);
+                    DAL.addListenerToTraining(training.getId(), this);
+                }
             }
         }
+        catch (Exception e){
+            CMNLogHelper.logError("FailedUpdateTrainingsList", e.getMessage());
+        }
+
         return oldList;
     }
 
@@ -278,22 +284,31 @@ public class DBMonitoringService extends Service implements FireBaseHandler {
 
 
     public BETraining findTrainingByID(String trainingID, ArrayList<BETraining> trainings) {
-        for (BETraining training : trainings) {
-            if (training.getId().equals(trainingID)) {
-                return training;
+        try{
+            for (BETraining training : trainings) {
+                if (training.getId().equals(trainingID)) {
+                    return training;
+                }
             }
         }
+        catch (Exception e){
+            CMNLogHelper.logError("findTrainingByIDFailed", e.getMessage());
+        }
+
         return null;
     }
 
     public void registerToNotifications(ArrayList<BETraining> trainings) {
-//        OnTrainingChangeListener listener = new OnTrainingChangeListener(this);
-        for (BETraining training : trainings) {
-//            OnTrainingChangeListener listener = new OnTrainingChangeListener(this, training.getId());
-//            DAL.getTrainingsRef().child(training.getId()).addChildEventListener(listener);
-            DAL.addListenerToTraining(training.getId(), this);
+        try{
+            for (BETraining training : trainings) {
+                DAL.addListenerToTraining(training.getId(), this);
 
+            }
         }
+        catch (Exception e){
+            CMNLogHelper.logError("registerToNotificationsFailed", e.getMessage());
+        }
+
 
     }
 
@@ -404,7 +419,7 @@ public class DBMonitoringService extends Service implements FireBaseHandler {
     @Override
     public void onDestroy() {
 
-        Toast.makeText(this, "service killed", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, "service killed", Toast.LENGTH_SHORT).show();
 
     }
 

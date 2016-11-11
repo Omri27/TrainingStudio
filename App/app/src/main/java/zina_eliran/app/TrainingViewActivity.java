@@ -113,11 +113,12 @@ public class TrainingViewActivity extends BaseActivity
             String _activityMode = getIntentParam(intent, _getString(R.string.training_view_activity_mode));
             activityMode = BETrainingViewModeEnum.valueOf(_activityMode);
 
-            if (activityMode != BETrainingViewModeEnum.training_view_run_mode ||
-                    activityMode != BETrainingViewModeEnum.training_view_read_only_mode) {
+            if (activityMode != BETrainingViewModeEnum.training_view_run_mode) {
                 sApi.getTraining(sApi.getNextTraining().getId(), this);
-            } else {
-                //handle error
+            } else if (activityMode != BETrainingViewModeEnum.training_view_read_only_mode) {
+                sApi.getTraining(getIntentParam(intent, _getString(R.string.training_id_view_mode)), this);
+            }
+            else {//handle error
             }
         } catch (Exception e) {
             CMNLogHelper.logError("TrainingViewActivity", e.getMessage());
@@ -178,13 +179,13 @@ public class TrainingViewActivity extends BaseActivity
         }
     }
 
-    private void setTrainingStatistics(){
+    private void setTrainingStatistics() {
         //set data into training view object
         List<BETrainingLocation> route = trainingView.getTrainingLocationRoute();
         trainingView.setTrainingCaloriesBurn(sApi.getAppUser());
-        trainingView.setActualDuration((int)route.get(0).getTimeMeasureDiff(route.get(route.size()-1), 3600));
-        trainingView.setTotalDistance(route.get(0).getDistance(route.get(route.size()-1)));
-        trainingView.setAvgSpeed(avgSpeed/measureCount);
+        trainingView.setActualDuration((int) route.get(0).getTimeMeasureDiff(route.get(route.size() - 1), 3600));
+        trainingView.setTotalDistance(route.get(0).getDistance(route.get(route.size() - 1)));
+        trainingView.setAvgSpeed(avgSpeed / measureCount);
         trainingView.setMaxSpeed(maxSpeed);
     }
 
@@ -195,9 +196,9 @@ public class TrainingViewActivity extends BaseActivity
                 float distance = locations.get(i).getDistance(locations.get(i + 1));
                 float time = locations.get(i).getTimeMeasureDiff(locations.get(i + 1), 3600);
                 float speed = (float) (distance / (time + 0.0001));
-                avgSpeed+=speed;
+                avgSpeed += speed;
 
-                if(maxSpeed < speed){
+                if (maxSpeed < speed) {
                     maxSpeed = speed;
                 }
 
@@ -282,7 +283,7 @@ public class TrainingViewActivity extends BaseActivity
                     //after we init the training objects - init the map & location service
                     initTrainingLocation();
                 } else if (response.getEntityType() == BETypesEnum.Trainings && response.getActionType() == DALActionTypeEnum.updateTrainingViewDetails) {
-                    if(((BETrainingViewDetails)response.getEntities().get(0)).getStatus() == BETrainingViewStatusEnum.ended){
+                    if (((BETrainingViewDetails) response.getEntities().get(0)).getStatus() == BETrainingViewStatusEnum.ended) {
                         isAllowBackButton = true;
                     }
                 } else {
@@ -368,6 +369,7 @@ public class TrainingViewActivity extends BaseActivity
 
     @Override
     protected void onDestroy() {
+        super.onDestroy();
         wl.release();
     }
 

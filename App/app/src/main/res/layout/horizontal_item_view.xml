@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="270dp"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:paddingTop="15dp">
+
+    <View
+        android:id="@+id/horizontal_item_first_view"
+        android:layout_width="20dp"
+        android:layout_height="100dp"></View>
+
+    <LinearLayout
+        android:id="@+id/horizontal_item_left_ll"
+        android:layout_width="20dp"
+        android:layout_height="100dp"
+        android:background="#22ffffff">
+
+        <View
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="15dp"
+            android:background="#ddFFA330"></View>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/horizontal_item_center_ll"
+        android:layout_width="180dp"
+        android:layout_height="100dp"
+        android:background="#22ffffff"
+        android:orientation="vertical"
+        android:paddingBottom="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="10dp">
+
+        <TextView
+            android:id="@+id/horizontal_item_city_tv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="City:"
+            android:textColor="#ffffff"
+            android:textSize="15dp" />
+
+        <TextView
+            android:id="@+id/horizontal_item_date_hour_tv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Date:"
+            android:textColor="#ffffff"
+            android:textSize="15dp" />
+
+        <TextView
+            android:id="@+id/horizontal_item_level_tv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Level:"
+            android:textColor="#ffffff"
+            android:textSize="15dp" />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/horizontal_item_right_ll"
+        android:layout_width="20dp"
+        android:layout_height="100dp"
+        android:background="#22ffffff">
+
+        <View
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="15dp"
+            android:background="#ddFFA330"></View>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/horizontal_item_connector_ll"
+        android:layout_width="match_parent"
+        android:layout_height="100dp">
+
+        <View
+            android:layout_width="60dp"
+            android:layout_height="3dp"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="24dp"
+            android:background="#ddFFA330"></View>
+    </LinearLayout>
+
+</LinearLayout>

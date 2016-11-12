@@ -21,7 +21,7 @@ public class EmailSendThread implements Runnable{
     public void run() {
         try {
             EmailSender send = new EmailSender(emailAdress, name , verificationCode);
-            CMNLogHelper.logError("SendMailSucceed", "mail sent");
+            //CMNLogHelper.logError("SendMailSucceed", "mail sent");
         } catch (Exception e) {
             CMNLogHelper.logError("SendMailFailed", e.getMessage());
         }

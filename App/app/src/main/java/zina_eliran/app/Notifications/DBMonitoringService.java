@@ -200,6 +200,7 @@ public class DBMonitoringService extends Service implements FireBaseHandler {
                     Integer numOfJoined = Integer.parseInt(data[1]);
                     for (BETraining training : myCreatedTrainings) {
                         if (training.getId().equals(trainingID)) {
+                            CMNLogHelper.logError("ServiceMyTraining", trainingID.toString());
                             if (training.getCurrentNumberOfParticipants() < numOfJoined) {
                                 NotificationSender sender = new NotificationSender(user, training, NotificationTypeEnum.userJoinedToTraining, this);
                                 new Thread(sender).start();
@@ -240,6 +241,18 @@ public class DBMonitoringService extends Service implements FireBaseHandler {
                             new Thread(reminderThread).start();
                         }
 
+
+                        CMNLogHelper.logError("Service", "MyTrainings:");
+                        for (BETraining training: myCreatedTrainings){
+                            CMNLogHelper.logError("MyTrainings", training.toString());
+                        }
+
+                        CMNLogHelper.logError("Service", "MyJoinedTrainings:");
+                        for (BETraining training: myJoinedTrainings){
+                            CMNLogHelper.logError("MyJoinedTrainings", training.toString());
+                        }
+
+
                         //If periodic thread not started, start
                         periodicalUpdateTrainingListThread = PeriodicalUpdateTrainingListThread.getInstance(this);
                         if (!periodicalUpdateTrainingListThread.isRunning())
@@ -257,10 +270,20 @@ public class DBMonitoringService extends Service implements FireBaseHandler {
     public ArrayList<BETraining> addNewTrainings(ArrayList<BETraining> oldList, ArrayList<BETraining> newList){
         try{
             for (BETraining training: newList){
-                if (!oldList.contains(training)){
+                if (findTrainingByID(training.getId(), oldList) == null){
                     oldList.add(training);
                     DAL.addListenerToTraining(training.getId(), this);
                 }
+            }
+
+            CMNLogHelper.logError("Service", "OLD-list:");
+            for (BETraining training: oldList){
+                CMNLogHelper.logError("OLD-list", training.toString());
+            }
+
+            CMNLogHelper.logError("Service", "New-List:");
+            for (BETraining training: newList){
+                CMNLogHelper.logError("New-List:", training.toString());
             }
         }
         catch (Exception e){

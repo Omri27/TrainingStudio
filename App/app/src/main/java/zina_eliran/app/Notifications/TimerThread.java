@@ -67,7 +67,7 @@ public class TimerThread implements Runnable {
     public void run() {
         while (isRunning) {
             try {
-                //reset sent notifications
+                //to reset sent notifications un-comment here
                 //sentNotifications.clear();
 
                 checkUpcomingTrainings(trainings,user);

@@ -201,14 +201,15 @@ public class ServerAPI {
         //Filter trainings to exclude current user, cancelled trainings, and past trainings
         if (!trainings.isEmpty()) {
             Calendar c = Calendar.getInstance();
-            c.set(Calendar.HOUR_OF_DAY, c.get(Calendar.HOUR_OF_DAY) - 6);
+            //30 minutes before
+            c.setTimeInMillis(c.getTimeInMillis() - 1000*60*30);
 
             for (int i = 0; i < trainings.size(); i++) {
                 BETraining training = (BETraining) trainings.get(i);
                 if (!training.getCreatorId().equals(userId) &&
                         !(training.getPatricipatedUserIds().contains(userId)) &&
                         (training.getStatus() != BETrainingStatusEnum.cancelled) &&
-                        !(training.getTrainingDateTimeCalender().after(c.getTime()))) {
+                        (training.getTrainingDateTimeCalender().getTimeInMillis() >= c.getTimeInMillis())) {
                     publicTrainings.add(((BETraining) trainings.get(i)));
                 }
             }
@@ -222,7 +223,9 @@ public class ServerAPI {
         ArrayList<BETraining> myTrainings = new ArrayList<>();
         //Filter all trainings that user participeted in or creator
         Calendar cal = Calendar.getInstance();
-        long minute30 = 1000 * 60 * 30;
+
+        //30 minutes before
+        cal.setTimeInMillis(cal.getTimeInMillis() - 1000*60*30);
         if (trainings != null && !trainings.isEmpty()) {
             for (int i = 0; i < trainings.size(); i++) {
                 BETraining currentTraining = ((BETraining) trainings.get(i));
@@ -230,7 +233,7 @@ public class ServerAPI {
                         currentTraining.getStatus() != BETrainingStatusEnum.cancelled) ||
                         (currentTraining.getCreatorId().equals(userId) && isCreatedByMe &&
                                 currentTraining.getStatus() != BETrainingStatusEnum.cancelled)) &&
-                        currentTraining.getTrainingDateTimeCalender().getTimeInMillis() >= (cal.getTimeInMillis() - minute30)) {
+                        currentTraining.getTrainingDateTimeCalender().getTimeInMillis() >= cal.getTimeInMillis()) {
                     myTrainings.add(currentTraining);
                 }
             }
@@ -262,7 +265,7 @@ public class ServerAPI {
 
         for (int i = 0; i < getMyJoinedTrainingsList().size(); i++) {
             BETraining currentTraining = myJoinedTrainings.get(i);
-            if (myEndedTrainingsList.contains(currentTraining.getId())) {
+            if (myEndedTrainingIds.contains(currentTraining.getId())) {
                 myResultTrainings.add(currentTraining);
             }
         }

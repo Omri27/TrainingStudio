@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -56,6 +57,7 @@ public class GoogleMapHandler implements
     int fastInterval = 1000;
     boolean isDrawOnMap = false;
     boolean isDrawFirstTime = false;
+    int i = 0;
 
     AppLocationChangedHandler activity;
 
@@ -112,19 +114,20 @@ public class GoogleMapHandler implements
     public void onLocationChanged(Location location) {
 
         if (activity != null) {
-            if (isDrawFirstTime) {
-                activity.onLocationChangedCallback(location);
-                return;
-            } else {
+            if (!isDrawFirstTime) {
 
                 if (mCurrLocationMarker != null) {
                     mCurrLocationMarker.remove();
                 }
-
                 //Place current location marker
                 mLastlatLng = new LatLng(trainingLocation.getLatitude(), trainingLocation.getLongitude());
                 mCurrLocationMarker = addMarker(mLastlatLng);
                 isDrawFirstTime = true;
+            }
+            else {
+                activity.onLocationChangedCallback(location);
+                Toast.makeText(this.context, "i: " + (i++) + " | " +location.toString(), Toast.LENGTH_LONG).show();
+                return;
             }
 
         } else {
@@ -242,7 +245,6 @@ public class GoogleMapHandler implements
         }
     }
 
-
     public void drawNextLocationOnMap(LatLng l1, LatLng l2) {
         try {
             mMap.clear();
@@ -256,7 +258,5 @@ public class GoogleMapHandler implements
         } catch (Exception ex) {
         }
     }
-
-
 
 }

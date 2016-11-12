@@ -81,10 +81,14 @@ public class BETrainingLocation extends BEBaseEntity {
     }
 
     public static List<LatLng> getLatLngList(List<BETrainingLocation> locationsList) {
+
         List<LatLng> list = new ArrayList<>();
-        for (BETrainingLocation item : locationsList) {
-            list.add(new LatLng(item.getLatitude(), item.getLongitude()));
+        if (locationsList != null) {
+            for (BETrainingLocation item : locationsList) {
+                list.add(new LatLng(item.getLatitude(), item.getLongitude()));
+            }
         }
+
         return list;
     }
 
@@ -100,7 +104,7 @@ public class BETrainingLocation extends BEBaseEntity {
         return l1.distanceTo(l2);
     }
 
-    public float getTimeMeasureDiff( BETrainingLocation l2, int timePart) {
+    public float getTimeMeasureDiff(BETrainingLocation l2, int timePart) {
         return (l2.getLocationMeasureTime().getTimeInMillis() - this.getLocationMeasureTime().getTimeInMillis()) / (timePart * 1000);
     }
 
@@ -118,7 +122,7 @@ public class BETrainingLocation extends BEBaseEntity {
     public static float getLocationRouteDuration(List<BETrainingLocation> locationsList, int timePart) {
         float time = 0;
         if (locationsList.size() >= 2) {
-            time = locationsList.get(locationsList.size()-1).getTimeMeasureDiff(locationsList.get(0), timePart);
+            time = locationsList.get(locationsList.size() - 1).getTimeMeasureDiff(locationsList.get(0), timePart);
         }
         return time;
     }

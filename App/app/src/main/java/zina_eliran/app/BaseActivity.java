@@ -46,8 +46,8 @@ public class BaseActivity extends AppCompatActivity {
     ServerAPI sApi;
     Context appContext;
     Intent intent;
-    DateFormat dateFormatter = new SimpleDateFormat("dd/MM/yy");
-    DateFormat timeFormatter = new SimpleDateFormat("kk:mm"); //kk = 1-24
+    SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yy");
+    SimpleDateFormat timeFormatter = new SimpleDateFormat("kk:mm"); //kk = 1-24
 
     GoogleApiClient client;
     LocationRequest mLocationRequest;

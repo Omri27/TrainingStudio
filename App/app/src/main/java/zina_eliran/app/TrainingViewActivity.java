@@ -14,7 +14,12 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.Description;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
@@ -106,6 +111,8 @@ public class TrainingViewActivity extends BaseActivity
         try {
             initActivityElements();
             initActivityMode();
+            initChartData();
+            setChartDataTest();
         } catch (Exception e) {
             CMNLogHelper.logError("TrainingViewActivity", e.getMessage());
         }
@@ -118,10 +125,12 @@ public class TrainingViewActivity extends BaseActivity
             String _activityMode = getIntentParam(intent, _getString(R.string.training_view_activity_mode));
             activityMode = BETrainingViewModeEnum.valueOf(_activityMode);
 
-            if (activityMode != BETrainingViewModeEnum.training_view_run_mode) {
+            if (activityMode == BETrainingViewModeEnum.training_view_run_mode) {
                 sApi.getTraining(sApi.getNextTraining().getId(), this);
-            } else if (activityMode != BETrainingViewModeEnum.training_view_read_only_mode) {
+            } else if (activityMode == BETrainingViewModeEnum.training_view_read_only_mode) {
                 sApi.getTraining(getIntentParam(intent, _getString(R.string.training_id_view_mode)), this);
+                startTrainingBtn.setEnabled(false);
+                endTrainingBtn.setEnabled(false);
             } else {//handle error
             }
         } catch (Exception e) {
@@ -160,11 +169,10 @@ public class TrainingViewActivity extends BaseActivity
     private void initTrainingLocation() {
         try {
             if (activityMode == BETrainingViewModeEnum.training_view_run_mode) {
-                gmh = new GoogleMapHandler(this, this, trainingMapFragment, training.getLocation(), 500, 100);
+                gmh = new GoogleMapHandler(this, this, trainingMapFragment, training.getLocation(), 3000, 1000);
             } else {
                 //in case of view only
                 gmh = new GoogleMapHandler(this, trainingMapFragment, trainingView.getTrainingLocationRoute());
-                sApi.getTrainingView(sApi.getNextTraining().getId(), sApi.getAppUser().getId(), this);
             }
         } catch (Exception e) {
             CMNLogHelper.logError("TrainingDetailsActivity", e.getMessage());
@@ -172,12 +180,32 @@ public class TrainingViewActivity extends BaseActivity
 
     }
 
-    private void initChartData(ArrayList<BETrainingLocation> trainingLocations) {
+    private void initChartData() {
         try {
             chart = (LineChart) findViewById(R.id.training_view_chart);
-            chartLineData = new LineData(chartDataSet);
-            chart.setData(chartLineData);
-            chart.invalidate(); // refresh the chart
+            chart.setDescription(new Description());
+            Description d =  new Description();
+            d.setText("");
+            chart.setDescription(d);
+
+            chart.setEnabled(false);
+            chart.animateY(5000, Easing.EasingOption.EaseOutBack);
+            chart.animateX(2000, Easing.EasingOption.EaseOutBack);
+            XAxis xAxis = chart.getXAxis();
+            YAxis leftYAxis = chart.getAxisLeft();
+            YAxis rightYAxis = chart.getAxisRight();
+            Legend legend = chart.getLegend();
+            chart.disableScroll();
+            chart.setTouchEnabled(false);
+
+            xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+            xAxis.setTextColor(Color.WHITE);
+            legend.setTextColor(Color.WHITE);
+            leftYAxis.setTextColor(Color.WHITE);
+
+            xAxis.setDrawAxisLine(true);
+            rightYAxis.setEnabled(false); // no right axis
+
         } catch (Exception e) {
             CMNLogHelper.logError("TrainingViewActivity", e.getMessage());
         }
@@ -199,6 +227,8 @@ public class TrainingViewActivity extends BaseActivity
 
     private void setChartData(List<BETrainingLocation> locations) {
         try {
+
+            //add those point to the data set
             for (int i = 0; i < locations.size() - 1; i++) {
                 measureCount++;
                 float distance = locations.get(i).getDistance(locations.get(i + 1));
@@ -211,10 +241,48 @@ public class TrainingViewActivity extends BaseActivity
                 }
 
                 chartData.add(new Entry(time, speed));
+                chartDataSet = new LineDataSet(chartData, "Route(M) | Time(m)"); // add entries to dataset
+                chartDataSet.setColor(Color.argb(159, 255, 106, 0));
+                chartDataSet.setValueTextColor(Color.WHITE);
+                chartDataSet.setDrawValues(false);
+            }
+
+
+            chart.notifyDataSetChanged(); // let the chart know it's data changed
+            chart.invalidate(); // refresh
+
+        } catch (Exception e) {
+            CMNLogHelper.logError("TrainingViewActivity", e.getMessage());
+        }
+    }
+
+    private void setChartDataTest() {
+        try {
+
+            int j = 0;
+            for (int i = 0; i < 20; i++) {
+
+                measureCount++;
+                float distance = (((i + 15) * 7) / 9) * 13;
+                float time = (j / 13) * 14;
+                float speed = (float) (distance / (time + 0.0001));
+                avgSpeed += speed;
+
+                if (maxSpeed < speed) {
+                    maxSpeed = speed;
+                }
+
+                chartData.add(new Entry(time, speed));
                 chartDataSet = new LineDataSet(chartData, "Route | Time"); // add entries to dataset
                 chartDataSet.setColor(Color.argb(159, 255, 106, 0));
                 chartDataSet.setValueTextColor(Color.WHITE);
+                j++;
             }
+
+
+            chartLineData = new LineData(chartDataSet);
+            chart.setData(chartLineData);
+            chart.invalidate(); // refresh the chart
 
         } catch (Exception e) {
             CMNLogHelper.logError("TrainingViewActivity", e.getMessage());
@@ -273,6 +341,8 @@ public class TrainingViewActivity extends BaseActivity
                 if (response.getStatus() == BEResponseStatusEnum.error) {
                     CMNLogHelper.logError("TrainingViewActivity", "error in training details callbacks | err:" + response.getMessage());
                     Toast.makeText(_getAppContext(), "Error while performing training view action, please try again later.", Toast.LENGTH_LONG).show();
+                    //navigate to lobby
+                    navigateToActivity(this, LobbyActivity.class, true, null);
                 } else if (response.getEntityType() == BETypesEnum.Trainings && response.getActionType() == DALActionTypeEnum.getTraining) {
                     training = ((BETraining) response.getEntities().get(0));
                     //bind elements to the object fields
@@ -281,22 +351,24 @@ public class TrainingViewActivity extends BaseActivity
                     trainingDateTv.setText("On: " + dateFormatter.format(training.getTrainingDateTimeCalender().getTime()));
                     trainingTimeTv.setText("Start at: " + timeFormatter.format(training.getTrainingDateTimeCalender().getTime()));
 
+                    if (activityMode == BETrainingViewModeEnum.training_view_read_only_mode) {
+                        //get training view data in case of read only mode
+                        sApi.getTrainingView(sApi.getNextTraining().getId(), sApi.getAppUser().getId(), this);
+                    }
                     //after we init the training objects - init the map & location service
                     initTrainingLocation();
 
                 } else if (response.getEntityType() == BETypesEnum.TrainingViewDetails && response.getActionType() == DALActionTypeEnum.getTrainingViewDetails) {
 
                     trainingView = ((BETrainingViewDetails) response.getEntities().get(0));
-                    trainingMaxSpeedTv.setText(trainingView.getMaxSpeed() + "");
-                    trainingAvgSpeedTv.setText(trainingView.getAvgSpeed() + "");
-                    trainingCaloriesTv.setText(trainingView.getTotalCalories() + "");
-                    initChartData(trainingView.getTrainingLocationRoute());
+                    //initChartData(trainingView.getTrainingLocationRoute());
 
                 } else if (response.getEntityType() == BETypesEnum.TrainingViewDetails && response.getActionType() == DALActionTypeEnum.createTrainingViewDetails) {
                     endTrainingBtn.setEnabled(true);
                 } else if (response.getEntityType() == BETypesEnum.TrainingViewDetails && response.getActionType() == DALActionTypeEnum.updateTrainingViewDetails) {
                     if (((BETrainingViewDetails) response.getEntities().get(0)).getStatus() == BETrainingViewStatusEnum.ended) {
                         isAllowBackButton = true;
+                        sApi.setNextTraining(null);
                     }
                 } else {
                     CMNLogHelper.logError("TrainingViewActivity", "error in training view callbacks | err:" + response.getMessage());

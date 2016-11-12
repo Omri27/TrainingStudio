@@ -22,6 +22,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
+import zina_eliran.app.BusinessEntities.BEAddressPartsEnum;
 import zina_eliran.app.BusinessEntities.BEFragmentResultTypeEnum;
 import zina_eliran.app.BusinessEntities.BEResponse;
 import zina_eliran.app.BusinessEntities.BEResponseStatusEnum;
@@ -319,7 +320,8 @@ public class TrainingDetailsActivity extends BaseFragmentActivity
                     trainingLocation.setLatitude(selectedLocation.getLatLng().latitude);
                     trainingLocation.setLongitude(selectedLocation.getLatLng().longitude);
                     initTrainingLocation(trainingLocation);
-                    Toast.makeText(this, String.format("%s was selected successfully.", selectedLocation.getName()), Toast.LENGTH_LONG).show();
+                    updateLocationTv.setText("Update");
+                    Toast.makeText(this, String.format("%s was selected successfully.", trainingLocation.getAddressPart(this, BEAddressPartsEnum.city)), Toast.LENGTH_LONG).show();
                 }
             }
         } catch (Exception e) {
@@ -336,9 +338,6 @@ public class TrainingDetailsActivity extends BaseFragmentActivity
                     switch (activityMode) {
                         case training_details_create_mode:
                             //create object
-
-                            //!!!validations will be added as ui elements such as spinners & calenders & google map elements at phase 2
-
                             training = new BETraining();
                             if (!validateBeforeSave()) {
                                 return;
@@ -420,7 +419,8 @@ public class TrainingDetailsActivity extends BaseFragmentActivity
                 if (response.getStatus() == BEResponseStatusEnum.error) {
                     CMNLogHelper.logError("TrainingDetailsActivity", "error in training details callbacks | err:" + response.getMessage());
                     Toast.makeText(_getAppContext(), "Error while performing training action, please try again later.", Toast.LENGTH_LONG).show();
-
+                    //navigate to lobby
+                    navigateToActivity(this, LobbyActivity.class, true, null);
                 } else if (response.getEntityType() == BETypesEnum.Trainings) {
 
                     if (response.getActionType() == DALActionTypeEnum.getTraining) {
@@ -550,12 +550,6 @@ public class TrainingDetailsActivity extends BaseFragmentActivity
                     } else {
                         trainingCalender.set(Calendar.HOUR, value.get(Calendar.HOUR_OF_DAY));
                         trainingCalender.set(Calendar.MINUTE, value.get(Calendar.MINUTE));
-                    }
-
-                    if (value.get(Calendar.HOUR_OF_DAY) > 12) {
-                        trainingCalender.set(Calendar.AM_PM, Calendar.PM);
-                    } else {
-                        trainingCalender.set(Calendar.AM_PM, Calendar.AM);
                     }
 
                     timeTv.setText(timeFormatter.format(value.getTime()));

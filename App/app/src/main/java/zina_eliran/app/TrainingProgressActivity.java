@@ -122,16 +122,26 @@ public class TrainingProgressActivity extends BaseActivity implements View.OnCli
                 if (response.getStatus() == BEResponseStatusEnum.error) {
                     CMNLogHelper.logError("TrainingProgressActivity", "error in get user callback on app load | err:" + response.getMessage());
                     Toast.makeText(_getAppContext(), "Error while retrieving trainings view data, please try again later.", Toast.LENGTH_LONG).show();
+                    //navigate to lobby
+                    navigateToActivity(this, LobbyActivity.class, true, null);
                 } else if (response.getActionType() == DALActionTypeEnum.getAllTrainingsViews && response.getEntityType() == BETypesEnum.TrainingViewDetails) {
 
                     //get all trainings data
                     sApi.setMyEndedTrainingsViewList(sApi.filterMyEndedTrainings(sApi.getAppUser().getId(), response.getEntities()));
                     trainingList = sApi.getMyEndedTrainingsList();
 
-                    //bind elements to the object fields
-                    bindTrainingViewDetails();
+                    if(trainingList.size() == 0){
+                        Toast.makeText(_getAppContext(), "You have no Trainings yet, it is a good time to start!", Toast.LENGTH_LONG).show();
+                        //navigate to lobby
+                        navigateToActivity(this, LobbyActivity.class, true, null);
+                    }
+                    else {
+                        //bind elements to the object fields
+                        bindTrainingViewDetails();
 
-                    pBar.setVisibility(View.GONE);
+                        pBar.setVisibility(View.GONE);
+                    }
+
 
                 } else {
                     CMNLogHelper.logError("TrainingProgressActivity", "wrong action type in callback" + response.getEntityType() + ", " + response.getActionType());

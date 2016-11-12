@@ -130,6 +130,8 @@ public class LobbyActivity extends BaseActivity implements View.OnClickListener,
                 if (response.getStatus() == BEResponseStatusEnum.error) {
                     CMNLogHelper.logError("LobbyActivity", "error in get user callback on app load | err:" + response.getMessage());
                     Toast.makeText(_getAppContext(), "Error while retrieving user data, please try again later.", Toast.LENGTH_LONG).show();
+                    //navigate to lobby
+                    navigateToActivity(this, LobbyActivity.class, true, null);
                 } else if (response.getActionType() == DALActionTypeEnum.getUser && response.getEntityType() == BETypesEnum.Users) {
                     sApi.setAppUser((BEUser) response.getEntities().get(0));
 

@@ -11,10 +11,12 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 import android.widget.ToggleButton;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import zina_eliran.app.BusinessEntities.BEResponse;
 import zina_eliran.app.BusinessEntities.BEResponseStatusEnum;
 import zina_eliran.app.BusinessEntities.BETraining;
@@ -132,9 +134,12 @@ public class TrainingsListActivity extends BaseActivity implements View.OnClickL
                 }
                 myTrainingListModeTb.setOnCheckedChangeListener(this);
             }
-
+            if (trainingsList == null) {
+                trainingsList = new ArrayList<>();
+            }
             trainingAdapter.setTrainingList(trainingsList);
             trainingAdapter.notifyDataSetChanged();
+
 
         } catch (Exception e) {
             CMNLogHelper.logError("TrainingsListActivity", e.getMessage());
@@ -217,6 +222,8 @@ public class TrainingsListActivity extends BaseActivity implements View.OnClickL
                 if (response.getStatus() == BEResponseStatusEnum.error) {
                     CMNLogHelper.logError("TrainingsListActivity", "error in get trainings callback | err:" + response.getMessage());
                     Toast.makeText(_getAppContext(), "Error while retrieving trainings data, please try again later.", Toast.LENGTH_LONG).show();
+                    //navigate to lobby
+                    navigateToActivity(this, LobbyActivity.class, true, null);
                 } else if (response.getEntityType() == BETypesEnum.Trainings) {
                     if (response.getActionType() == DALActionTypeEnum.getAllTrainings) {
                         sApi.updateAppTrainingsData(response.getEntities());
@@ -244,13 +251,13 @@ public class TrainingsListActivity extends BaseActivity implements View.OnClickL
 
             if (myTrainingListModeTb.isChecked()) {
                 trainingsList = sApi.getMyCreatedTrainingsList();
-                //set the switch button status here
             } else {
                 trainingsList = sApi.getMyJoinedTrainingsList();
-                ;
-                //set the switch button status here
             }
 
+            if (trainingsList == null) {
+                trainingsList = new ArrayList<>();
+            }
             trainingAdapter.setTrainingList(trainingsList);
             trainingAdapter.notifyDataSetChanged();
 

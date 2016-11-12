@@ -360,7 +360,7 @@ public class ProfileSettingsActivity extends BaseActivity implements View.OnClic
         }
         return preferredHours;
     }
-    
+
 
     @Override
     public void onClick(View view) {
@@ -463,6 +463,8 @@ public class ProfileSettingsActivity extends BaseActivity implements View.OnClic
                 if (response.getStatus() == BEResponseStatusEnum.error) {
                     CMNLogHelper.logError("ProfileSettingsActivity", "error in save user callback | err:" + response.getMessage());
                     Toast.makeText(_getAppContext(), "Error while saving user data, please try again later.", Toast.LENGTH_LONG).show();
+                    //navigate to lobby
+                    navigateToActivity(this, LobbyActivity.class, true, null);
                 } else if (response.getActionType() == DALActionTypeEnum.updateUser && response.getEntityType() == BETypesEnum.Users) {
                     //set spinner off
                     pBar.setVisibility(View.INVISIBLE);

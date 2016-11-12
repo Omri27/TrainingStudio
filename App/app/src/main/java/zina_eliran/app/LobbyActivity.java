@@ -3,6 +3,8 @@ package zina_eliran.app;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -33,7 +35,7 @@ public class LobbyActivity extends BaseActivity implements View.OnClickListener,
     ProgressBar pBar;
     RelativeLayout pBarRl;
     LinearLayout mainLayout;
-
+    Animation myAnim;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         try {
@@ -64,6 +66,8 @@ public class LobbyActivity extends BaseActivity implements View.OnClickListener,
             startTrainingBtn = (Button) findViewById(R.id.lobby_start_training_btn);
             myProgressBtn = (Button) findViewById(R.id.lobby_my_progress_btn);
 
+            initAnimation();
+
             //add events
             createTrainingBtn.setOnClickListener(this);
             publicTrainingsBtn.setOnClickListener(this);
@@ -72,6 +76,28 @@ public class LobbyActivity extends BaseActivity implements View.OnClickListener,
             startTrainingBtn.setOnClickListener(this);
             myProgressBtn.setOnClickListener(this);
 
+        } catch (Exception e) {
+            CMNLogHelper.logError("LobbyActivity", e.getMessage());
+        }
+    }
+
+    public void initAnimation(){
+        try{
+            myAnim = AnimationUtils.loadAnimation(this, R.anim.milkshake);
+
+            createTrainingBtn.setAnimation(myAnim);
+            publicTrainingsBtn.setAnimation(myAnim);
+            myProfileSettingsBtn.setAnimation(myAnim);
+            myTrainingsBtn.setAnimation(myAnim);
+            startTrainingBtn.setAnimation(myAnim);
+            myProgressBtn.setAnimation(myAnim);
+
+            createTrainingBtn.startAnimation(myAnim);
+            publicTrainingsBtn.startAnimation(myAnim);
+            myProfileSettingsBtn.startAnimation(myAnim);
+            myTrainingsBtn.startAnimation(myAnim);
+            startTrainingBtn.startAnimation(myAnim);
+            myProgressBtn.startAnimation(myAnim);
         } catch (Exception e) {
             CMNLogHelper.logError("LobbyActivity", e.getMessage());
         }

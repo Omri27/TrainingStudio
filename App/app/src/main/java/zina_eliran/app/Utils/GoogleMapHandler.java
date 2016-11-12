@@ -120,13 +120,12 @@ public class GoogleMapHandler implements
                     mCurrLocationMarker.remove();
                 }
                 //Place current location marker
-                mLastlatLng = new LatLng(trainingLocation.getLatitude(), trainingLocation.getLongitude());
+                mLastlatLng = new LatLng(location.getLatitude(), location.getLongitude());
                 mCurrLocationMarker = addMarker(mLastlatLng);
                 isDrawFirstTime = true;
-            }
-            else {
+            } else {
                 activity.onLocationChangedCallback(location);
-                Toast.makeText(this.context, "i: " + (i++) + " | " +location.toString(), Toast.LENGTH_LONG).show();
+                Toast.makeText(this.context, "i: " + (i++) + " | " + location.toString(), Toast.LENGTH_LONG).show();
                 return;
             }
 

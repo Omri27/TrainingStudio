@@ -184,7 +184,7 @@ public class TrainingViewActivity extends BaseActivity
         try {
             chart = (LineChart) findViewById(R.id.training_view_chart);
             chart.setDescription(new Description());
-            Description d =  new Description();
+            Description d = new Description();
             d.setText("");
             chart.setDescription(d);
 
@@ -228,6 +228,8 @@ public class TrainingViewActivity extends BaseActivity
     private void setChartData(List<BETrainingLocation> locations) {
         try {
 
+            chartData = new ArrayList<>();
+
             //add those point to the data set
             for (int i = 0; i < locations.size() - 1; i++) {
                 measureCount++;
@@ -247,7 +249,6 @@ public class TrainingViewActivity extends BaseActivity
                 chartDataSet.setDrawValues(false);
             }
 
-
             chart.notifyDataSetChanged(); // let the chart know it's data changed
             chart.invalidate(); // refresh
 
@@ -259,7 +260,9 @@ public class TrainingViewActivity extends BaseActivity
     private void setChartDataTest() {
         try {
 
-            int j = 0;
+            chartData = new ArrayList<>();
+
+            /*int j = 0;
             for (int i = 0; i < 20; i++) {
 
                 measureCount++;
@@ -277,9 +280,34 @@ public class TrainingViewActivity extends BaseActivity
                 chartDataSet.setColor(Color.argb(159, 255, 106, 0));
                 chartDataSet.setValueTextColor(Color.WHITE);
                 j++;
-            }
+            }*/
 
-
+            chartData.add(new Entry(0, 120f));
+            chartData.add(new Entry(0.50f, 100f));
+            chartData.add(new Entry(0.90f, 90f));
+            chartData.add(new Entry(1.10f, 90f));
+            chartData.add(new Entry(2.00f, 100f));
+   /*         chartData.add(new Entry(2.20f, 100f));
+            chartData.add(new Entry(5.30f, 110f));
+            chartData.add(new Entry(6.00f, 110f));
+            chartData.add(new Entry(6.30f, 110f));
+            chartData.add(new Entry(6.880f, 110f));
+            chartData.add(new Entry(9.10f, 110f));
+            chartData.add(new Entry(12.10f, 70f));
+            chartData.add(new Entry(13.50f, 60f));
+            chartData.add(new Entry(14.320f, 50f));
+            chartData.add(new Entry(15.10f, 70f));
+            chartData.add(new Entry(17.70f, 90f));
+            chartData.add(new Entry(18.50f, 90f));
+            chartData.add(new Entry(19.70f, 90f));
+            chartData.add(new Entry(20.70f, 90f));
+            chartData.add(new Entry(21.00f, 90f));
+            chartData.add(new Entry(23.00f, 90f));
+            chartData.add(new Entry(24.00f, 90f));
+            chartData.add(new Entry(25.00f, 90f));*/
+            chartDataSet = new LineDataSet(chartData, "Route(M) | Time(m)"); // add entries to dataset
+            chartDataSet.setColor(Color.argb(159, 255, 106, 0));
+            chartDataSet.setValueTextColor(Color.WHITE);
             chartLineData = new LineData(chartDataSet);
             chart.setData(chartLineData);
             chart.invalidate(); // refresh the chart

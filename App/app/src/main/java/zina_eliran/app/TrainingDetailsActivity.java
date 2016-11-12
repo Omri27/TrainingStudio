@@ -281,6 +281,51 @@ public class TrainingDetailsActivity extends BaseFragmentActivity
 
     }
 
+    private boolean validateBeforeSave() {
+
+        boolean isValid = true;
+        try {
+            if (descriptionEt.getText().toString().isEmpty()) {
+                isValid = false;
+            }
+            if (dateTv.getText().toString().isEmpty() || dateTv.getText().toString().contains("Pick")) {
+                isValid = false;
+            }
+            if (timeTv.getText().toString().isEmpty() || timeTv.getText().toString().contains("Pick")) {
+                isValid = false;
+            }
+
+            if (!isValid) {
+                isValid = false;
+                Toast.makeText(_getAppContext(), _getString(R.string.inputs_missing_or_invalid), Toast.LENGTH_LONG).show();
+            } else if (trainingLocation == null) {
+                isValid = false;
+                Toast.makeText(_getAppContext(), _getString(R.string.location_missing), Toast.LENGTH_LONG).show();
+            }
+
+
+        } catch (Exception e) {
+            CMNLogHelper.logError("TrainingDetailsActivity", e.getMessage());
+        }
+        return isValid;
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        try {
+            if (requestCode == PLACE_PICKER_REQUEST) {
+                if (resultCode == RESULT_OK) {
+                    Place selectedLocation = PlacePicker.getPlace(data, this);
+                    trainingLocation = new BETrainingLocation();
+                    trainingLocation.setLatitude(selectedLocation.getLatLng().latitude);
+                    trainingLocation.setLongitude(selectedLocation.getLatLng().longitude);
+                    initTrainingLocation(trainingLocation);
+                    Toast.makeText(this, String.format("%s was selected successfully.", selectedLocation.getName()), Toast.LENGTH_LONG).show();
+                }
+            }
+        } catch (Exception e) {
+            CMNLogHelper.logError("TrainingDetailsActivity", e.getMessage());
+        }
+    }
 
     @Override
     public void onClick(View view) {
@@ -365,35 +410,6 @@ public class TrainingDetailsActivity extends BaseFragmentActivity
         } catch (Exception e) {
             CMNLogHelper.logError("TrainingDetailsActivity", e.getMessage());
         }
-    }
-
-    private boolean validateBeforeSave() {
-
-        boolean isValid = true;
-        try {
-            if (descriptionEt.getText().toString().isEmpty()) {
-                isValid = false;
-            }
-            if (dateTv.getText().toString().isEmpty() || dateTv.getText().toString().contains("Pick")) {
-                isValid = false;
-            }
-            if (timeTv.getText().toString().isEmpty() || timeTv.getText().toString().contains("Pick")) {
-                isValid = false;
-            }
-
-            if (!isValid) {
-                isValid = false;
-                Toast.makeText(_getAppContext(), _getString(R.string.inputs_missing_or_invalid), Toast.LENGTH_LONG).show();
-            } else if (trainingLocation == null) {
-                isValid = false;
-                Toast.makeText(_getAppContext(), _getString(R.string.location_missing), Toast.LENGTH_LONG).show();
-            }
-
-
-        } catch (Exception e) {
-            CMNLogHelper.logError("TrainingDetailsActivity", e.getMessage());
-        }
-        return isValid;
     }
 
     @Override
@@ -552,20 +568,5 @@ public class TrainingDetailsActivity extends BaseFragmentActivity
 
     }
 
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        try {
-            if (requestCode == PLACE_PICKER_REQUEST) {
-                if (resultCode == RESULT_OK) {
-                    Place selectedLocation = PlacePicker.getPlace(data, this);
-                    trainingLocation = new BETrainingLocation();
-                    trainingLocation.setLatitude(selectedLocation.getLatLng().latitude);
-                    trainingLocation.setLongitude(selectedLocation.getLatLng().longitude);
-                    initTrainingLocation(trainingLocation);
-                    Toast.makeText(this, String.format("%s was selected successfully.", selectedLocation.getName()), Toast.LENGTH_LONG).show();
-                }
-            }
-        } catch (Exception e) {
-            CMNLogHelper.logError("TrainingDetailsActivity", e.getMessage());
-        }
-    }
+
 }

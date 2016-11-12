@@ -31,8 +31,7 @@
         android:text="Create"
         android:textSize="17dp" />
 
-    <ScrollView
-        xmlns:android="http://schemas.android.com/apk/res/android"
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="fill_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="60dp"
@@ -182,32 +181,31 @@
                         android:layout_height="match_parent"
                         android:layout_marginBottom="5dp"
                         android:layout_marginLeft="4dp"
+                        android:layout_weight="1"
                         android:text="Training location:"
                         android:textColor="#ffffff"
                         android:textSize="18dp"
-                        android:textStyle="bold"
-                        android:layout_weight="1"/>
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/training_details_update_location_tv"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_weight="10"
+                        android:text="Set"
                         android:textColor="#eeFF6600"
                         android:textSize="18dp"
-                        android:textStyle="bold"
-                        android:text="Set"/>
+                        android:textStyle="bold" />
 
                 </LinearLayout>
 
                 <fragment
                     android:id="@+id/training_details_location_map_f"
+                    android:name="com.google.android.gms.maps.MapFragment"
                     class="com.google.android.gms.maps.MapFragment"
                     android:layout_width="match_parent"
-                    android:layout_weight="1"
-                    android:layout_height="200dp" >
-
-                </fragment>
+                    android:layout_height="200dp"
+                    android:layout_weight="1" />
 
             </LinearLayout>
 

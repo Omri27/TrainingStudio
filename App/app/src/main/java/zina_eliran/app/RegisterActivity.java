@@ -149,15 +149,17 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
                     //Send verification code by email again
                     if (readFromSharedPreferences(_getString(R.string.user_id)) != "") {
 
-                        resendEmailTv.setVisibility(View.VISIBLE);
+                        resendEmailTv.setVisibility(View.INVISIBLE);
+                        pBar.setVisibility(View.VISIBLE);
                         sApi.resendUserRegistrationEmail(email, name, verificationCode);
                         new android.os.Handler().postDelayed(
                                 new Runnable() {
                                     public void run() {
                                         Toast.makeText(_getAppContext(), _getString(R.string.registration_resend_email_message), Toast.LENGTH_LONG).show();
                                         resendEmailTv.setVisibility(View.VISIBLE);
+                                        pBar.setVisibility(View.GONE);
                                     }
-                                }, 60000);
+                                }, 10000);
                     }
                     //something went wrong with the registration - init the app
                     else {

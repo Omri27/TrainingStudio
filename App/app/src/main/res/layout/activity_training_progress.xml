@@ -25,24 +25,24 @@
 
 
     <View
+        android:id="@+id/view"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_alignTop="@+id/training_progress_trainings_title_tv"
-        android:background="#88ffffff"
-        android:id="@+id/view" />
+        android:background="#88ffffff" />
 
     <TextView
         android:id="@+id/training_progress_trainings_title_tv"
         android:layout_width="match_parent"
         android:layout_height="27dp"
         android:layout_alignParentBottom="true"
-        android:paddingTop="5dp"
         android:layout_marginBottom="140dp"
         android:layout_marginLeft="16dp"
+        android:paddingTop="5dp"
         android:text="Trainings:"
         android:textColor="#ffffff"
         android:textSize="16dp"
-        android:textStyle="bold"/>
+        android:textStyle="bold" />
 
     <LinearLayout
         android:id="@+id/training_details_layout"
@@ -62,12 +62,12 @@
             android:layout_width="match_parent"
             android:layout_height="30dp"
             android:layout_marginBottom="10dp"
-            android:paddingTop="10dp"
             android:layout_marginLeft="4dp"
+            android:paddingTop="10dp"
             android:text="Name | Personal records:"
             android:textColor="#ffffff"
             android:textSize="18dp"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/training_progress_joining_date_tv"
@@ -76,7 +76,7 @@
             android:background="#ffffff"
             android:gravity="center_vertical"
             android:paddingLeft="20dp"
-            android:text="Description"
+            android:text="Joining Date: "
             android:textColor="#555555"
             android:textSize="18dp" />
 
@@ -93,7 +93,7 @@
             android:background="#ffffff"
             android:gravity="center_vertical"
             android:paddingLeft="20dp"
-            android:text="Training count: "
+            android:text="Total Trainings: "
             android:textColor="#555555"
             android:textSize="18dp" />
 
@@ -109,7 +109,7 @@
             android:background="#ffffff"
             android:gravity="center_vertical"
             android:paddingLeft="20dp"
-            android:text="Description"
+            android:text="Total Distance: "
             android:textColor="#555555"
             android:textSize="18dp" />
 
@@ -125,7 +125,7 @@
             android:background="#ffffff"
             android:gravity="center_vertical"
             android:paddingLeft="20dp"
-            android:text="Description"
+            android:text="Total Calories:"
             android:textColor="#555555"
             android:textSize="18dp" />
 
@@ -141,7 +141,7 @@
             android:background="#ffffff"
             android:gravity="center_vertical"
             android:paddingLeft="20dp"
-            android:text="Description"
+            android:text="Maximum Speed:"
             android:textColor="#555555"
             android:textSize="18dp" />
 
@@ -157,7 +157,7 @@
             android:background="#ffffff"
             android:gravity="center_vertical"
             android:paddingLeft="20dp"
-            android:text="Description"
+            android:text="Average Speed:"
             android:textColor="#555555"
             android:textSize="18dp" />
 
@@ -173,8 +173,9 @@
         android:id="@+id/training_progress_horizontal_rv"
         android:layout_width="match_parent"
         android:layout_height="115dp"
-        android:layout_below="@+id/view"
         android:layout_alignParentStart="true"
+        android:layout_below="@+id/view"
         android:layout_marginTop="16dp" />
+
 
 </RelativeLayout>

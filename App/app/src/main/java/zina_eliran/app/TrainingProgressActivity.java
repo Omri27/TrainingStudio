@@ -137,7 +137,7 @@ public class TrainingProgressActivity extends BaseActivity implements View.OnCli
             trainingsCountTv.setText("Total Trainings: " + sApi.getMyEndedTrainingsList().size());
             totalDistanceTv.setText("Total Distance: " + BETrainingViewDetails.getDistanceSum(sApi.getMyEndedTrainingsViewList()));
             totalCaloriesTv.setText("Total Calories: " + BETrainingViewDetails.getCaloriesSum(sApi.getMyEndedTrainingsViewList()));
-            maxSpeedTv.setText("Max speed: " + BETrainingViewDetails.getMaxSpeed(sApi.getMyEndedTrainingsViewList()));
+            maxSpeedTv.setText("Maximum speed: " + BETrainingViewDetails.getMaxSpeed(sApi.getMyEndedTrainingsViewList()));
             avgSpeedTv.setText("Average Speed: " + BETrainingViewDetails.getAvgSpeed(sApi.getMyEndedTrainingsViewList()));
 
             initTrainingHorizontalRv();

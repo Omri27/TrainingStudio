@@ -145,7 +145,6 @@ public class LobbyActivity extends BaseActivity implements View.OnClickListener,
                         sApi.setNextTraining(sApi.getMyJoinedTrainingsList().get(0));
                     }
 
-
                     BETraining nextTraining = sApi.getNextTraining();
                     if (nextTraining != null) {
                         if (isNextXMinSelectedDate(nextTraining.getTrainingDateTimeCalender(), 15)) {
@@ -156,6 +155,10 @@ public class LobbyActivity extends BaseActivity implements View.OnClickListener,
                     pBar.setVisibility(View.GONE);
                     pBarRl.setVisibility(View.GONE);
                     mainLayout.setVisibility(View.VISIBLE);
+
+                    //ask for permission : ACCESS_FINE_LOCATION
+                    askForPermission(android.Manifest.permission.ACCESS_FINE_LOCATION, LOCATION);
+
 
                 } else {
                     CMNLogHelper.logError("LobbyActivity", "wrong action type in callback" + response.getEntityType() + ", " + response.getActionType());

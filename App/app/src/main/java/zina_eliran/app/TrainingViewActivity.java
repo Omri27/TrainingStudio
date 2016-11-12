@@ -282,11 +282,11 @@ public class TrainingViewActivity extends BaseActivity
                 j++;
             }*/
 
-            chartData.add(new Entry(0, 120f));
-            chartData.add(new Entry(0.50f, 100f));
-            chartData.add(new Entry(0.90f, 90f));
-            chartData.add(new Entry(1.10f, 90f));
-            chartData.add(new Entry(2.00f, 100f));
+            chartData.add(new Entry(0, 40f));
+            chartData.add(new Entry(0.50f, 50f));
+            chartData.add(new Entry(0.90f, 5f));
+            chartData.add(new Entry(1.10f, 5f));
+            chartData.add(new Entry(2.00f, 50f));
    /*         chartData.add(new Entry(2.20f, 100f));
             chartData.add(new Entry(5.30f, 110f));
             chartData.add(new Entry(6.00f, 110f));

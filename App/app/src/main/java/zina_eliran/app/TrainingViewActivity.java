@@ -23,6 +23,7 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import zina_eliran.app.BusinessEntities.BEResponse;
@@ -82,19 +83,23 @@ public class TrainingViewActivity extends BaseActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_training_view);
+        try {
+            setContentView(R.layout.activity_training_view);
 
-        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "My Tag");
-        wl.acquire();
-        // do your things, even when screen is off
+            PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+            wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "My Tag");
+            wl.acquire();
+            // do your things, even when screen is off
 
-        intent = getIntent();
-        chartData = new ArrayList<>();
-        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        sensor = sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE);
+            intent = getIntent();
+            chartData = new ArrayList<>();
+            sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+            sensor = sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE);
 
-        onCreateUI();
+            onCreateUI();
+        } catch (Exception e) {
+            CMNLogHelper.logError("TrainingViewActivity", e.getMessage());
+        }
     }
 
     private void onCreateUI() {
@@ -117,8 +122,7 @@ public class TrainingViewActivity extends BaseActivity
                 sApi.getTraining(sApi.getNextTraining().getId(), this);
             } else if (activityMode != BETrainingViewModeEnum.training_view_read_only_mode) {
                 sApi.getTraining(getIntentParam(intent, _getString(R.string.training_id_view_mode)), this);
-            }
-            else {//handle error
+            } else {//handle error
             }
         } catch (Exception e) {
             CMNLogHelper.logError("TrainingViewActivity", e.getMessage());
@@ -180,13 +184,17 @@ public class TrainingViewActivity extends BaseActivity
     }
 
     private void setTrainingStatistics() {
-        //set data into training view object
-        List<BETrainingLocation> route = trainingView.getTrainingLocationRoute();
-        trainingView.setTrainingCaloriesBurn(sApi.getAppUser());
-        trainingView.setActualDuration((int) route.get(0).getTimeMeasureDiff(route.get(route.size() - 1), 3600));
-        trainingView.setTotalDistance(route.get(0).getDistance(route.get(route.size() - 1)));
-        trainingView.setAvgSpeed(avgSpeed / measureCount);
-        trainingView.setMaxSpeed(maxSpeed);
+        try {
+            //set data into training view object
+            List<BETrainingLocation> route = trainingView.getTrainingLocationRoute();
+            trainingView.setTrainingCaloriesBurn(sApi.getAppUser());
+            trainingView.setActualDuration((int) route.get(0).getTimeMeasureDiff(route.get(route.size() - 1), 3600));
+            trainingView.setTotalDistance(route.get(0).getDistance(route.get(route.size() - 1)));
+            trainingView.setAvgSpeed(avgSpeed / measureCount);
+            trainingView.setMaxSpeed(maxSpeed);
+        } catch (Exception e) {
+            CMNLogHelper.logError("TrainingViewActivity", e.getMessage());
+        }
     }
 
     private void setChartData(List<BETrainingLocation> locations) {
@@ -221,18 +229,25 @@ public class TrainingViewActivity extends BaseActivity
             switch (view.getId()) {
                 case R.id.training_view_start_btn:
                     startTrainingBtn.setEnabled(false);
+                    trainingView.setTrainingStartDateTimeCalender(Calendar.getInstance());
                     trainingView.setStatus(BETrainingViewStatusEnum.started);
-                    endTrainingBtn.setEnabled(true);
+                    trainingView.setUserId(sApi.getAppUser().getId());
+                    trainingView.setTrainingId(training.getId());
+
+                    sApi.createTrainingView(trainingView, this);
 
                     break;
                 case R.id.training_view_end_btn:
 
                     isTrainingEnded = true;
                     endTrainingBtn.setEnabled(false);
+                    trainingView.setTrainingEndDateTimeCalender(Calendar.getInstance());
                     gmh.drawOnMap(BETrainingLocation.getLatLngList(trainingView.getTrainingLocationRoute()));
                     gmh.stopListener();
                     trainingView.setStatus(BETrainingViewStatusEnum.ended);
+
                     sApi.updateTrainingView(trainingView, this);
+
                     break;
             }
 
@@ -266,12 +281,10 @@ public class TrainingViewActivity extends BaseActivity
                     trainingDateTv.setText("On: " + dateFormatter.format(training.getTrainingDateTimeCalender().getTime()));
                     trainingTimeTv.setText("Start at: " + timeFormatter.format(training.getTrainingDateTimeCalender().getTime()));
 
-                    //TODO Eliran - remove this after zina push
                     //after we init the training objects - init the map & location service
-                    trainingView = new BETrainingViewDetails();
                     initTrainingLocation();
 
-                } else if (response.getEntityType() == BETypesEnum.Trainings && response.getActionType() == DALActionTypeEnum.getTrainingViewDetails) {
+                } else if (response.getEntityType() == BETypesEnum.TrainingViewDetails && response.getActionType() == DALActionTypeEnum.getTrainingViewDetails) {
 
                     trainingView = ((BETrainingViewDetails) response.getEntities().get(0));
                     trainingMaxSpeedTv.setText(trainingView.getMaxSpeed() + "");
@@ -279,9 +292,9 @@ public class TrainingViewActivity extends BaseActivity
                     trainingCaloriesTv.setText(trainingView.getTotalCalories() + "");
                     initChartData(trainingView.getTrainingLocationRoute());
 
-                    //after we init the training objects - init the map & location service
-                    initTrainingLocation();
-                } else if (response.getEntityType() == BETypesEnum.Trainings && response.getActionType() == DALActionTypeEnum.updateTrainingViewDetails) {
+                } else if (response.getEntityType() == BETypesEnum.TrainingViewDetails && response.getActionType() == DALActionTypeEnum.createTrainingViewDetails) {
+                    endTrainingBtn.setEnabled(true);
+                } else if (response.getEntityType() == BETypesEnum.TrainingViewDetails && response.getActionType() == DALActionTypeEnum.updateTrainingViewDetails) {
                     if (((BETrainingViewDetails) response.getEntities().get(0)).getStatus() == BETrainingViewStatusEnum.ended) {
                         isAllowBackButton = true;
                     }
@@ -369,7 +382,11 @@ public class TrainingViewActivity extends BaseActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        wl.release();
+        try {
+            wl.release();
+        } catch (Exception e) {
+            CMNLogHelper.logError("TrainingViewActivity", e.getMessage());
+        }
     }
 
 }

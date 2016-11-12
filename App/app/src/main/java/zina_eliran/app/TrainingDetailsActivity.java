@@ -16,6 +16,7 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -37,6 +38,7 @@ import zina_eliran.app.Utils.DateTimeFragmentHandler;
 import zina_eliran.app.Utils.FireBaseHandler;
 import zina_eliran.app.Utils.GoogleMapHandler;
 import zina_eliran.app.Utils.TimePickerFragment;
+
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.MapFragment;
@@ -75,15 +77,19 @@ public class TrainingDetailsActivity extends BaseFragmentActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_training_details);
+        try {
+            setContentView(R.layout.activity_training_details);
 
-        //prevent open keyboard automatically
-        getWindow().setSoftInputMode(
-                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+            //prevent open keyboard automatically
+            getWindow().setSoftInputMode(
+                    WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-        intent = getIntent();
-        training = new BETraining();
-        onCreateUI();
+            intent = getIntent();
+            training = new BETraining();
+            onCreateUI();
+        } catch (Exception e) {
+            CMNLogHelper.logError("TrainingDetailsActivity", e.getMessage());
+        }
     }
 
     public void onCreateUI() {
@@ -234,8 +240,7 @@ public class TrainingDetailsActivity extends BaseFragmentActivity
 
             if (activityMode != BETrainingDetailsModeEnum.training_details_create_mode) {
                 sApi.getTraining(getIntentParam(intent, _getString(R.string.training_details_training_id)), this);
-            }
-            else {
+            } else {
                 //init the map with the current location
                 initTrainingLocation(null);
             }
@@ -376,13 +381,14 @@ public class TrainingDetailsActivity extends BaseFragmentActivity
                 isValid = false;
             }
 
-            if(trainingLocation == null){
+            if (!isValid) {
                 isValid = false;
+                Toast.makeText(_getAppContext(), _getString(R.string.inputs_missing_or_invalid), Toast.LENGTH_LONG).show();
+            } else if (trainingLocation == null) {
+                isValid = false;
+                Toast.makeText(_getAppContext(), _getString(R.string.location_missing), Toast.LENGTH_LONG).show();
             }
 
-            if (!isValid) {
-                Toast.makeText(_getAppContext(), _getString(R.string.inputs_missing_or_invalid), Toast.LENGTH_LONG).show();
-            }
 
         } catch (Exception e) {
             CMNLogHelper.logError("TrainingDetailsActivity", e.getMessage());
@@ -442,7 +448,7 @@ public class TrainingDetailsActivity extends BaseFragmentActivity
 
 
                                 //test data only!!
-                                if(activityMode == BETrainingDetailsModeEnum.training_details_join_mode) {
+                                if (activityMode == BETrainingDetailsModeEnum.training_details_join_mode) {
                                     sApi.setNextTraining(training);
                                 }
 

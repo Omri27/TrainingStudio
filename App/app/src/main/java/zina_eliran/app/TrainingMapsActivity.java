@@ -10,6 +10,8 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import zina_eliran.app.BusinessEntities.CMNLogHelper;
+
 public class TrainingMapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
@@ -17,11 +19,15 @@ public class TrainingMapsActivity extends FragmentActivity implements OnMapReady
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        try{
         setContentView(R.layout.activity_training_maps);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        } catch (Exception e) {
+            CMNLogHelper.logError("TrainingMapsActivity", e.getMessage());
+        }
     }
 
 
@@ -36,11 +42,15 @@ public class TrainingMapsActivity extends FragmentActivity implements OnMapReady
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        try{
         mMap = googleMap;
 
         // Add a marker in Sydney and move the camera
         LatLng sydney = new LatLng(-34, 151);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        } catch (Exception e) {
+            CMNLogHelper.logError("TrainingMapsActivity", e.getMessage());
+        }
     }
 }

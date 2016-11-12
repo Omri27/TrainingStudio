@@ -42,16 +42,19 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        try {
+            //in debug mode: set to true, on release - set to false!
+            CMNLogHelper.logTraffic = true;
+            setContentView(R.layout.activity_register);
 
-        //in debug mode: set to true, on release - set to false!
-        CMNLogHelper.logTraffic = true;
-        setContentView(R.layout.activity_register);
+            //prevent open keyboard automatically
+            getWindow().setSoftInputMode(
+                    WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-        //prevent open keyboard automatically
-        getWindow().setSoftInputMode(
-                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-
-        onCreateUI();
+            onCreateUI();
+        } catch (Exception e) {
+            CMNLogHelper.logError("RegisterActivity", e.getMessage());
+        }
 
     }
 
@@ -92,12 +95,16 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
     }
 
     public void setLayoutMode(boolean isRegistered) {
+        try{
         if (isRegistered) {
             registrationLayout.setVisibility(View.GONE);
             verificationLayout.setVisibility(View.VISIBLE);
         } else {
             registrationLayout.setVisibility(View.VISIBLE);
             verificationLayout.setVisibility(View.GONE);
+        }
+        } catch (Exception e) {
+            CMNLogHelper.logError("RegisterActivity", e.getMessage());
         }
     }
 
@@ -180,32 +187,6 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
         }
     }
 
-    public void updateUser(BEUser _user, boolean isRegisterCallback) {
-        try {
-
-
-            if (isRegisterCallback) {
-                writeToSharedPreferences(_getString(R.string.user_id), _user.getId().toString());
-                writeToSharedPreferences(_getString(R.string.user_verification_code), _user.getVerificationCode());
-                writeToSharedPreferences(_getString(R.string.user_registration_permission), "true");
-                Toast.makeText(_getAppContext(), _getString(R.string.registration_success_message), Toast.LENGTH_LONG).show();
-
-                //set layout
-            } else {
-                //verification callback
-                writeToSharedPreferences(_getString(R.string.user_verification_permission), "true");
-
-//                //Zina: Start service for the first time
-//                Intent serviceIntent = new Intent(getBaseContext(), DBMonitoringService.class);
-//                serviceIntent.putExtra("UserID", user.getId());
-//                CMNLogHelper.logError("STARTING SERVICE WITH ID", user.getId());
-//                startService(serviceIntent);
-            }
-
-        } catch (Exception e) {
-            CMNLogHelper.logError("BaseActivity", e.getMessage());
-        }
-    }
 
     @Override
     public void onActionCallback(BEResponse response) {
@@ -214,11 +195,6 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
             if (response.getActionType() == DALActionTypeEnum.registerUser) {
 
                 sApi.setAppUser((BEUser) response.getEntities().get(0));
-
-                //*****************************************
-                //Zina = we have here the user id for the first time.
-                //init the Service here.
-
 
                 name = sApi.getAppUser().getName();
                 email = sApi.getAppUser().getEmail();
@@ -245,7 +221,6 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
             pBar.setVisibility(View.GONE);
 
             Toast.makeText(_getAppContext(), _getString(R.string.registration_error_message), Toast.LENGTH_LONG).show();
-
 
         }
     }

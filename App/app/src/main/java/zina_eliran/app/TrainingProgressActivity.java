@@ -9,11 +9,7 @@ import android.widget.CompoundButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import java.util.ArrayList;
 import java.util.List;
-
-import zina_eliran.app.BusinessEntities.BEBaseEntity;
 import zina_eliran.app.BusinessEntities.BEResponse;
 import zina_eliran.app.BusinessEntities.BEResponseStatusEnum;
 import zina_eliran.app.BusinessEntities.BETraining;
@@ -28,7 +24,6 @@ public class TrainingProgressActivity extends BaseActivity implements View.OnCli
 
     private RecyclerView horizontalRv;
     private List<BETraining> trainingList;
-    private List<BEBaseEntity> trainingViewList;
     private HorizontalAdapter horizontalAdapter;
 
     TextView joinedDateTv;
@@ -44,10 +39,14 @@ public class TrainingProgressActivity extends BaseActivity implements View.OnCli
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_training_progress);
 
-        onCreateUI();
+        try {
+            setContentView(R.layout.activity_training_progress);
 
+            onCreateUI();
+        } catch (Exception e) {
+            CMNLogHelper.logError("TrainingProgressActivity", e.getMessage());
+        }
     }
 
     private void onCreateUI() {
@@ -87,6 +86,23 @@ public class TrainingProgressActivity extends BaseActivity implements View.OnCli
         }
     }
 
+    private void bindTrainingViewDetails() {
+        try {
+
+            joinedDateTv.setText("Joining Date: " + dateFormatter.format(sApi.getAppUser().getRegisteredDate()));
+            trainingsCountTv.setText("Total Trainings: " + sApi.getMyEndedTrainingsList().size());
+            totalDistanceTv.setText("Total Distance: " + BETrainingViewDetails.getDistanceSum(sApi.getMyEndedTrainingsViewList()));
+            totalCaloriesTv.setText("Total Calories: " + BETrainingViewDetails.getCaloriesSum(sApi.getMyEndedTrainingsViewList()));
+            maxSpeedTv.setText("Maximum speed: " + BETrainingViewDetails.getMaxSpeed(sApi.getMyEndedTrainingsViewList()));
+            avgSpeedTv.setText("Average Speed: " + BETrainingViewDetails.getAvgSpeed(sApi.getMyEndedTrainingsViewList()));
+
+            initTrainingHorizontalRv();
+
+        } catch (Exception e) {
+            CMNLogHelper.logError("TrainingProgressActivity", e.getMessage());
+        }
+    }
+
 
     @Override
     public void onClick(View view) {
@@ -106,7 +122,7 @@ public class TrainingProgressActivity extends BaseActivity implements View.OnCli
                 if (response.getStatus() == BEResponseStatusEnum.error) {
                     CMNLogHelper.logError("TrainingProgressActivity", "error in get user callback on app load | err:" + response.getMessage());
                     Toast.makeText(_getAppContext(), "Error while retrieving trainings view data, please try again later.", Toast.LENGTH_LONG).show();
-                } else if (response.getActionType() == DALActionTypeEnum.getAllTrainings && response.getEntityType() == BETypesEnum.TrainingViewDetails) {
+                } else if (response.getActionType() == DALActionTypeEnum.getAllTrainingsViews && response.getEntityType() == BETypesEnum.TrainingViewDetails) {
 
                     //get all trainings data
                     sApi.setMyEndedTrainingsViewList(sApi.filterMyEndedTrainings(sApi.getAppUser().getId(), response.getEntities()));
@@ -130,20 +146,4 @@ public class TrainingProgressActivity extends BaseActivity implements View.OnCli
         }
     }
 
-    private void bindTrainingViewDetails() {
-        try {
-
-            joinedDateTv.setText("Joining Date: " + dateFormatter.format(sApi.getAppUser().getRegisteredDate()));
-            trainingsCountTv.setText("Total Trainings: " + sApi.getMyEndedTrainingsList().size());
-            totalDistanceTv.setText("Total Distance: " + BETrainingViewDetails.getDistanceSum(sApi.getMyEndedTrainingsViewList()));
-            totalCaloriesTv.setText("Total Calories: " + BETrainingViewDetails.getCaloriesSum(sApi.getMyEndedTrainingsViewList()));
-            maxSpeedTv.setText("Maximum speed: " + BETrainingViewDetails.getMaxSpeed(sApi.getMyEndedTrainingsViewList()));
-            avgSpeedTv.setText("Average Speed: " + BETrainingViewDetails.getAvgSpeed(sApi.getMyEndedTrainingsViewList()));
-
-            initTrainingHorizontalRv();
-
-        } catch (Exception e) {
-            CMNLogHelper.logError("TrainingProgressActivity", e.getMessage());
-        }
-    }
 }

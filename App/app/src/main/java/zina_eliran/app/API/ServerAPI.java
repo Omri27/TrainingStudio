@@ -151,7 +151,7 @@ public class ServerAPI {
         DAL.getTrainingView(trainingId, userId, fbHandler);
     }
 
-    public static void createTrainingView(BETrainingViewDetails trainingView, FireBaseHandler fbHandler) {
+    public void createTrainingView(BETrainingViewDetails trainingView, FireBaseHandler fbHandler) {
         DAL.createTrainingView(trainingView, fbHandler);
     }
 
@@ -164,7 +164,7 @@ public class ServerAPI {
     }
 
     public void getAllTrainingViews(FireBaseHandler fbHandler) {
-
+        //Dal.get
     }
 
     public void createTraining(BETraining training, FireBaseHandler fbHandler) {
@@ -195,7 +195,6 @@ public class ServerAPI {
         return num.toString();
     }
 
-
     public ArrayList<BETraining> filterPublicTrainings(String userId, ArrayList<BEBaseEntity> trainings) {
         ArrayList<BETraining> publicTrainings = new ArrayList<>();
 
@@ -211,7 +210,6 @@ public class ServerAPI {
                         (training.getStatus() != BETrainingStatusEnum.cancelled) &&
                         !(training.getTrainingDateTimeCalender().after(c.getTime()))) {
                     publicTrainings.add(((BETraining) trainings.get(i)));
-//                    CMNLogHelper.logError("publicTrainings", trainings.get(i).toString());
                 }
             }
         }
@@ -234,7 +232,6 @@ public class ServerAPI {
                                 currentTraining.getStatus() != BETrainingStatusEnum.cancelled)) &&
                         currentTraining.getTrainingDateTimeCalender().getTimeInMillis() >= (cal.getTimeInMillis() - minute30)) {
                     myTrainings.add(currentTraining);
-//                    CMNLogHelper.logError("myTrainings", currentTraining.toString());
                 }
             }
         } else {
@@ -289,7 +286,6 @@ public class ServerAPI {
         return trainings.size() > 0 ? trainings.get(0) : null;
 
     }
-
 
     public void updateAppTrainingsData(ArrayList<BEBaseEntity> entities) {
         //update server api

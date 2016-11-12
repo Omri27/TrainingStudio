@@ -25,6 +25,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
+
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
@@ -34,6 +35,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+
 import zina_eliran.app.BusinessEntities.BEResponse;
 import zina_eliran.app.BusinessEntities.BEResponseStatusEnum;
 import zina_eliran.app.BusinessEntities.BETypesEnum;
@@ -83,15 +85,19 @@ public class ProfileSettingsActivity extends BaseActivity implements View.OnClic
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_profile_settings);
+        try {
+            setContentView(R.layout.activity_profile_settings);
 
-        //prevent open keyboard automatically
-        getWindow().setSoftInputMode(
-                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+            //prevent open keyboard automatically
+            getWindow().setSoftInputMode(
+                    WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-        onCreateUI();
+            onCreateUI();
 
-        bindUserDetails();
+            bindUserDetails();
+        } catch (Exception e) {
+            CMNLogHelper.logError("ProfileSettingsActivity", e.getMessage());
+        }
     }
 
     private void bindUserDetails() {
@@ -136,7 +142,6 @@ public class ProfileSettingsActivity extends BaseActivity implements View.OnClic
             CMNLogHelper.logError("ProfileSettingsActivity", e.getMessage());
         }
     }
-
 
     private void onCreateUI() {
         try {
@@ -269,6 +274,93 @@ public class ProfileSettingsActivity extends BaseActivity implements View.OnClic
         }
     }
 
+    private String saveProfileImageToInternalStorage(Bitmap bitmapImage) {
+        try {
+            ContextWrapper cw = new ContextWrapper(getApplicationContext());
+            // path to /data/data/<app>/app_data/appImagesDir
+            File directory = cw.getDir("appImagesDir", Context.MODE_PRIVATE);
+            // Create appImagesDir
+            File myPath = new File(directory, "profilePic.jpg");
+
+            FileOutputStream fos = null;
+            try {
+                fos = new FileOutputStream(myPath);
+                // Use the compress method on the BitMap object to write image to the OutputStream
+                bitmapImage.compress(Bitmap.CompressFormat.PNG, 100, fos);
+            } catch (Exception e) {
+                CMNLogHelper.logError("ProfileSettingsActivity", e.getMessage());
+            } finally {
+                try {
+                    fos.close();
+                } catch (IOException e) {
+                    CMNLogHelper.logError("ProfileSettingsActivity", e.getMessage());
+                }
+            }
+            return directory.getAbsolutePath();
+
+        } catch (Exception e) {
+            CMNLogHelper.logError("ProfileSettingsActivity", e.getMessage());
+        }
+        return "";
+
+    }
+
+    private Bitmap readProfileImageFromInternalStorage() {
+
+        Bitmap profilePic = null;// = BitmapFactory.decodeResource(getResources(), R.drawable.app_man_icon);
+        try {
+            ContextWrapper cw = new ContextWrapper(getApplicationContext());
+            File directory = cw.getDir("appImagesDir", Context.MODE_PRIVATE);
+            File f = new File(directory, "profilePic.jpg");
+            profilePic = BitmapFactory.decodeStream(new FileInputStream(f));
+        } catch (FileNotFoundException e) {
+            CMNLogHelper.logError("ProfileSettingsActivity", e.getMessage());
+        }
+        return profilePic;
+    }
+
+    public ArrayList<Integer> getPreferredDays() {
+        ArrayList<Integer> preferredDays = new ArrayList<>();
+        if (sundayCbox.isChecked()) {
+            preferredDays.add(1);
+        }
+        if (mondayCbox.isChecked()) {
+            preferredDays.add(2);
+        }
+        if (tuesdayCbox.isChecked()) {
+            preferredDays.add(3);
+        }
+        if (wednesdayCbox.isChecked()) {
+            preferredDays.add(4);
+        }
+        if (thursdayCbox.isChecked()) {
+            preferredDays.add(5);
+        }
+        if (fridayCbox.isChecked()) {
+            preferredDays.add(6);
+        }
+        if (saturdayCbox.isChecked()) {
+            preferredDays.add(7);
+        }
+
+
+        return preferredDays;
+    }
+
+    public ArrayList<Integer> getPreferredHours() {
+        ArrayList<Integer> preferredHours = new ArrayList<>();
+        if (firstCycleHoursCbox.isChecked()) {
+            preferredHours.add(1);
+        }
+        if (secondCycleHoursCbox.isChecked()) {
+            preferredHours.add(2);
+        }
+        if (thirdCycleHoursCbox.isChecked()) {
+            preferredHours.add(3);
+        }
+        return preferredHours;
+    }
+    
 
     @Override
     public void onClick(View view) {
@@ -363,45 +455,6 @@ public class ProfileSettingsActivity extends BaseActivity implements View.OnClic
         }
     }
 
-
-    private String saveProfileImageToInternalStorage(Bitmap bitmapImage) {
-        ContextWrapper cw = new ContextWrapper(getApplicationContext());
-        // path to /data/data/<app>/app_data/appImagesDir
-        File directory = cw.getDir("appImagesDir", Context.MODE_PRIVATE);
-        // Create appImagesDir
-        File myPath = new File(directory, "profilePic.jpg");
-
-        FileOutputStream fos = null;
-        try {
-            fos = new FileOutputStream(myPath);
-            // Use the compress method on the BitMap object to write image to the OutputStream
-            bitmapImage.compress(Bitmap.CompressFormat.PNG, 100, fos);
-        } catch (Exception e) {
-            CMNLogHelper.logError("ProfileSettingsActivity", e.getMessage());
-        } finally {
-            try {
-                fos.close();
-            } catch (IOException e) {
-                CMNLogHelper.logError("ProfileSettingsActivity", e.getMessage());
-            }
-        }
-        return directory.getAbsolutePath();
-    }
-
-    private Bitmap readProfileImageFromInternalStorage() {
-
-        Bitmap profilePic = null;// = BitmapFactory.decodeResource(getResources(), R.drawable.app_man_icon);
-        try {
-            ContextWrapper cw = new ContextWrapper(getApplicationContext());
-            File directory = cw.getDir("appImagesDir", Context.MODE_PRIVATE);
-            File f = new File(directory, "profilePic.jpg");
-            profilePic = BitmapFactory.decodeStream(new FileInputStream(f));
-        } catch (FileNotFoundException e) {
-            CMNLogHelper.logError("ProfileSettingsActivity", e.getMessage());
-        }
-        return profilePic;
-    }
-
     @Override
     public void onActionCallback(BEResponse response) {
         try {
@@ -425,45 +478,5 @@ public class ProfileSettingsActivity extends BaseActivity implements View.OnClic
         }
     }
 
-    public ArrayList<Integer> getPreferredDays() {
-        ArrayList<Integer> preferredDays = new ArrayList<>();
-        if (sundayCbox.isChecked()) {
-            preferredDays.add(1);
-        }
-        if (mondayCbox.isChecked()) {
-            preferredDays.add(2);
-        }
-        if (tuesdayCbox.isChecked()) {
-            preferredDays.add(3);
-        }
-        if (wednesdayCbox.isChecked()) {
-            preferredDays.add(4);
-        }
-        if (thursdayCbox.isChecked()) {
-            preferredDays.add(5);
-        }
-        if (fridayCbox.isChecked()) {
-            preferredDays.add(6);
-        }
-        if (saturdayCbox.isChecked()) {
-            preferredDays.add(7);
-        }
 
-
-        return preferredDays;
-    }
-
-    public ArrayList<Integer> getPreferredHours() {
-        ArrayList<Integer> preferredHours = new ArrayList<>();
-        if (firstCycleHoursCbox.isChecked()) {
-            preferredHours.add(1);
-        }
-        if (secondCycleHoursCbox.isChecked()) {
-            preferredHours.add(2);
-        }
-        if (thirdCycleHoursCbox.isChecked()) {
-            preferredHours.add(3);
-        }
-        return preferredHours;
-    }
 }

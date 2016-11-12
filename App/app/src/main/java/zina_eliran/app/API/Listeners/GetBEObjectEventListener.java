@@ -96,7 +96,7 @@ public class GetBEObjectEventListener implements ValueEventListener {
 //                CMNLogHelper.logError("All trainings listener", objects.get(i).toString());
             }
 
-            else if (action == DALActionTypeEnum.getTrainingViewDetails){
+            else if (action == DALActionTypeEnum.getAllTrainingsViews){
                 for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
                     BETrainingViewDetails t = postSnapshot.getValue(BETrainingViewDetails.class);
                     objects.add(t);

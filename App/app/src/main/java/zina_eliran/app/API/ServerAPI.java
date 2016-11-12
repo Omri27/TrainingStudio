@@ -33,6 +33,8 @@ public class ServerAPI {
 
     ArrayList<BETraining> myEndedTrainingsList;
 
+    ArrayList<BETrainingViewDetails> myEndedTrainingsViewList;
+
     ArrayList<BETraining> publicTrainingsList;
 
 
@@ -100,6 +102,14 @@ public class ServerAPI {
         this.myEndedTrainingsList = myEndedTrainingsList;
     }
 
+    public ArrayList<BETrainingViewDetails> getMyEndedTrainingsViewList() {
+        return myEndedTrainingsViewList;
+    }
+
+    public void setMyEndedTrainingsViewList(ArrayList<BETrainingViewDetails> myEndedTrainingsViewList) {
+        this.myEndedTrainingsViewList = myEndedTrainingsViewList;
+    }
+
     public BEResponse getActionResponse() {
         return actionResponse;
     }
@@ -121,21 +131,17 @@ public class ServerAPI {
         DAL.resendUserRegistrationEmail(email, name, verificationCode);
     }
 
-
     public void getUser(String userId, FireBaseHandler fbHandler) {
         DAL.getUserByUID(userId, fbHandler);
     }
-
 
     public void updateUser(BEUser user, FireBaseHandler fbHandler) {
         DAL.updateUser(user, fbHandler);
     }
 
-
     public void getUsersByTraining(String trainingId, FireBaseHandler fbHandler) {
         DAL.getUsersByTraining(trainingId, fbHandler);
     }
-
 
     public void getTraining(String trainingId, FireBaseHandler fbHandler) {
         DAL.getTraining(trainingId, fbHandler);
@@ -157,20 +163,17 @@ public class ServerAPI {
         DAL.getAllTrainings(fbHandler);
     }
 
-    public void getAllTrainingViewsByUserId(String userId, FireBaseHandler fbHandler) {
+    public void getAllTrainingViews(FireBaseHandler fbHandler) {
 
     }
-
 
     public void createTraining(BETraining training, FireBaseHandler fbHandler) {
         DAL.createTraining(training, fbHandler);
     }
 
-
     public void updateTraining(BETraining training, FireBaseHandler fbHandler) {
         DAL.updateTraining(training, fbHandler);
     } //num of participants and status can be changed
-
 
     public void joinTraining(String trainingId, String userId, FireBaseHandler fbHandler) {
         DAL.joinTraining(trainingId, userId, fbHandler);
@@ -241,17 +244,22 @@ public class ServerAPI {
 
     }
 
-    public ArrayList<BETraining> filterMyEndedTrainings(String userId, ArrayList<BETrainingViewDetails> trainingViews) {
+    public ArrayList<BETrainingViewDetails> filterMyEndedTrainings(String userId, ArrayList<BEBaseEntity> trainingViews) {
         ArrayList<String> myEndedTrainingIds = new ArrayList<>();
+        ArrayList<BETrainingViewDetails> myResultTrainingsViews = new ArrayList<>();
 
+        //extract all *my* ended trainings view
         for (int i = 0; i < trainingViews.size(); i++) {
-            BETrainingViewDetails currentTrainingView = trainingViews.get(i);
+            BETrainingViewDetails currentTrainingView = (BETrainingViewDetails)trainingViews.get(i);
             if (currentTrainingView.getStatus() == BETrainingViewStatusEnum.ended &&
                     currentTrainingView.getUserId().equals(userId)) {
+                myResultTrainingsViews.add(currentTrainingView);
                 myEndedTrainingIds.add(currentTrainingView.getTrainingId());
             }
         }
 
+
+        //extract all ended trainings
         ArrayList<BETraining> myJoinedTrainings = getMyJoinedTrainingsList();
         ArrayList<BETraining> myResultTrainings = new ArrayList<>();
 
@@ -262,7 +270,9 @@ public class ServerAPI {
             }
         }
 
-        return myResultTrainings;
+        setMyEndedTrainingsList(myResultTrainings);
+
+        return myResultTrainingsViews;
 
     }
 

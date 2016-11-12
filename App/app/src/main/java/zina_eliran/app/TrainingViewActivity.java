@@ -258,7 +258,6 @@ public class TrainingViewActivity extends BaseActivity
                 if (response.getStatus() == BEResponseStatusEnum.error) {
                     CMNLogHelper.logError("TrainingViewActivity", "error in training details callbacks | err:" + response.getMessage());
                     Toast.makeText(_getAppContext(), "Error while performing training view action, please try again later.", Toast.LENGTH_LONG).show();
-
                 } else if (response.getEntityType() == BETypesEnum.Trainings && response.getActionType() == DALActionTypeEnum.getTraining) {
                     training = ((BETraining) response.getEntities().get(0));
                     //bind elements to the object fields

@@ -3,6 +3,7 @@ package zina_eliran.app.BusinessEntities;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.jar.Pack200;
 
 public class BETrainingViewDetails extends BEBaseEntity {
@@ -61,7 +62,7 @@ public class BETrainingViewDetails extends BEBaseEntity {
     }
 
     public void addTrainingLocationRoute(BETrainingLocation trainingLocation) {
-        if(this.trainingLocationRoute == null){
+        if (this.trainingLocationRoute == null) {
             this.trainingLocationRoute = new ArrayList<>();
         }
         this.trainingLocationRoute.add(trainingLocation);
@@ -131,13 +132,58 @@ public class BETrainingViewDetails extends BEBaseEntity {
         this.actualDuration = actualDuration;
     }
 
-    public int setTrainingCaloriesBurn(BEUser user){
-        float poundFactor = 22/10;
-        float distanceFactor = (10/16)*this.totalDistance;
-        float speedFactor = (10/8)*this.avgSpeed;
-        float calManFactor = 63/100;
-        float calWomanFactor = 57/100;
-        return  (int)(user.getWeigth()* poundFactor*(user.isMale() ? calManFactor : calWomanFactor)*speedFactor*distanceFactor);
+    public int setTrainingCaloriesBurn(BEUser user) {
+        float poundFactor = 22 / 10;
+        float distanceFactor = (10 / 16) * this.totalDistance;
+        float speedFactor = (10 / 8) * this.avgSpeed;
+        float calManFactor = 63 / 100;
+        float calWomanFactor = 57 / 100;
+        return (int) (user.getWeigth() * poundFactor * (user.isMale() ? calManFactor : calWomanFactor) * speedFactor * distanceFactor);
 
+    }
+
+
+
+    public static float getDistanceSum(List<BETrainingViewDetails> trainingList) {
+        float result = 0;
+        if (trainingList != null) {
+            for (BETrainingViewDetails training : trainingList) {
+                result += training.getTotalDistance();
+            }
+        }
+        return result;
+    }
+
+    public static int getCaloriesSum(List<BETrainingViewDetails> trainingList) {
+        int result = 0;
+        if (trainingList != null) {
+            for (BETrainingViewDetails training : trainingList) {
+                result += training.getTotalCalories();
+            }
+        }
+        return result;
+    }
+
+    public static float getMaxSpeed(List<BETrainingViewDetails> trainingList) {
+        float result = 0;
+        if (trainingList != null) {
+            for (BETrainingViewDetails training : trainingList) {
+                if (result < training.getMaxSpeed()) {
+                    result = training.getMaxSpeed();
+                }
+            }
+        }
+        return result;
+    }
+
+    public static float getAvgSpeed(List<BETrainingViewDetails> trainingList) {
+        float result = 0;
+        if (trainingList != null) {
+            for (BETrainingViewDetails training : trainingList) {
+                result += training.getAvgSpeed();
+            }
+            result /= trainingList.size();
+        }
+        return result;
     }
 }

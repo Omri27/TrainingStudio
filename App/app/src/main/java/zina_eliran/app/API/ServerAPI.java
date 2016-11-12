@@ -11,6 +11,7 @@ import zina_eliran.app.BusinessEntities.BEResponse;
 import zina_eliran.app.BusinessEntities.BETraining;
 import zina_eliran.app.BusinessEntities.BETrainingStatusEnum;
 import zina_eliran.app.BusinessEntities.BETrainingViewDetails;
+import zina_eliran.app.BusinessEntities.BETrainingViewStatusEnum;
 import zina_eliran.app.BusinessEntities.BEUser;
 import zina_eliran.app.BusinessEntities.CMNLogHelper;
 import zina_eliran.app.Utils.FireBaseHandler;
@@ -30,7 +31,12 @@ public class ServerAPI {
 
     ArrayList<BETraining> myCreatedTrainingsList;
 
+    ArrayList<BETraining> myEndedTrainingsList;
+
+    ArrayList<BETrainingViewDetails> myEndedTrainingsViewList;
+
     ArrayList<BETraining> publicTrainingsList;
+
 
     protected ServerAPI() {
         // Exists only to defeat instantiation.
@@ -88,6 +94,22 @@ public class ServerAPI {
         this.publicTrainingsList = publicTrainingsList;
     }
 
+    public ArrayList<BETraining> getMyEndedTrainingsList() {
+        return myEndedTrainingsList;
+    }
+
+    public void setMyEndedTrainingsList(ArrayList<BETraining> myEndedTrainingsList) {
+        this.myEndedTrainingsList = myEndedTrainingsList;
+    }
+
+    public ArrayList<BETrainingViewDetails> getMyEndedTrainingsViewList() {
+        return myEndedTrainingsViewList;
+    }
+
+    public void setMyEndedTrainingsViewList(ArrayList<BETrainingViewDetails> myEndedTrainingsViewList) {
+        this.myEndedTrainingsViewList = myEndedTrainingsViewList;
+    }
+
     public BEResponse getActionResponse() {
         return actionResponse;
     }
@@ -109,21 +131,17 @@ public class ServerAPI {
         DAL.resendUserRegistrationEmail(email, name, verificationCode);
     }
 
-
     public void getUser(String userId, FireBaseHandler fbHandler) {
         DAL.getUserByUID(userId, fbHandler);
     }
-
 
     public void updateUser(BEUser user, FireBaseHandler fbHandler) {
         DAL.updateUser(user, fbHandler);
     }
 
-
     public void getUsersByTraining(String trainingId, FireBaseHandler fbHandler) {
         DAL.getUsersByTraining(trainingId, fbHandler);
     }
-
 
     public void getTraining(String trainingId, FireBaseHandler fbHandler) {
         DAL.getTraining(trainingId, fbHandler);
@@ -145,16 +163,17 @@ public class ServerAPI {
         DAL.getAllTrainings(fbHandler);
     }
 
+    public void getAllTrainingViews(FireBaseHandler fbHandler) {
+
+    }
 
     public void createTraining(BETraining training, FireBaseHandler fbHandler) {
         DAL.createTraining(training, fbHandler);
     }
 
-
     public void updateTraining(BETraining training, FireBaseHandler fbHandler) {
         DAL.updateTraining(training, fbHandler);
     } //num of participants and status can be changed
-
 
     public void joinTraining(String trainingId, String userId, FireBaseHandler fbHandler) {
         DAL.joinTraining(trainingId, userId, fbHandler);
@@ -205,7 +224,7 @@ public class ServerAPI {
         ArrayList<BETraining> myTrainings = new ArrayList<>();
         //Filter all trainings that user participeted in or creator
         Calendar cal = Calendar.getInstance();
-        long minute30 = 1000*60*30;
+        long minute30 = 1000 * 60 * 30;
         if (trainings != null && !trainings.isEmpty()) {
             for (int i = 0; i < trainings.size(); i++) {
                 BETraining currentTraining = ((BETraining) trainings.get(i));
@@ -218,25 +237,42 @@ public class ServerAPI {
 //                    CMNLogHelper.logError("myTrainings", currentTraining.toString());
                 }
             }
-        }
-        else {
+        } else {
             CMNLogHelper.logError("myTrainingsFilter", "No training found");
         }
         return myTrainings;
 
     }
 
-    public ArrayList<BETraining> filterMyEndedTrainings(ArrayList<BETraining> trainings) {
-        ArrayList<BETraining> myEndedTrainings = new ArrayList<>();
+    public ArrayList<BETrainingViewDetails> filterMyEndedTrainings(String userId, ArrayList<BEBaseEntity> trainingViews) {
+        ArrayList<String> myEndedTrainingIds = new ArrayList<>();
+        ArrayList<BETrainingViewDetails> myResultTrainingsViews = new ArrayList<>();
 
-        for (int i = 0; i < trainings.size(); i++) {
-            BETraining currentTraining = trainings.get(i);
-            if (currentTraining.getTrainingDateTimeCalender().before(Calendar.getInstance().getTime())) {
-                myEndedTrainings.add(currentTraining);
+        //extract all *my* ended trainings view
+        for (int i = 0; i < trainingViews.size(); i++) {
+            BETrainingViewDetails currentTrainingView = (BETrainingViewDetails)trainingViews.get(i);
+            if (currentTrainingView.getStatus() == BETrainingViewStatusEnum.ended &&
+                    currentTrainingView.getUserId().equals(userId)) {
+                myResultTrainingsViews.add(currentTrainingView);
+                myEndedTrainingIds.add(currentTrainingView.getTrainingId());
             }
         }
 
-        return myEndedTrainings;
+
+        //extract all ended trainings
+        ArrayList<BETraining> myJoinedTrainings = getMyJoinedTrainingsList();
+        ArrayList<BETraining> myResultTrainings = new ArrayList<>();
+
+        for (int i = 0; i < getMyJoinedTrainingsList().size(); i++) {
+            BETraining currentTraining = myJoinedTrainings.get(i);
+            if (myEndedTrainingsList.contains(currentTraining.getId())) {
+                myResultTrainings.add(currentTraining);
+            }
+        }
+
+        setMyEndedTrainingsList(myResultTrainings);
+
+        return myResultTrainingsViews;
 
     }
 
@@ -249,7 +285,7 @@ public class ServerAPI {
             }
         };
 
-        Collections.sort(trainings,comparator);
+        Collections.sort(trainings, comparator);
         return trainings.size() > 0 ? trainings.get(0) : null;
 
     }

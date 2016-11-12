@@ -1,8 +1,5 @@
 package zina_eliran.app;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -12,11 +9,9 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import zina_eliran.app.API.DAL;
 import zina_eliran.app.BusinessEntities.BEResponse;
 import zina_eliran.app.BusinessEntities.BEResponseStatusEnum;
 import zina_eliran.app.BusinessEntities.BETraining;
@@ -41,34 +36,21 @@ public class LobbyActivity extends BaseActivity implements View.OnClickListener,
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_lobby);
-        pBar = (ProgressBar) findViewById(R.id.lobby_pbar);
-        pBar.setVisibility(View.VISIBLE);
-        pBar.bringToFront();
-        pBarRl = (RelativeLayout) findViewById(R.id.lobby_pbar_rl);
-        mainLayout = (LinearLayout) findViewById(R.id.lobby_ll);
+        try {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_lobby);
+            pBar = (ProgressBar) findViewById(R.id.lobby_pbar);
+            pBar.setVisibility(View.VISIBLE);
+            pBar.bringToFront();
+            pBarRl = (RelativeLayout) findViewById(R.id.lobby_pbar_rl);
+            mainLayout = (LinearLayout) findViewById(R.id.lobby_ll);
 
 
-
-        onCreateUI();
-        handleLoginState();
-
-
-//        Intent intent = new Intent(getBaseContext(), DBMonitoringService.class);
-//
-//        startService(intent);
-//
-//        DAL.tests(this);
-
-        //Zina: Start service for the first time
-        Intent serviceIntent = new Intent(getBaseContext(), DBMonitoringService.class);
-        String user_id = readFromSharedPreferences("user_id");
-        serviceIntent.putExtra("UserID", user_id);
-        CMNLogHelper.logError("STARTING SERVICE WITH ID", user_id);
-        startService(serviceIntent);
-
-
+            onCreateUI();
+            handleLoginState();
+        } catch (Exception e) {
+            CMNLogHelper.logError("LobbyActivity", e.getMessage());
+        }
     }
 
     private void onCreateUI() {
@@ -151,10 +133,6 @@ public class LobbyActivity extends BaseActivity implements View.OnClickListener,
                 } else if (response.getActionType() == DALActionTypeEnum.getUser && response.getEntityType() == BETypesEnum.Users) {
                     sApi.setAppUser((BEUser) response.getEntities().get(0));
 
-                    //*****************************************
-                    //Zina = we have here the user id for the first time.
-                    //START again the Service here.
-
                     //get next training here, using my training ids and update server api
                     sApi.getAllTrainings(this);
 
@@ -168,12 +146,12 @@ public class LobbyActivity extends BaseActivity implements View.OnClickListener,
                     }
 
 
-                   /*  BETraining nextTraining = sApi.getNextTraining();
-                   if (nextTraining != null) {
-                        if (isNext10MinSelectedDate(nextTraining.getTrainingDateTimeCalender())) {
+                    BETraining nextTraining = sApi.getNextTraining();
+                    if (nextTraining != null) {
+                        if (isNextXMinSelectedDate(nextTraining.getTrainingDateTimeCalender(), 15)) {
                             startTrainingBtn.setEnabled(true);
                         }
-                    }*/
+                    }
 
                     pBar.setVisibility(View.GONE);
                     pBarRl.setVisibility(View.GONE);
@@ -193,8 +171,10 @@ public class LobbyActivity extends BaseActivity implements View.OnClickListener,
     private void handleLoginState() {
         try {
             if (isVerified()) {
-
                 sApi.getUser(readFromSharedPreferences(_getString(R.string.user_id)), this);
+
+                //after the user has beed registered - init the app service (Notifications use)
+                initAppService();
             }
             //navigate to Lobby if the user is verified
             else {
@@ -215,5 +195,17 @@ public class LobbyActivity extends BaseActivity implements View.OnClickListener,
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
 
+        try {
+            pBar.setVisibility(View.VISIBLE);
+            pBarRl.setVisibility(View.VISIBLE);
+            mainLayout.setVisibility(View.INVISIBLE);
+            sApi.getAllTrainings(this);
+        } catch (Exception e) {
+            CMNLogHelper.logError("LobbyActivity", e.getMessage());
+        }
+    }
 }

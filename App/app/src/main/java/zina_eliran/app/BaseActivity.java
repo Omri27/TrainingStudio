@@ -34,6 +34,7 @@ import java.util.Map;
 
 import zina_eliran.app.API.ServerAPI;
 import zina_eliran.app.BusinessEntities.CMNLogHelper;
+import zina_eliran.app.Notifications.DBMonitoringService;
 
 
 public class BaseActivity extends AppCompatActivity {
@@ -65,47 +66,61 @@ public class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        sApi = ServerAPI.getInstance();
-        appContext = this;
-        Firebase.setAndroidContext(this);
 
-        //create the Shared Preferences read/write objects
-        preferences = getSharedPreferences(appPreferences, 0);
-        editor = preferences.edit();
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        try {
+            super.onCreate(savedInstanceState);
+            sApi = ServerAPI.getInstance();
+            appContext = this;
+            Firebase.setAndroidContext(this);
 
-        //"force" LTR alignment + english language
-        String languageToLoad = "en";
-        Locale locale = new Locale(languageToLoad);
-        Locale.setDefault(locale);
-        Configuration config = new Configuration();
-        config.locale = locale;
-        getBaseContext().getResources().updateConfiguration(config,
-                getBaseContext().getResources().getDisplayMetrics());
+            //create the Shared Preferences read/write objects
+            preferences = getSharedPreferences(appPreferences, 0);
+            editor = preferences.edit();
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-
-        client = new GoogleApiClient.Builder(this)
-                .addApi(AppIndex.API)
-                .addApi(LocationServices.API)
-                .build();
+            //"force" LTR alignment + english language
+            String languageToLoad = "en";
+            Locale locale = new Locale(languageToLoad);
+            Locale.setDefault(locale);
+            Configuration config = new Configuration();
+            config.locale = locale;
+            getBaseContext().getResources().updateConfiguration(config,
+                    getBaseContext().getResources().getDisplayMetrics());
 
 
-        //************************************************************
-        //run this once when you want to "init" the registration process
-        //clearSharedPreferences();
+            client = new GoogleApiClient.Builder(this)
+                    .addApi(AppIndex.API)
+                    .addApi(LocationServices.API)
+                    .build();
+
+
+            //************************************************************
+            //run this once when you want to "init" the registration process
+            //clearSharedPreferences();
+
+        } catch (Exception e) {
+            CMNLogHelper.logError("BaseActivity", e.getMessage());
+        }
     }
 
     @Override
     public void onStart() {
-        super.onStart();
-        client.connect();
+        try {
+            super.onStart();
+            client.connect();
+        } catch (Exception e) {
+            CMNLogHelper.logError("BaseActivity", e.getMessage());
+        }
     }
 
     @Override
     public void onStop() {
-        super.onStop();
-        client.disconnect();
+        try {
+            super.onStop();
+            client.disconnect();
+        } catch (Exception e) {
+            CMNLogHelper.logError("BaseActivity", e.getMessage());
+        }
     }
 
     public String readFromSharedPreferences(String key) {
@@ -125,16 +140,6 @@ public class BaseActivity extends AppCompatActivity {
         try {
             editor.putString(key, value);
             editor.commit();
-            return true;
-        } catch (Exception e) {
-            CMNLogHelper.logError("BaseActivity", e.getMessage());
-        }
-        return false;
-    }
-
-    public boolean deleteFromSharedPreferences(String key) {
-        try {
-            preferences.edit().remove(key).commit();
             return true;
         } catch (Exception e) {
             CMNLogHelper.logError("BaseActivity", e.getMessage());
@@ -177,11 +182,21 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     public boolean isRegistered() {
-        return !readFromSharedPreferences(_getString(R.string.user_registration_permission)).isEmpty();
+        try {
+            return !readFromSharedPreferences(_getString(R.string.user_registration_permission)).isEmpty();
+        } catch (Exception e) {
+            CMNLogHelper.logError("BaseActivity", e.getMessage());
+        }
+        return false;
     }
 
     public boolean isVerified() {
-        return !readFromSharedPreferences(_getString(R.string.user_verification_permission)).isEmpty();
+        try {
+            return !readFromSharedPreferences(_getString(R.string.user_verification_permission)).isEmpty();
+        } catch (Exception e) {
+            CMNLogHelper.logError("BaseActivity", e.getMessage());
+        }
+        return false;
     }
 
     public Context _getAppContext() {
@@ -189,14 +204,19 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     public String getIntentParam(Intent intent, String key) {
-        String result = null;
-        if (intent != null) {
-            Bundle extras = intent.getExtras();
-            if (extras != null) {
-                result = extras.getString(key);
+        try {
+            String result = null;
+            if (intent != null) {
+                Bundle extras = intent.getExtras();
+                if (extras != null) {
+                    result = extras.getString(key);
+                }
             }
+            return result != null ? result : "";
+        } catch (Exception e) {
+            CMNLogHelper.logError("BaseActivity", e.getMessage());
         }
-        return result != null ? result : "";
+        return "";
     }
 
     public String _getString(int key) {
@@ -313,10 +333,10 @@ public class BaseActivity extends AppCompatActivity {
     }
 
 
-    public boolean isNext10MinSelectedDate(Calendar cal) {
+    public boolean isNextXMinSelectedDate(Calendar cal, int minutesBefore) {
         try {
             Calendar now = Calendar.getInstance();
-            long minute10 = 1000*60*10;
+            long minute10 = 1000 * 60 * minutesBefore;
 
             return (isTodaySelectedDate(now) &&
                     cal.getTimeInMillis() >= now.getTimeInMillis() &&
@@ -328,5 +348,12 @@ public class BaseActivity extends AppCompatActivity {
         return false;
     }
 
-
+    public void initAppService(){
+        //Zina: Start service for the first time
+        Intent serviceIntent = new Intent(getBaseContext(), DBMonitoringService.class);
+        String user_id = readFromSharedPreferences("user_id");
+        serviceIntent.putExtra("UserID", user_id);
+        CMNLogHelper.logError("STARTING SERVICE WITH ID", user_id);
+        startService(serviceIntent);
+    }
 }

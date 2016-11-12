@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="270dp"
+    android:layout_width="290dp"
     android:layout_height="match_parent"
     android:orientation="horizontal"
     android:paddingTop="15dp">
@@ -26,7 +26,7 @@
 
     <LinearLayout
         android:id="@+id/horizontal_item_center_ll"
-        android:layout_width="180dp"
+        android:layout_width="170dp"
         android:layout_height="100dp"
         android:background="#22ffffff"
         android:orientation="vertical"

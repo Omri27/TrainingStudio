@@ -96,6 +96,13 @@ public class GetBEObjectEventListener implements ValueEventListener {
 //                CMNLogHelper.logError("All trainings listener", objects.get(i).toString());
             }
 
+            else if (action == DALActionTypeEnum.getTrainingViewDetails){
+                for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
+                    BETrainingViewDetails t = postSnapshot.getValue(BETrainingViewDetails.class);
+                    objects.add(t);
+                }
+            }
+
             else {
                 status = BEResponseStatusEnum.error;
                 errorMessage = "Unknown action type";

@@ -54,7 +54,6 @@ public class NotificationSender implements Runnable {
     public boolean shouldSendNotification() {
         Boolean shouldSend = false;
         try {
-            CMNLogHelper.logError("SERVICE", "CHECKIfshouldSend");
             if (user != null && training != null) {
 
                 //Check if should send trainingIsFull notification
@@ -85,14 +84,12 @@ public class NotificationSender implements Runnable {
                 //Check if user subscribed to reminder notification
                 else if (notificationType == NotificationTypeEnum.reminder && user.isTrainingRemainderNotification())
                     shouldSend = true;
-                CMNLogHelper.logError("SERVICECHECKIfshouldSend", shouldSend.toString());
+
                 return shouldSend;
             }
         } catch (Exception e) {
             CMNLogHelper.logError("CheckNotificationFailed", e.getMessage());
         }
-
-        CMNLogHelper.logError("SERVICECHECKIfshouldSend", shouldSend.toString());
         return shouldSend;
     }
 
@@ -147,7 +144,7 @@ public class NotificationSender implements Runnable {
                 else
                     trainingTime = hours+2 + ":" + time[1];
 
-                CMNLogHelper.logError("Training time", trainingTime);
+                //CMNLogHelper.logError("Training time", trainingTime);
                 message = "Hurry up! The training " + training.getName() + " starts at " + trainingTime;
             } catch (Exception e) {
                 CMNLogHelper.logError("FailedGenerateReminderNitofocation", e.getMessage());

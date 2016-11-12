@@ -67,7 +67,7 @@ public class TimerThread implements Runnable {
     public void run() {
         while (isRunning) {
             try {
-                //reset sent notifications
+                //to reset sent notifications un-comment here
                 //sentNotifications.clear();
 
                 checkUpcomingTrainings(trainings,user);
@@ -102,16 +102,16 @@ public class TimerThread implements Runnable {
                     if (training.getTrainingDateTimeCalender().getTime().after(cal1.getTime()) && training.getTrainingDateTimeCalender().getTime().before(cal.getTime())){
 //                    if (training.getTrainingDateTimeCalender().after(cal) && training.getTrainingDateTimeCalender().before(cal1)) {
                         if (!sentNotifications.contains(training.getId())){
-                            CMNLogHelper.logError("ReminderThread", "Should send");
-                            CMNLogHelper.logError("ReminderCheckedTraining", training.toString());
+                            //CMNLogHelper.logError("ReminderThread", "Should send");
+                            //CMNLogHelper.logError("ReminderCheckedTraining", training.toString());
                             NotificationSender sender = new NotificationSender(user,training,NotificationTypeEnum.reminder,context);
                             new Thread(sender).start();
 
                         }
-                        else CMNLogHelper.logError("ReminderThread Should not send, already sent", sentNotifications.toString());
+                        //else CMNLogHelper.logError("ReminderThread Should not send, already sent", sentNotifications.toString());
                     }
-                    else
-                        CMNLogHelper.logError("ReminderThread", "Should not send");
+                    //else
+                       //CMNLogHelper.logError("ReminderThread", "Should not send");
 
                 }
             }

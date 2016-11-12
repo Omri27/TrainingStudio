@@ -164,7 +164,7 @@ public class ServerAPI {
     }
 
     public void getAllTrainingViews(FireBaseHandler fbHandler) {
-        //Dal.get
+        DAL.getAllTrainingViewDetails(fbHandler);
     }
 
     public void createTraining(BETraining training, FireBaseHandler fbHandler) {

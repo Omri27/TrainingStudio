@@ -130,6 +130,10 @@ public class DAL {
         getList(BETypesEnum.Trainings, DALActionTypeEnum.getAllTrainings, fireBaseHandler);
     }
 
+    public static void getAllTrainingViewDetails(FireBaseHandler fireBaseHandler){
+        getList(BETypesEnum.TrainingViewDetails, DALActionTypeEnum.getAllTrainingsViews, fireBaseHandler);
+    }
+
     public static void joinTraining(String trainingId, String userId, FireBaseHandler fireBaseHandler) {
         try {
             if (trainingId != null && userId != null) {

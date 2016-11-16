@@ -104,11 +104,13 @@ public class BETrainingLocation extends BEBaseEntity {
         return l1.distanceTo(l2);
     }
 
-    public float getTimeMeasureDiff(BETrainingLocation l2, int timePart) {
-        return (l2.getLocationMeasureTime().getTimeInMillis() - this.getLocationMeasureTime().getTimeInMillis()) / (timePart * 1000);
+    public Calendar getTimeMeasureDiff(BETrainingLocation l2) {
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis((l2.getLocationMeasureTime().getTimeInMillis() - this.getLocationMeasureTime().getTimeInMillis()));
+        return c;
     }
 
-    public static float getLocationRouteDistance(List<BETrainingLocation> locationsList, boolean isKilometer) {
+    public static float getLocationRouteDistance(List<BETrainingLocation> locationsList) {
         //in Meters
         float distance = 0;
         if (locationsList.size() >= 2) {
@@ -116,13 +118,13 @@ public class BETrainingLocation extends BEBaseEntity {
                 distance += locationsList.get(i).getDistance(locationsList.get(i + 1));
             }
         }
-        return !isKilometer ? distance : distance / 1000;
+        return distance;
     }
 
-    public static float getLocationRouteDuration(List<BETrainingLocation> locationsList, int timePart) {
-        float time = 0;
+    public static float getLocationRouteDuration(List<BETrainingLocation> locationsList) {
+        long time = 0;
         if (locationsList.size() >= 2) {
-            time = locationsList.get(locationsList.size() - 1).getTimeMeasureDiff(locationsList.get(0), timePart);
+            time = locationsList.get(locationsList.size() - 1).getTimeMeasureDiff(locationsList.get(0)).getTimeInMillis();
         }
         return time;
     }

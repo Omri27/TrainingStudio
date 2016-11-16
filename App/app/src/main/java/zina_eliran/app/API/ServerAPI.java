@@ -44,6 +44,8 @@ public class ServerAPI {
         nextTraining = new BETraining();
         myJoinedTrainingsList = new ArrayList<>();
         myCreatedTrainingsList = new ArrayList<>();
+        myEndedTrainingsList = new ArrayList<>();
+        myEndedTrainingsViewList = new ArrayList<>();
         publicTrainingsList = new ArrayList<>();
     }
 
@@ -221,7 +223,8 @@ public class ServerAPI {
 
     public ArrayList<BETraining> filterMyTrainings(String userId, ArrayList<BEBaseEntity> trainings, boolean isCreatedByMe) {
         ArrayList<BETraining> myTrainings = new ArrayList<>();
-        //Filter all trainings that user participeted in or creator
+        ArrayList<BETraining> myEndedTrainings = new ArrayList<>();
+        //Filter all trainings that user participated in or creator
         Calendar cal = Calendar.getInstance();
 
         //30 minutes before
@@ -232,20 +235,45 @@ public class ServerAPI {
                 if (((currentTraining.getPatricipatedUserIds().contains(userId) && !isCreatedByMe &&
                         currentTraining.getStatus() != BETrainingStatusEnum.cancelled) ||
                         (currentTraining.getCreatorId().equals(userId) && isCreatedByMe &&
-                                currentTraining.getStatus() != BETrainingStatusEnum.cancelled)) &&
-                        currentTraining.getTrainingDateTimeCalender().getTimeInMillis() >= cal.getTimeInMillis()) {
-                    myTrainings.add(currentTraining);
+                                currentTraining.getStatus() != BETrainingStatusEnum.cancelled))) {
+                    if(currentTraining.getTrainingDateTimeCalender().getTimeInMillis() >= cal.getTimeInMillis()){
+                        myTrainings.add(currentTraining);
+                    }
+                    else {
+                        //add to my ended training list
+                        myEndedTrainings.add(currentTraining);
+                    }
                 }
             }
         } else {
             CMNLogHelper.logError("myTrainingsFilter", "No training found");
         }
+
+        setMyEndedTrainingsList(myEndedTrainings);
         return myTrainings;
 
     }
 
-    public ArrayList<BETrainingViewDetails> filterMyEndedTrainings(String userId, ArrayList<BEBaseEntity> trainingViews) {
-        ArrayList<String> myEndedTrainingIds = new ArrayList<>();
+    public ArrayList<BETraining> filterMyEndedTrainings(String userId) {
+
+        //extract all actually ended trainings
+        ArrayList<BETrainingViewDetails> myEndedTrainingsViews = getMyEndedTrainingsViewList();
+        ArrayList<BETraining> myResultEndedTrainingsList = getMyEndedTrainingsList();
+
+        for (int i = 0; i < myEndedTrainingsViews.size(); i++) {
+            for(int j=0; j< myEndedTrainingsList.size(); j++){
+                if(myEndedTrainingsList.get(j).getId().equals(myEndedTrainingsViews.get(i).getTrainingId())){
+                    myResultEndedTrainingsList.add(myEndedTrainingsList.get(j));
+                }
+            }
+        }
+
+        return myResultEndedTrainingsList;
+
+    }
+
+    public ArrayList<BETrainingViewDetails> filterMyEndedTrainingsView(String userId, ArrayList<BEBaseEntity> trainingViews) {
+
         ArrayList<BETrainingViewDetails> myResultTrainingsViews = new ArrayList<>();
 
         //extract all *my* ended trainings view
@@ -254,25 +282,10 @@ public class ServerAPI {
             if (currentTrainingView.getStatus() == BETrainingViewStatusEnum.ended &&
                     currentTrainingView.getUserId().equals(userId)) {
                 myResultTrainingsViews.add(currentTrainingView);
-                myEndedTrainingIds.add(currentTrainingView.getTrainingId());
             }
         }
 
-
-        //extract all ended trainings
-        ArrayList<BETraining> myJoinedTrainings = getMyJoinedTrainingsList();
-        ArrayList<BETraining> myResultTrainings = new ArrayList<>();
-
-        for (int i = 0; i < getMyJoinedTrainingsList().size(); i++) {
-            BETraining currentTraining = myJoinedTrainings.get(i);
-            if (myEndedTrainingIds.contains(currentTraining.getId())) {
-                myResultTrainings.add(currentTraining);
-            }
-        }
-
-        setMyEndedTrainingsList(myResultTrainings);
-
-        return myResultTrainingsViews;
+       return myResultTrainingsViews;
 
     }
 

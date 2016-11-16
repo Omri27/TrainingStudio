@@ -222,4 +222,7 @@ public class BEUser extends BEBaseEntity {
             myTrainingIds.remove(trainingID);
     }
 
+    public boolean hasTrainingStatisticValues() {
+        return getWeigth() > 0 && getHeigth() > 0 && getAge() > 0;
+    }
 }

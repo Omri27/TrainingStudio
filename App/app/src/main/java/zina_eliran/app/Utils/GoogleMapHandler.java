@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Locale;
 
 import zina_eliran.app.BusinessEntities.BETrainingLocation;
+import zina_eliran.app.BusinessEntities.CMNLogHelper;
 
 
 public class GoogleMapHandler implements
@@ -62,120 +63,145 @@ public class GoogleMapHandler implements
     AppLocationChangedHandler activity;
 
     public GoogleMapHandler(Context context, MapFragment mfMap) {
-        this.context = context;
-        this.mfMap = mfMap;
+        try {
+            this.context = context;
+            this.mfMap = mfMap;
 
-        setEngLocale();
-        mfMap.getMapAsync(this);
+            setEngLocale();
+            mfMap.getMapAsync(this);
+        } catch (Exception e) {
+            CMNLogHelper.logError("GoogleMapHandler", e.getMessage());
+        }
     }
 
     public GoogleMapHandler(Context context, MapFragment mfMap, BETrainingLocation trainingLocation) {
-        this.context = context;
-        this.mfMap = mfMap;
-        this.trainingLocation = trainingLocation;
+        try {
+            this.context = context;
+            this.mfMap = mfMap;
+            this.trainingLocation = trainingLocation;
 
-        setEngLocale();
-        mfMap.getMapAsync(this);
+            setEngLocale();
+            mfMap.getMapAsync(this);
+        } catch (Exception e) {
+            CMNLogHelper.logError("GoogleMapHandler", e.getMessage());
+        }
     }
 
     public GoogleMapHandler(Context context, MapFragment mfMap, ArrayList<BETrainingLocation> trainingLocations) {
-        this.context = context;
-        this.mfMap = mfMap;
-        this.trainingLocations = trainingLocations;
-        this.isDrawOnMap = true;
+        try {
+            this.context = context;
+            this.mfMap = mfMap;
+            this.trainingLocations = trainingLocations;
+            this.isDrawOnMap = true;
 
-        setEngLocale();
-        mfMap.getMapAsync(this);
+            setEngLocale();
+            mfMap.getMapAsync(this);
+        } catch (Exception e) {
+            CMNLogHelper.logError("GoogleMapHandler", e.getMessage());
+        }
     }
 
     public GoogleMapHandler(Context context, AppLocationChangedHandler activity, MapFragment mfMap, BETrainingLocation startLocation, int interval, int fastInterval) {
         this(context, mfMap, startLocation);
-        this.interval = interval;
-        this.fastInterval = fastInterval;
-        this.activity = activity;
+        try {
+
+            this.interval = interval;
+            this.fastInterval = fastInterval;
+            this.activity = activity;
+        } catch (Exception e) {
+            CMNLogHelper.logError("GoogleMapHandler", e.getMessage());
+        }
     }
 
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(interval);
-        mLocationRequest.setFastestInterval(fastInterval);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-        //check permissions
-        if (ContextCompat.checkSelfPermission(context,
-                android.Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+        try {
+            mLocationRequest = new LocationRequest();
+            mLocationRequest.setInterval(interval);
+            mLocationRequest.setFastestInterval(fastInterval);
+            mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+            //check permissions
+            if (ContextCompat.checkSelfPermission(context,
+                    android.Manifest.permission.ACCESS_FINE_LOCATION)
+                    == PackageManager.PERMISSION_GRANTED) {
+                LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+            }
+        } catch (Exception e) {
+            CMNLogHelper.logError("GoogleMapHandler", e.getMessage());
         }
     }
 
     @Override
     public void onLocationChanged(Location location) {
+        try {
+            if (activity != null) {
+                if (!isDrawFirstTime) {
 
-        if (activity != null) {
-            if (!isDrawFirstTime) {
+                    if (mCurrLocationMarker != null) {
+                        mCurrLocationMarker.remove();
+                    }
+                    //Place current location marker
+                    mLastlatLng = new LatLng(location.getLatitude(), location.getLongitude());
+                    mCurrLocationMarker = addMarker(mLastlatLng);
+                    isDrawFirstTime = true;
+                } else {
+                    activity.onLocationChangedCallback(location);
+                    //Toast.makeText(this.context, "i: " + (i++) + " | " + location.toString(), Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+            } else {
 
                 if (mCurrLocationMarker != null) {
                     mCurrLocationMarker.remove();
                 }
-                //Place current location marker
-                mLastlatLng = new LatLng(location.getLatitude(), location.getLongitude());
-                mCurrLocationMarker = addMarker(mLastlatLng);
-                isDrawFirstTime = true;
-            } else {
-                activity.onLocationChangedCallback(location);
-                Toast.makeText(this.context, "i: " + (i++) + " | " + location.toString(), Toast.LENGTH_LONG).show();
-                return;
+
+                if (this.trainingLocation != null) {
+                    //remove old markers
+                    mMap.clear();
+                    //Place current location marker
+                    mLastlatLng = new LatLng(trainingLocation.getLatitude(), trainingLocation.getLongitude());
+                    mCurrLocationMarker = addMarker(mLastlatLng);
+                } else if (isDrawOnMap && trainingLocations.size() > 0) {
+                    List<LatLng> list = BETrainingLocation.getLatLngList(trainingLocations);
+                    drawOnMap(list);
+                    LatLng middleLocation = list.get((int) (list.size() / 2));
+                    mLastlatLng = new LatLng(middleLocation.latitude, middleLocation.longitude);
+                } else {
+                    //Place current location marker
+                    mLastlatLng = new LatLng(location.getLatitude(), location.getLongitude());
+                    mCurrLocationMarker = addMarker(mLastlatLng);
+                }
             }
 
-        } else {
+            //move map camera
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(mLastlatLng, 16);
+            mMap.animateCamera(cameraUpdate);
 
-            if (mCurrLocationMarker != null) {
-                mCurrLocationMarker.remove();
+            //stop location updates
+            if (mGoogleApiClient != null && this.activity == null) {
+                LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
             }
-
-            if (this.trainingLocation != null) {
-                //remove old markers
-                mMap.clear();
-                //Place current location marker
-                mLastlatLng = new LatLng(trainingLocation.getLatitude(), trainingLocation.getLongitude());
-                mCurrLocationMarker = addMarker(mLastlatLng);
-            } else if (isDrawOnMap && trainingLocations.size() > 0) {
-                List<LatLng> list = BETrainingLocation.getLatLngList(trainingLocations);
-                drawOnMap(list);
-                LatLng middleLocation = list.get((int) (list.size() / 2));
-                mLastlatLng = new LatLng(middleLocation.latitude, middleLocation.longitude);
-            } else {
-                //Place current location marker
-                mLastlatLng = new LatLng(location.getLatitude(), location.getLongitude());
-                mCurrLocationMarker = addMarker(mLastlatLng);
-            }
+        } catch (Exception e) {
+            CMNLogHelper.logError("GoogleMapHandler", e.getMessage());
         }
-
-        //move map camera
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(mLastlatLng, 16);
-        mMap.animateCamera(cameraUpdate);
-
-        //stop location updates
-        if (mGoogleApiClient != null) {
-            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
-        }
-
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        try {
+            mMap = googleMap;
+            mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
-        mMap = googleMap;
-        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-
-        buildGoogleApiClient();
-        if (ContextCompat.checkSelfPermission(context,
-                android.Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED)
-            mMap.setMyLocationEnabled(true);
-
+            buildGoogleApiClient();
+            if (ContextCompat.checkSelfPermission(context,
+                    android.Manifest.permission.ACCESS_FINE_LOCATION)
+                    == PackageManager.PERMISSION_GRANTED)
+                mMap.setMyLocationEnabled(true);
+        } catch (Exception e) {
+            CMNLogHelper.logError("GoogleMapHandler", e.getMessage());
+        }
     }
 
     @Override
@@ -187,48 +213,71 @@ public class GoogleMapHandler implements
     }
 
     private void setEngLocale() {
-        //"force" LTR alignment + english language
-        String languageToLoad = "en";
-        Locale locale = new Locale(languageToLoad);
-        Locale.setDefault(locale);
-        Configuration config = new Configuration();
-        config.locale = locale;
-        this.context.getResources().updateConfiguration(config,
-                this.context.getResources().getDisplayMetrics());
+        try {
+            //"force" LTR alignment + english language
+            String languageToLoad = "en";
+            Locale locale = new Locale(languageToLoad);
+            Locale.setDefault(locale);
+            Configuration config = new Configuration();
+            config.locale = locale;
+            this.context.getResources().updateConfiguration(config,
+                    this.context.getResources().getDisplayMetrics());
+        } catch (Exception e) {
+            CMNLogHelper.logError("GoogleMapHandler", e.getMessage());
+        }
     }
 
     protected synchronized void buildGoogleApiClient() {
-        if (mGoogleApiClient == null) {
-            mGoogleApiClient = new GoogleApiClient.Builder(context)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(LocationServices.API)
-                    .build();
-        }
+        try {
+            if (mGoogleApiClient == null) {
+                mGoogleApiClient = new GoogleApiClient.Builder(context)
+                        .addConnectionCallbacks(this)
+                        .addOnConnectionFailedListener(this)
+                        .addApi(LocationServices.API)
+                        .build();
+            }
 
-        mGoogleApiClient.connect();
+            mGoogleApiClient.connect();
+        } catch (Exception e) {
+            CMNLogHelper.logError("GoogleMapHandler", e.getMessage());
+        }
     }
 
     public Marker addMarker(LatLng latlng) {
-        MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(latlng);
-        markerOptions.title(getAddressString(latlng));
-        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE));
-        return mMap.addMarker(markerOptions);
+        try {
+            MarkerOptions markerOptions = new MarkerOptions();
+            markerOptions.position(latlng);
+            markerOptions.title(getAddressString(latlng));
+            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE));
+            return mMap.addMarker(markerOptions);
+        } catch (Exception e) {
+            CMNLogHelper.logError("GoogleMapHandler", e.getMessage());
+        }
+        return null;
     }
 
     private String getAddressString(LatLng latLng) {
-        Geocoder geocoder = new Geocoder(context, Locale.getDefault());
-        List<Address> addresses = null;
         try {
-            addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
-        } catch (Exception ex) {
+            Geocoder geocoder = new Geocoder(context, Locale.getDefault());
+            List<Address> addresses = null;
+            try {
+                addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
+            } catch (Exception ex) {
+            }
+            return addresses.get(0).getAddressLine(0);
+        } catch (Exception e) {
+            CMNLogHelper.logError("GoogleMapHandler", e.getMessage());
         }
-        return addresses.get(0).getAddressLine(0);
+        return "";
     }
 
     public void stopListener() {
-        mGoogleApiClient.disconnect();
+
+        try {
+            mGoogleApiClient.disconnect();
+        } catch (Exception e) {
+            CMNLogHelper.logError("GoogleMapHandler", e.getMessage());
+        }
     }
 
     public void drawOnMap(List<LatLng> list) {
@@ -236,11 +285,12 @@ public class GoogleMapHandler implements
             mMap.clear();
             Polyline line = mMap.addPolyline(new PolylineOptions()
                     .addAll(list)
-                    .width(12)
+                    .width(15)
                     .color(Color.parseColor("#05b1fb"))//Google maps blue color
                     .geodesic(true)
             );
-        } catch (Exception ex) {
+        } catch (Exception e) {
+            CMNLogHelper.logError("GoogleMapHandler", e.getMessage());
         }
     }
 
@@ -254,7 +304,8 @@ public class GoogleMapHandler implements
                     .color(Color.parseColor("#ddFFA330"))//Google maps blue color
                     .geodesic(true)
             );
-        } catch (Exception ex) {
+        } catch (Exception e) {
+            CMNLogHelper.logError("GoogleMapHandler", e.getMessage());
         }
     }
 

@@ -40,6 +40,7 @@ public class DAL {
     public static void registerUser(BEUser user, FireBaseHandler fbHandler) {
         if (user != null) {
             user.setVerificationCode(ServerAPI.generateVerificationCode());
+            user.setRegisteredDate(Calendar.getInstance().getTime());
             createObject(BETypesEnum.Users, DALActionTypeEnum.registerUser, user, fbHandler);
 
             //Send verification code

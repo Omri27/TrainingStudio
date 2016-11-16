@@ -19,6 +19,11 @@
         android:layout_height="160dp"
         android:layout_marginTop="60dp" />
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:layout_alignBottom="@+id/training_view_location_map_f"
+        android:background="#00000000" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -57,7 +62,7 @@
         android:layout_width="fill_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="50dp"
-        android:layout_marginTop="220dp">
+        android:layout_marginTop="224dp">
 
         <LinearLayout
             android:id="@+id/training_view_layout"
@@ -210,7 +215,7 @@
                     android:background="#ffffff"
                     android:gravity="center_vertical"
                     android:paddingLeft="20dp"
-                    android:text="Duration: 25(s)"
+                    android:text="Duration: --"
                     android:textColor="#555555"
                     android:textSize="18dp" />
 
@@ -234,7 +239,7 @@
                     android:background="#ffffff"
                     android:gravity="center_vertical"
                     android:paddingLeft="20dp"
-                    android:text="Avg Speed: 9.5(m/s)"
+                    android:text="Avg Speed: --"
                     android:textColor="#555555"
                     android:textSize="18dp" />
 
@@ -247,7 +252,7 @@
                     android:background="#ffffff"
                     android:gravity="center_vertical"
                     android:paddingLeft="20dp"
-                    android:text="Max Speed: 11(m/s)"
+                    android:text="Max Speed: --"
                     android:textColor="#555555"
                     android:textSize="18dp" />
 
@@ -271,7 +276,7 @@
                     android:background="#ffffff"
                     android:gravity="center_vertical"
                     android:paddingLeft="20dp"
-                    android:text="Calories"
+                    android:text="Calories: --"
                     android:textColor="#555555"
                     android:textSize="18dp" />
 
@@ -284,7 +289,7 @@
                     android:background="#ffffff"
                     android:gravity="center_vertical"
                     android:paddingLeft="20dp"
-                    android:text="Distance"
+                    android:text="Distance: --"
                     android:textColor="#555555"
                     android:textSize="18dp" />
 

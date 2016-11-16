@@ -18,7 +18,7 @@ public class BETrainingViewDetails extends BEBaseEntity {
     private float maxSpeed;
     private float totalDistance;
     private int totalCalories;
-    private int actualDuration;
+    private long actualDuration;
 
 
     public String getTrainingId() {
@@ -124,24 +124,23 @@ public class BETrainingViewDetails extends BEBaseEntity {
                 '}';
     }
 
-    public int getActualDuration() {
+    public long getActualDuration() {
         return actualDuration;
     }
 
-    public void setActualDuration(int actualDuration) {
+    public void setActualDuration(long actualDuration) {
         this.actualDuration = actualDuration;
     }
 
-    public int setTrainingCaloriesBurn(BEUser user) {
-        float poundFactor = 22 / 10;
-        float distanceFactor = (10 / 16) * this.totalDistance;
-        float speedFactor = (10 / 8) * this.avgSpeed;
-        float calManFactor = 63 / 100;
-        float calWomanFactor = 57 / 100;
-        return (int) (user.getWeigth() * poundFactor * (user.isMale() ? calManFactor : calWomanFactor) * speedFactor * distanceFactor);
+    public void setTrainingCaloriesBurn(BEUser user) {
+        float poundFactor = (float)(22 / 10);
+        float distanceFactor = (float)(10 / 16) * (float)this.totalDistance;
+        float speedFactor = (float)(10 / 8) * (float)this.avgSpeed;
+        float calManFactor = (float)(63 / 100);
+        float calWomanFactor = (float)(57 / 100);
+        setTotalCalories((int) (user.getWeigth() * poundFactor * (user.isMale() ? calManFactor : calWomanFactor) * speedFactor * distanceFactor));
 
     }
-
 
 
     public static float getDistanceSum(List<BETrainingViewDetails> trainingList) {

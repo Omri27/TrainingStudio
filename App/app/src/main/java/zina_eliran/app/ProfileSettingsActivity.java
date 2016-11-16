@@ -116,9 +116,9 @@ public class ProfileSettingsActivity extends BaseActivity implements View.OnClic
                 levelAdapter.notifyDataSetChanged();
                 ageSpinner.setSelection(ageAdapter.getPosition("Age: " + Integer.toString(user.getAge())));
                 ageAdapter.notifyDataSetChanged();
-                weightSpinner.setSelection(weightAdapter.getPosition(Float.toString(user.getWeigth()) + " KG"));
+                weightSpinner.setSelection(weightAdapter.getPosition((int)user.getWeigth() + " KG"));
                 weightAdapter.notifyDataSetChanged();
-                heightSpinner.setSelection(heightAdapter.getPosition(Float.toString(user.getHeigth()) + " (m)"));
+                heightSpinner.setSelection(heightAdapter.getPosition(floatToString(user.getHeigth()) + " (m)"));
                 heightAdapter.notifyDataSetChanged();
 
                 saturdayCbox.setChecked(user.getMyPreferredDays().contains(7));
@@ -211,7 +211,6 @@ public class ProfileSettingsActivity extends BaseActivity implements View.OnClic
             list = new ArrayList<>();
             for (int i = 40; i < 150; i++) {
                 list.add("" + i + " KG");
-                list.add("" + i + ".5 KG");
             }
             weightSpinner = (Spinner) findViewById(R.id.profile_settings_weight_spinner);
             weightAdapter = new ArrayAdapter<String>(this, R.layout.app_spinner_item, list);
@@ -222,11 +221,11 @@ public class ProfileSettingsActivity extends BaseActivity implements View.OnClic
 
 
             list = new ArrayList<>();
-            for (int i = 50; i < 99; i++) {
+            for (int i = 50; i < 99; i+=5) {
                 list.add("1." + i + " (m)");
             }
 
-            for (int i = 0; i < 20; i++) {
+            for (int i = 0; i < 20; i+=5) {
                 list.add("2." + i + " (m)");
             }
             heightSpinner = (Spinner) findViewById(R.id.profile_settings_height_spinner);

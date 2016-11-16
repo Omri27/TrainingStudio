@@ -26,6 +26,7 @@ public class TrainingProgressActivity extends BaseActivity implements View.OnCli
     private List<BETraining> trainingList;
     private HorizontalAdapter horizontalAdapter;
 
+    TextView activityTitle;
     TextView joinedDateTv;
     TextView trainingsCountTv;
     TextView totalDistanceTv;
@@ -52,6 +53,7 @@ public class TrainingProgressActivity extends BaseActivity implements View.OnCli
     private void onCreateUI() {
         try {
 
+            activityTitle = (TextView) findViewById(R.id.training_progress_personal_records_title_tv);
             joinedDateTv = (TextView) findViewById(R.id.training_progress_joining_date_tv);
             trainingsCountTv = (TextView) findViewById(R.id.training_progress_trainings_count_tv);
             totalDistanceTv = (TextView) findViewById(R.id.training_progress_total_distance_tv);
@@ -89,8 +91,9 @@ public class TrainingProgressActivity extends BaseActivity implements View.OnCli
     private void bindTrainingViewDetails() {
         try {
 
+            activityTitle.setText(sApi.getAppUser().getName() + " | Personal records: ");
             joinedDateTv.setText("Joining Date: " + dateFormatter.format(sApi.getAppUser().getRegisteredDate()));
-            trainingsCountTv.setText("Total Trainings: " + sApi.getMyEndedTrainingsList().size());
+            trainingsCountTv.setText("Total Trainings: " + sApi.getMyEndedTrainingsViewList().size());
             totalDistanceTv.setText("Total Distance: " + BETrainingViewDetails.getDistanceSum(sApi.getMyEndedTrainingsViewList()));
             totalCaloriesTv.setText("Total Calories: " + BETrainingViewDetails.getCaloriesSum(sApi.getMyEndedTrainingsViewList()));
             maxSpeedTv.setText("Maximum speed: " + BETrainingViewDetails.getMaxSpeed(sApi.getMyEndedTrainingsViewList()));
@@ -127,8 +130,8 @@ public class TrainingProgressActivity extends BaseActivity implements View.OnCli
                 } else if (response.getActionType() == DALActionTypeEnum.getAllTrainingsViews && response.getEntityType() == BETypesEnum.TrainingViewDetails) {
 
                     //get all trainings data
-                    sApi.setMyEndedTrainingsViewList(sApi.filterMyEndedTrainings(sApi.getAppUser().getId(), response.getEntities()));
-                    trainingList = sApi.getMyEndedTrainingsList();
+                    sApi.setMyEndedTrainingsViewList(sApi.filterMyEndedTrainingsView(sApi.getAppUser().getId(), response.getEntities()));
+                    trainingList = sApi.filterMyEndedTrainings(sApi.getAppUser().getId());
 
                     if(trainingList.size() == 0){
                         Toast.makeText(_getAppContext(), "You have no Trainings yet, it is a good time to start!", Toast.LENGTH_LONG).show();

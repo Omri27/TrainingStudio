@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.icu.text.DecimalFormat;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -355,5 +356,9 @@ public class BaseActivity extends AppCompatActivity {
         serviceIntent.putExtra("UserID", user_id);
         CMNLogHelper.logError("STARTING SERVICE WITH ID", user_id);
         startService(serviceIntent);
+    }
+
+    public String floatToString(float num){
+        return String.format("%.2f", num);
     }
 }

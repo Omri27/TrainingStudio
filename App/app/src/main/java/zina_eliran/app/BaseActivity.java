@@ -349,6 +349,7 @@ public class BaseActivity extends AppCompatActivity {
         return false;
     }
 
+
     public void initAppService(){
         //Zina: Start service for the first time
         Intent serviceIntent = new Intent(getBaseContext(), DBMonitoringService.class);

@@ -68,8 +68,6 @@ public class TrainingViewActivity extends BaseActivity
 
     GoogleMapHandler gmh;
     MapFragment trainingMapFragment;
-    SensorManager sensorManager;
-    Sensor sensor;
 
     BETrainingViewModeEnum activityMode;
     List<Entry> chartData;
@@ -98,8 +96,6 @@ public class TrainingViewActivity extends BaseActivity
 
             intent = getIntent();
             chartData = new ArrayList<>();
-            sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-            sensor = sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE);
 
             onCreateUI();
         } catch (Exception e) {
@@ -109,8 +105,7 @@ public class TrainingViewActivity extends BaseActivity
 
     private void onCreateUI() {
         try {
-            if(!sApi.getAppUser().hasTrainingStatisticValues())
-            {
+            if (!sApi.getAppUser().hasTrainingStatisticValues()) {
                 Toast.makeText(this, "Please update your profile in order to get training calculation data well.", Toast.LENGTH_LONG).show();
             }
             initActivityElements();
@@ -232,29 +227,30 @@ public class TrainingViewActivity extends BaseActivity
     private void setChartData(List<BETrainingLocation> locations) {
         try {
 
-            //chartData = new ArrayList<>();
+            chartData = new ArrayList<>();
 
             //add those point to the data set
             for (int i = 0; i < locations.size() - 1; i++) {
-                measureCount++;
-                float distance = locations.get(i).getDistance(locations.get(i + 1));
-                float time = locations.get(i).getTimeMeasureDiff(locations.get(i + 1)).getTimeInMillis()/(float)3.6; //Hour
-                float speed = (float) (distance*1000 / (time + 0.0001));// km/h
-                totalSpeed += speed;
 
+                float distance = locations.get(i).getDistance(locations.get(i + 1));
+                float time = locations.get(i).getTimeMeasureDiff(locations.get(i + 1)).getTimeInMillis() / (float) 3.6; //Hour
+                float speed = (float) (distance * 1000 / (time + 0.0001));// km/h
+
+                totalSpeed += speed;
+                measureCount++;
                 if (maxSpeed < speed) {
                     maxSpeed = speed;
                 }
 
-                //chartData.add(new Entry(distance, time));
+                chartData.add(new Entry(distance, time));
             }
 
-           /* chartDataSet = new LineDataSet(chartData, "Time(m) | Route(M)"); // add entries to dataset
+            chartDataSet = new LineDataSet(chartData, "Time(m) | Route(M)"); // add entries to dataset
             chartDataSet.setColor(Color.argb(159, 255, 106, 0));
             chartDataSet.setValueTextColor(Color.WHITE);
             chartDataSet.setDrawValues(false);
             chart.notifyDataSetChanged(); // let the chart know it's data changed
-            chart.invalidate(); // refresh*/
+            chart.invalidate(); // refresh
 
         } catch (Exception e) {
             CMNLogHelper.logError("TrainingViewActivity", e.getMessage());
@@ -267,10 +263,10 @@ public class TrainingViewActivity extends BaseActivity
             chartData = new ArrayList<>();
 
             chartData.add(new Entry(0, 40f));
-            chartData.add(new Entry(0.50f, 50f));
-            chartData.add(new Entry(0.90f, 5f));
-            chartData.add(new Entry(1.10f, 5f));
-            chartData.add(new Entry(2.00f, 50f));
+            chartData.add(new Entry(0.50f, 40f));
+            chartData.add(new Entry(1.40f, 40f));
+            chartData.add(new Entry(1.90f, 40f));
+            chartData.add(new Entry(2.70f, 40f));
 
             chartDataSet = new LineDataSet(chartData, "Route(M) | Time(m)"); // add entries to dataset
             chartDataSet.setColor(Color.argb(159, 255, 106, 0));
@@ -291,6 +287,8 @@ public class TrainingViewActivity extends BaseActivity
 
             switch (view.getId()) {
                 case R.id.training_view_start_btn:
+                    //write the training id to Shared Preferences in order to disable the run button on lobby activity
+                    writeToSharedPreferences(_getString(R.string.training_view_last_active_training), training.getId());
                     startTrainingBtn.setEnabled(false);
                     trainingView.setTrainingStartDateTimeCalender(Calendar.getInstance());
                     trainingView.setStatus(BETrainingViewStatusEnum.started);
@@ -348,7 +346,7 @@ public class TrainingViewActivity extends BaseActivity
 
                     if (activityMode == BETrainingViewModeEnum.training_view_read_only_mode) {
                         //get training view data in case of read only mode
-                        sApi.getTrainingView(sApi.getNextTraining().getId(), sApi.getAppUser().getId(), this);
+                        sApi.getTrainingView(training.getId(), sApi.getAppUser().getId(), this);
                     }
                     //after we init the training objects - init the map & location service
                     initTrainingLocation();
@@ -356,14 +354,16 @@ public class TrainingViewActivity extends BaseActivity
                 } else if (response.getEntityType() == BETypesEnum.TrainingViewDetails && response.getActionType() == DALActionTypeEnum.getTrainingViewDetails) {
 
                     trainingView = ((BETrainingViewDetails) response.getEntities().get(0));
-                    //initChartData(trainingView.getTrainingLocationRoute());
+                    initChartData();
+                    setChartData(trainingView.getTrainingLocationRoute());
+                    initTrainingLocation();
+                    bindElements();
 
                 } else if (response.getEntityType() == BETypesEnum.TrainingViewDetails && response.getActionType() == DALActionTypeEnum.createTrainingViewDetails) {
                     endTrainingBtn.setEnabled(true);
                 } else if (response.getEntityType() == BETypesEnum.TrainingViewDetails && response.getActionType() == DALActionTypeEnum.updateTrainingViewDetails) {
                     if (((BETrainingViewDetails) response.getEntities().get(0)).getStatus() == BETrainingViewStatusEnum.ended) {
                         isAllowBackButton = true;
-                        sApi.setNextTraining(null);
                     }
                 } else {
                     CMNLogHelper.logError("TrainingViewActivity", "error in training view callbacks | err:" + response.getMessage());
@@ -420,24 +420,15 @@ public class TrainingViewActivity extends BaseActivity
                 lastChartLocationRoute.add(trainingLocation);
                 locationChangedCount++;
 
+                gmh.drawOnMap(BETrainingLocation.getLatLngList(trainingView.getTrainingLocationRoute()));
+
                 if (locationChangedCount == 10) {
+
                     initChartData();
                     setChartData(lastChartLocationRoute);
                     setTrainingStatistics();
+                    bindElements();
 
-                    //setMaxSpeed
-                    trainingMaxSpeedTv.setText("Max speed: \n" + floatToString(trainingView.getMaxSpeed()) + " Km/h");
-                    //set avgSpeed
-                    trainingAvgSpeedTv.setText("Avg speed: \n" + floatToString(trainingView.getAvgSpeed()) + " Km/h");
-                    //set calories
-                    trainingCaloriesTv.setText(floatToString(trainingView.getTotalCalories()) + " Cal");
-                    //set distance
-                    trainingDistanceTv.setText("Dist: \n" + floatToString(trainingView.getTotalDistance()) + " m");
-                    //set duration
-                    Calendar c = Calendar.getInstance();
-                    c.setTimeInMillis(trainingView.getActualDuration());
-                    trainingDurationTv.setText("Time: \n" + timeFormatter.format(c.getTime()) + " Min");
-                    gmh.drawOnMap(BETrainingLocation.getLatLngList(trainingView.getTrainingLocationRoute()));
                     locationChangedCount = 0;
                     lastChartLocationRoute = new ArrayList<>();
 
@@ -449,6 +440,26 @@ public class TrainingViewActivity extends BaseActivity
         } catch (Exception e) {
             CMNLogHelper.logError("TrainingViewActivity", e.getMessage());
         }
+    }
+
+    public void bindElements() {
+        try {
+            //setMaxSpeed
+            trainingMaxSpeedTv.setText("Max speed: \n" + floatToString(trainingView.getMaxSpeed()) + " Km/h");
+            //set avgSpeed
+            trainingAvgSpeedTv.setText("Avg speed: \n" + floatToString(trainingView.getAvgSpeed()) + " Km/h");
+            //set calories
+            trainingCaloriesTv.setText(floatToString(trainingView.getTotalCalories()) + " Cal");
+            //set distance
+            trainingDistanceTv.setText("Dist: \n" + floatToString(trainingView.getTotalDistance() / 1000) + " Km");
+            //set duration
+            Calendar c = Calendar.getInstance();
+            c.setTimeInMillis(trainingView.getActualDuration());
+            trainingDurationTv.setText("Time: \n" + timeFormatter.format(c.getTime()) + " Min");
+        } catch (Exception e) {
+            CMNLogHelper.logError("TrainingViewActivity", e.getMessage());
+        }
+
     }
 
     @Override

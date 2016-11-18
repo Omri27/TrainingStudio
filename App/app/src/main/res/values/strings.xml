@@ -56,6 +56,8 @@
     <string name="training_view_run_mode">training_view_run_mode</string>
     <string name="training_view_read_only_mode">training_view_read_only_mode</string>
     <string name="training_id_view_mode">training_id_view_mode</string>
+    <string name="training_view_last_active_training">training_view_last_active_training</string>
+
 
 
 </resources>

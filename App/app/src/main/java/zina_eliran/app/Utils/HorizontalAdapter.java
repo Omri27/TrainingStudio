@@ -75,19 +75,20 @@ public class HorizontalAdapter extends RecyclerView.Adapter<HorizontalAdapter.My
         try {
             BETraining currTraining = trainingList.get(position);
 
-            if(position > 0){
+            if (position > 0) {
                 holder.firstView.setVisibility(View.GONE);
             }
 
             if (position == trainingList.size() - 1) {
-                if(trainingList.size() != 1){
+                if (trainingList.size() != 1) {
                     holder.rightLl.setVisibility(View.GONE);
                 }
                 holder.connectorLl.setVisibility(View.GONE);
             }
 
             holder.cityTv.setText("City: " + currTraining.getLocation().getAddressPart(activity, BEAddressPartsEnum.city));
-            //holder.dateHourTv.setText(dateFormatter.format(currTraining.getTrainingDateTimeCalender()) + " | " + timeFormatter.format(currTraining.getTrainingDateTimeCalender()));
+            holder.dateHourTv.setText("Date: " + dateFormatter.format(currTraining.getTrainingDateTimeCalender().getTime()) +
+                    " | " + timeFormatter.format(currTraining.getTrainingDateTimeCalender().getTime()));
             holder.levelTv.setText("Level: " + currTraining.getLevel());
 
             holder.centerLl.setOnClickListener(new View.OnClickListener() {

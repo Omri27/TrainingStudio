@@ -36,10 +36,12 @@ public class LobbyActivity extends BaseActivity implements View.OnClickListener,
     RelativeLayout pBarRl;
     LinearLayout mainLayout;
     Animation myAnim;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         try {
             super.onCreate(savedInstanceState);
+            overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
             setContentView(R.layout.activity_lobby);
             pBar = (ProgressBar) findViewById(R.id.lobby_pbar);
             pBar.setVisibility(View.VISIBLE);
@@ -81,8 +83,8 @@ public class LobbyActivity extends BaseActivity implements View.OnClickListener,
         }
     }
 
-    public void initAnimation(){
-        try{
+    public void initAnimation() {
+        try {
             myAnim = AnimationUtils.loadAnimation(this, R.anim.milkshake);
 
             createTrainingBtn.setAnimation(myAnim);
@@ -175,7 +177,9 @@ public class LobbyActivity extends BaseActivity implements View.OnClickListener,
 
                     BETraining nextTraining = sApi.getNextTraining();
                     if (nextTraining != null) {
-                        if (isNextXMinSelectedDate(nextTraining.getTrainingDateTimeCalender(), 15)) {
+                        //display un activated trainings
+                        if (isNextXMinSelectedDate(nextTraining.getTrainingDateTimeCalender(), 15) &&
+                                !nextTraining.getId().equals(readFromSharedPreferences(_getString(R.string.training_view_last_active_training)))) {
                             startTrainingBtn.setEnabled(true);
                         }
                     }
@@ -234,7 +238,10 @@ public class LobbyActivity extends BaseActivity implements View.OnClickListener,
             pBar.setVisibility(View.VISIBLE);
             pBarRl.setVisibility(View.VISIBLE);
             mainLayout.setVisibility(View.INVISIBLE);
-            sApi.getAllTrainings(this);
+            if (sApi.getAppUser().getId() != null) {
+                sApi.getAllTrainings(this);
+            }
+
         } catch (Exception e) {
             CMNLogHelper.logError("LobbyActivity", e.getMessage());
         }

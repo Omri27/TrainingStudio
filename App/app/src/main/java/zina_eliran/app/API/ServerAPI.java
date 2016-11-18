@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Random;
 
 import zina_eliran.app.BusinessEntities.BEBaseEntity;
@@ -15,6 +16,7 @@ import zina_eliran.app.BusinessEntities.BETrainingViewStatusEnum;
 import zina_eliran.app.BusinessEntities.BEUser;
 import zina_eliran.app.BusinessEntities.CMNLogHelper;
 import zina_eliran.app.Utils.FireBaseHandler;
+import zina_eliran.app.Utils.TrainingComparator;
 
 //singleton class
 public class ServerAPI {
@@ -204,7 +206,7 @@ public class ServerAPI {
         if (!trainings.isEmpty()) {
             Calendar c = Calendar.getInstance();
             //30 minutes before
-            c.setTimeInMillis(c.getTimeInMillis() - 1000*60*30);
+            c.setTimeInMillis(c.getTimeInMillis() - 1000 * 60 * 30);
 
             for (int i = 0; i < trainings.size(); i++) {
                 BETraining training = (BETraining) trainings.get(i);
@@ -217,6 +219,7 @@ public class ServerAPI {
             }
         }
 
+        Collections.sort(publicTrainings, new TrainingComparator());
         return publicTrainings;
 
     }
@@ -228,7 +231,7 @@ public class ServerAPI {
         Calendar cal = Calendar.getInstance();
 
         //30 minutes before
-        cal.setTimeInMillis(cal.getTimeInMillis() - 1000*60*30);
+        cal.setTimeInMillis(cal.getTimeInMillis() - 1000 * 60 * 30);
         if (trainings != null && !trainings.isEmpty()) {
             for (int i = 0; i < trainings.size(); i++) {
                 BETraining currentTraining = ((BETraining) trainings.get(i));
@@ -236,12 +239,13 @@ public class ServerAPI {
                         currentTraining.getStatus() != BETrainingStatusEnum.cancelled) ||
                         (currentTraining.getCreatorId().equals(userId) && isCreatedByMe &&
                                 currentTraining.getStatus() != BETrainingStatusEnum.cancelled))) {
-                    if(currentTraining.getTrainingDateTimeCalender().getTimeInMillis() >= cal.getTimeInMillis()){
+                    if (currentTraining.getTrainingDateTimeCalender().getTimeInMillis() >= cal.getTimeInMillis()) {
                         myTrainings.add(currentTraining);
-                    }
-                    else {
+                    } else {
                         //add to my ended training list
-                        myEndedTrainings.add(currentTraining);
+                        if(!isCreatedByMe){
+                            myEndedTrainings.add(currentTraining);
+                        }
                     }
                 }
             }
@@ -249,7 +253,13 @@ public class ServerAPI {
             CMNLogHelper.logError("myTrainingsFilter", "No training found");
         }
 
-        setMyEndedTrainingsList(myEndedTrainings);
+
+        if(!isCreatedByMe){
+            Collections.sort(myEndedTrainings, new TrainingComparator());
+            setMyEndedTrainingsList(myEndedTrainings);
+        }
+
+        Collections.sort(myTrainings, new TrainingComparator());
         return myTrainings;
 
     }
@@ -258,16 +268,17 @@ public class ServerAPI {
 
         //extract all actually ended trainings
         ArrayList<BETrainingViewDetails> myEndedTrainingsViews = getMyEndedTrainingsViewList();
-        ArrayList<BETraining> myResultEndedTrainingsList = getMyEndedTrainingsList();
+        ArrayList<BETraining> myResultEndedTrainingsList = new ArrayList<>();
 
         for (int i = 0; i < myEndedTrainingsViews.size(); i++) {
-            for(int j=0; j< myEndedTrainingsList.size(); j++){
-                if(myEndedTrainingsList.get(j).getId().equals(myEndedTrainingsViews.get(i).getTrainingId())){
+            for (int j = 0; j < myEndedTrainingsList.size(); j++) {
+                if (myEndedTrainingsList.get(j).getId().equals(myEndedTrainingsViews.get(i).getTrainingId())) {
                     myResultEndedTrainingsList.add(myEndedTrainingsList.get(j));
                 }
             }
         }
 
+        Collections.sort(myResultEndedTrainingsList, new TrainingComparator());
         return myResultEndedTrainingsList;
 
     }
@@ -278,36 +289,50 @@ public class ServerAPI {
 
         //extract all *my* ended trainings view
         for (int i = 0; i < trainingViews.size(); i++) {
-            BETrainingViewDetails currentTrainingView = (BETrainingViewDetails)trainingViews.get(i);
+            BETrainingViewDetails currentTrainingView = (BETrainingViewDetails) trainingViews.get(i);
             if (currentTrainingView.getStatus() == BETrainingViewStatusEnum.ended &&
                     currentTrainingView.getUserId().equals(userId)) {
                 myResultTrainingsViews.add(currentTrainingView);
             }
         }
 
-       return myResultTrainingsViews;
+        return myResultTrainingsViews;
 
     }
 
     public BETraining getMyNextTraining(ArrayList<BETraining> trainings) {
-
-        Comparator<BETraining> comparator = new Comparator<BETraining>() {
-            @Override
-            public int compare(BETraining t1, BETraining t2) {
-                return t1.getTrainingDateTimeCalender().before(t2.getCreationDateTimeCalender()) ? 1 : -1;
-            }
-        };
-
-        Collections.sort(trainings, comparator);
-        return trainings.size() > 0 ? trainings.get(0) : null;
+        BETraining nextTraining = null;
+        if (trainings.size() > 0) {
+            Collections.sort(trainings, new TrainingComparator());
+            nextTraining = trainings.get(0);
+        }
+        return nextTraining;
 
     }
 
     public void updateAppTrainingsData(ArrayList<BEBaseEntity> entities) {
         //update server api
+
         setMyJoinedTrainingsList(filterMyTrainings(getAppUser().getId(), entities, false));
         setMyCreatedTrainingsList(filterMyTrainings(getAppUser().getId(), entities, true));
         setPublicTrainingsList(filterPublicTrainings(getAppUser().getId(), entities));
         setNextTraining(getMyNextTraining(getMyJoinedTrainingsList()));
+    }
+
+    public boolean isMyTrainingExist(BETraining training, boolean isCreatedByMe) {
+
+        List<BETraining> trainingList = myJoinedTrainingsList;
+
+        if (isCreatedByMe) {
+            trainingList = myCreatedTrainingsList;
+        }
+
+        for (int i = 0; i < trainingList.size(); i++) {
+            if (trainingList.get(i).isTrainingDatesOverlap(training)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

@@ -85,6 +85,7 @@ public class ProfileSettingsActivity extends BaseActivity implements View.OnClic
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
         try {
             setContentView(R.layout.activity_profile_settings);
 
@@ -129,9 +130,9 @@ public class ProfileSettingsActivity extends BaseActivity implements View.OnClic
                 thursdayCbox.setChecked(user.getMyPreferredDays().contains(5));
                 fridayCbox.setChecked(user.getMyPreferredDays().contains(6));
 
-                firstCycleHoursCbox.setChecked(user.getMyPreferredDays().contains(1));
-                secondCycleHoursCbox.setChecked(user.getMyPreferredDays().contains(2));
-                thirdCycleHoursCbox.setChecked(user.getMyPreferredDays().contains(3));
+                firstCycleHoursCbox.setChecked(user.getMyPreferredHours().contains(1));
+                secondCycleHoursCbox.setChecked(user.getMyPreferredHours().contains(2));
+                thirdCycleHoursCbox.setChecked(user.getMyPreferredHours().contains(3));
 
                 trainingCanceledNotificationSwitch.setChecked(user.isTrainingCancelledNotification());
                 trainingFullNotificationSwitch.setChecked(user.isTrainingFullNotification());

@@ -342,6 +342,11 @@ public class TrainingDetailsActivity extends BaseFragmentActivity
                             if (!validateBeforeSave()) {
                                 return;
                             }
+
+                            if (sApi.isMyTrainingExist(training, true)) {
+                                Toast.makeText(this, "You already have been created a training which overlap this training date and time.", Toast.LENGTH_LONG).show();
+                            }
+
                             training.setDescription(descriptionEt.getText().toString());
                             training.setLevel(BETrainingLevelEnum.valueOf(levelSpinner.getSelectedItem().toString().replace("Level:", "").trim()));
                             training.setDuration(Integer.parseInt(durationSpinner.getSelectedItem().toString().replace("Min", "").trim()));
@@ -365,6 +370,10 @@ public class TrainingDetailsActivity extends BaseFragmentActivity
 
                             break;
                         case training_details_join_mode:
+                            if (sApi.isMyTrainingExist(training, false)) {
+                                Toast.makeText(this, "You already have been joined to a training which overlap this training date and time.", Toast.LENGTH_LONG).show();
+                                return;
+                            }
                             sApi.joinTraining(training.getId(), sApi.getAppUser().getId(), this);
                             break;
                         case training_details_leave_mode:

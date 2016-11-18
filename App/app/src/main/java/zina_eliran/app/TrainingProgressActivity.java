@@ -94,10 +94,10 @@ public class TrainingProgressActivity extends BaseActivity implements View.OnCli
             activityTitle.setText(sApi.getAppUser().getName() + " | Personal records: ");
             joinedDateTv.setText("Joining Date: " + dateFormatter.format(sApi.getAppUser().getRegisteredDate()));
             trainingsCountTv.setText("Total Trainings: " + sApi.getMyEndedTrainingsViewList().size());
-            totalDistanceTv.setText("Total Distance: " + BETrainingViewDetails.getDistanceSum(sApi.getMyEndedTrainingsViewList()));
+            totalDistanceTv.setText("Total Distance: " + floatToString(BETrainingViewDetails.getDistanceSum(sApi.getMyEndedTrainingsViewList())/1000) + " Km");
             totalCaloriesTv.setText("Total Calories: " + BETrainingViewDetails.getCaloriesSum(sApi.getMyEndedTrainingsViewList()));
-            maxSpeedTv.setText("Maximum speed: " + BETrainingViewDetails.getMaxSpeed(sApi.getMyEndedTrainingsViewList()));
-            avgSpeedTv.setText("Average Speed: " + BETrainingViewDetails.getAvgSpeed(sApi.getMyEndedTrainingsViewList()));
+            maxSpeedTv.setText("Maximum speed: " + floatToString(BETrainingViewDetails.getMaxSpeed(sApi.getMyEndedTrainingsViewList())) + " Km/h");
+            avgSpeedTv.setText("Average Speed: " + floatToString(BETrainingViewDetails.getAvgSpeed(sApi.getMyEndedTrainingsViewList())) + " Km/h");
 
             initTrainingHorizontalRv();
 

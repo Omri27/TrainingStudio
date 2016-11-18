@@ -177,4 +177,34 @@ public class BETraining extends BEBaseEntity {
         return getPatricipatedUserIds().contains(userId);
     }
 
+
+    public boolean isTrainingDatesOverlap(BETraining other) {
+        try {
+
+            Calendar c1 = getTrainingDateTimeCalender();
+            Calendar c2 = other.getTrainingDateTimeCalender();
+            if (c1.get(Calendar.YEAR) == c2.get(Calendar.YEAR) &&
+                    c1.get(Calendar.MONTH) == c2.get(Calendar.YEAR) &&
+                    c1.get(Calendar.DAY_OF_MONTH) == c2.get(Calendar.DAY_OF_MONTH)) {
+
+                long t1 = c1.getTimeInMillis();
+                long t2 = c2.getTimeInMillis();
+
+                if(t2 <= t1){
+                    return (t2 + other.getDuration()) > t1;
+                }
+
+                if(t2 > t1){
+                    return (t1 + getDuration()) > t2;
+                }
+
+            }
+
+
+        } catch (Exception e) {
+            CMNLogHelper.logError("BETraining", e.getMessage());
+        }
+        return false;
+    }
+
 }

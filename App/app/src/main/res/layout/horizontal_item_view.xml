@@ -1,14 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="290dp"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:paddingTop="15dp">
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp">
+
 
     <View
         android:id="@+id/horizontal_item_first_view"
         android:layout_width="20dp"
         android:layout_height="100dp"></View>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/app_rect_horizontal_scroller_buttons_shape">
 
     <LinearLayout
         android:id="@+id/horizontal_item_left_ll"
@@ -28,12 +35,12 @@
         android:id="@+id/horizontal_item_center_ll"
         android:layout_width="170dp"
         android:layout_height="100dp"
-        android:background="#22ffffff"
         android:orientation="vertical"
         android:paddingBottom="10dp"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
-        android:paddingTop="10dp">
+        android:paddingTop="10dp"
+        android:background="#22ffffff">
 
         <TextView
             android:id="@+id/horizontal_item_city_tv"
@@ -68,8 +75,7 @@
     <LinearLayout
         android:id="@+id/horizontal_item_right_ll"
         android:layout_width="20dp"
-        android:layout_height="100dp"
-        android:background="#22ffffff">
+        android:layout_height="100dp" android:background="#22ffffff">
 
         <View
             android:layout_width="20dp"
@@ -77,6 +83,8 @@
             android:layout_gravity="bottom"
             android:layout_marginBottom="15dp"
             android:background="#ddFFA330"></View>
+    </LinearLayout>
+
     </LinearLayout>
 
     <LinearLayout

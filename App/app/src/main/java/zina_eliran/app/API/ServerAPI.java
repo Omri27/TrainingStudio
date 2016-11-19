@@ -21,6 +21,8 @@ import zina_eliran.app.Utils.TrainingComparator;
 //singleton class
 public class ServerAPI {
 
+    final int xMinutesefore = 15;
+
     private static ServerAPI instance = null;
 
     private BEResponse actionResponse;
@@ -56,6 +58,10 @@ public class ServerAPI {
             instance = new ServerAPI();
         }
         return instance;
+    }
+
+    public int getxMinutesefore() {
+        return xMinutesefore;
     }
 
     public BEUser getAppUser() {
@@ -205,8 +211,8 @@ public class ServerAPI {
         //Filter trainings to exclude current user, cancelled trainings, and past trainings
         if (!trainings.isEmpty()) {
             Calendar c = Calendar.getInstance();
-            //30 minutes before
-            c.setTimeInMillis(c.getTimeInMillis() - 1000 * 60 * 30);
+            //15 minutes before
+            c.setTimeInMillis(c.getTimeInMillis() - 1000 * 60 * xMinutesefore);
 
             for (int i = 0; i < trainings.size(); i++) {
                 BETraining training = (BETraining) trainings.get(i);
@@ -230,15 +236,16 @@ public class ServerAPI {
         //Filter all trainings that user participated in or creator
         Calendar cal = Calendar.getInstance();
 
-        //30 minutes before
-        cal.setTimeInMillis(cal.getTimeInMillis() - 1000 * 60 * 30);
+
         if (trainings != null && !trainings.isEmpty()) {
             for (int i = 0; i < trainings.size(); i++) {
                 BETraining currentTraining = ((BETraining) trainings.get(i));
                 if (((currentTraining.getPatricipatedUserIds().contains(userId) && !isCreatedByMe &&
                         currentTraining.getStatus() != BETrainingStatusEnum.cancelled) ||
+
                         (currentTraining.getCreatorId().equals(userId) && isCreatedByMe &&
                                 currentTraining.getStatus() != BETrainingStatusEnum.cancelled))) {
+
                     if (currentTraining.getTrainingDateTimeCalender().getTimeInMillis() >= cal.getTimeInMillis()) {
                         myTrainings.add(currentTraining);
                     } else {

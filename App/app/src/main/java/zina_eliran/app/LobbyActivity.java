@@ -178,9 +178,13 @@ public class LobbyActivity extends BaseActivity implements View.OnClickListener,
                     BETraining nextTraining = sApi.getNextTraining();
                     if (nextTraining != null) {
                         //display un activated trainings
-                        if (isNextXMinSelectedDate(nextTraining.getTrainingDateTimeCalender(), 15) &&
+                        if (isNextXMinSelectedDate(nextTraining.getTrainingDateTimeCalender()) &&
                                 !nextTraining.getId().equals(readFromSharedPreferences(_getString(R.string.training_view_last_active_training)))) {
                             startTrainingBtn.setEnabled(true);
+                        }
+                        else {
+                            sApi.setNextTraining(null);
+                            startTrainingBtn.setEnabled(false);
                         }
                     }
 

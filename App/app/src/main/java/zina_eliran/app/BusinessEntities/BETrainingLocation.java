@@ -124,7 +124,7 @@ public class BETrainingLocation extends BEBaseEntity {
     public static float getLocationRouteDuration(List<BETrainingLocation> locationsList) {
         long time = 0;
         if (locationsList.size() >= 2) {
-            time = locationsList.get(locationsList.size() - 1).getTimeMeasureDiff(locationsList.get(0)).getTimeInMillis();
+            time = locationsList.get(0).getTimeMeasureDiff(locationsList.get(locationsList.size() - 1)).getTimeInMillis();
         }
         return time;
     }

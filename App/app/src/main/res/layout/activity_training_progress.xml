@@ -149,7 +149,6 @@
     </LinearLayout>
 
 
-
     <View
         android:id="@+id/view"
         android:layout_width="match_parent"
@@ -171,12 +170,19 @@
         android:textStyle="bold" />
 
 
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/training_progress_horizontal_rv"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="125dp"
-        android:layout_alignParentBottom="true" />
+        android:paddingLeft="15dp"
+        android:layout_alignParentBottom="true">
+
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/training_progress_horizontal_rv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </LinearLayout>
 
 
 </RelativeLayout>

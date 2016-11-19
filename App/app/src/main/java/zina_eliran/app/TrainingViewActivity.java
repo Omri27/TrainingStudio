@@ -2,8 +2,6 @@ package zina_eliran.app;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.hardware.Sensor;
-import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.PowerManager;
@@ -23,9 +21,8 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.google.android.gms.location.LocationRequest;
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -79,6 +76,7 @@ public class TrainingViewActivity extends BaseActivity
     int locationChangedCount = 0;
     PowerManager.WakeLock wl;
 
+    float avgSpeed = 0;
     float totalSpeed = 0;
     long measureCount = 0;
     float maxSpeed = 0;
@@ -105,13 +103,10 @@ public class TrainingViewActivity extends BaseActivity
 
     private void onCreateUI() {
         try {
-            if (!sApi.getAppUser().hasTrainingStatisticValues()) {
-                Toast.makeText(this, "Please update your profile in order to get training calculation data well.", Toast.LENGTH_LONG).show();
-            }
+
             initActivityElements();
             initActivityMode();
             initChartData();
-            setChartDataTest();
         } catch (Exception e) {
             CMNLogHelper.logError("TrainingViewActivity", e.getMessage());
         }
@@ -125,6 +120,9 @@ public class TrainingViewActivity extends BaseActivity
             activityMode = BETrainingViewModeEnum.valueOf(_activityMode);
 
             if (activityMode == BETrainingViewModeEnum.training_view_run_mode) {
+                if (!sApi.getAppUser().hasTrainingStatisticValues()) {
+                    Toast.makeText(this, "Please update your profile in order to get training calculation data well.", Toast.LENGTH_LONG).show();
+                }
                 sApi.getTraining(sApi.getNextTraining().getId(), this);
             } else if (activityMode == BETrainingViewModeEnum.training_view_read_only_mode) {
                 sApi.getTraining(getIntentParam(intent, _getString(R.string.training_id_view_mode)), this);
@@ -168,7 +166,7 @@ public class TrainingViewActivity extends BaseActivity
     private void initTrainingLocation() {
         try {
             if (activityMode == BETrainingViewModeEnum.training_view_run_mode) {
-                gmh = new GoogleMapHandler(this, this, trainingMapFragment, training.getLocation(), 500, 100);
+                gmh = new GoogleMapHandler(this, this, trainingMapFragment, training.getLocation(), 1000, 500);
             } else {
                 //in case of view only
                 gmh = new GoogleMapHandler(this, trainingMapFragment, trainingView.getTrainingLocationRoute());
@@ -177,6 +175,20 @@ public class TrainingViewActivity extends BaseActivity
             CMNLogHelper.logError("TrainingDetailsActivity", e.getMessage());
         }
 
+    }
+
+    private void setTrainingStatistics() {
+        try {
+            //set data into training view object
+            List<BETrainingLocation> route = trainingView.getTrainingLocationRoute();
+            trainingView.setActualDuration(route.get(0).getTimeMeasureDiff(route.get(route.size() - 1)).getTimeInMillis());
+            trainingView.setTotalDistance(BETrainingLocation.getLocationRouteDistance(route));
+            trainingView.setAvgSpeed(avgSpeed);
+            trainingView.setMaxSpeed(maxSpeed);
+            trainingView.setTrainingCaloriesBurn(sApi.getAppUser());
+        } catch (Exception e) {
+            CMNLogHelper.logError("TrainingViewActivity", e.getMessage());
+        }
     }
 
     private void initChartData() {
@@ -194,8 +206,8 @@ public class TrainingViewActivity extends BaseActivity
             YAxis leftYAxis = chart.getAxisLeft();
             YAxis rightYAxis = chart.getAxisRight();
             Legend legend = chart.getLegend();
-            chart.disableScroll();
-            chart.setTouchEnabled(false);
+            //chart.disableScroll();
+            //chart.setTouchEnabled(false);
 
             xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
             xAxis.setTextColor(Color.WHITE);
@@ -210,45 +222,44 @@ public class TrainingViewActivity extends BaseActivity
         }
     }
 
-    private void setTrainingStatistics() {
+    private void setChartData() {
         try {
-            //set data into training view object
-            List<BETrainingLocation> route = trainingView.getTrainingLocationRoute();
-            trainingView.setActualDuration(route.get(0).getTimeMeasureDiff(route.get(route.size() - 1)).getTimeInMillis());
-            trainingView.setTotalDistance(BETrainingLocation.getLocationRouteDistance(route));
-            trainingView.setAvgSpeed(totalSpeed / measureCount);
-            trainingView.setMaxSpeed(maxSpeed);
-            trainingView.setTrainingCaloriesBurn(sApi.getAppUser());
+
+            List<BETrainingLocation> locations = trainingView.getTrainingLocationRoute();
+
+            for (int i = 1; i < locations.size(); i++) {
+                addChartEntryData(locations.subList(0,i));
+            }
+
         } catch (Exception e) {
             CMNLogHelper.logError("TrainingViewActivity", e.getMessage());
         }
     }
 
-    private void setChartData(List<BETrainingLocation> locations) {
+    private void addChartEntryData(List<BETrainingLocation> locations) {
         try {
 
-            chartData = new ArrayList<>();
+            float distance = BETrainingLocation.getLocationRouteDistance(locations);
+            float time = BETrainingLocation.getLocationRouteDuration(locations);
+            float speed = (float) (distance * 1000 / (time + 0.00001));// km/h
 
-            //add those point to the data set
-            for (int i = 0; i < locations.size() - 1; i++) {
+            avgSpeed = speed;
 
-                float distance = locations.get(i).getDistance(locations.get(i + 1));
-                float time = locations.get(i).getTimeMeasureDiff(locations.get(i + 1)).getTimeInMillis() / (float) 3.6; //Hour
-                float speed = (float) (distance * 1000 / (time + 0.0001));// km/h
-
-                totalSpeed += speed;
-                measureCount++;
-                if (maxSpeed < speed) {
-                    maxSpeed = speed;
-                }
-
-                chartData.add(new Entry(distance, time));
+            if (maxSpeed < speed) {
+                maxSpeed = speed;
             }
 
-            chartDataSet = new LineDataSet(chartData, "Time(m) | Route(M)"); // add entries to dataset
+            chartData.add(new Entry(speed, distance/(float)1000));
+
+            chartDataSet = new LineDataSet(chartData, "Speed(Km/h) | Distance(Km)"); // add entries to dataset
             chartDataSet.setColor(Color.argb(159, 255, 106, 0));
             chartDataSet.setValueTextColor(Color.WHITE);
             chartDataSet.setDrawValues(false);
+            chartDataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
+
+            chartLineData = new LineData(chartDataSet);
+
+            chart.setData(chartLineData);
             chart.notifyDataSetChanged(); // let the chart know it's data changed
             chart.invalidate(); // refresh
 
@@ -257,27 +268,30 @@ public class TrainingViewActivity extends BaseActivity
         }
     }
 
-    private void setChartDataTest() {
+
+    public void bindElements() {
         try {
+            //setMaxSpeed
+            trainingMaxSpeedTv.setText("Max speed: \n" + floatToString(trainingView.getMaxSpeed()) + " Km/h");
+            //set avgSpeed
+            trainingAvgSpeedTv.setText("Avg speed: \n" + floatToString(trainingView.getAvgSpeed()) + " Km/h");
+            //set calories
+            trainingCaloriesTv.setText(floatToString(trainingView.getTotalCalories()) + " Cal");
+            //set distance
+            trainingDistanceTv.setText("Dist: \n" + floatToString(trainingView.getTotalDistance() / 1000) + " Km");
 
-            chartData = new ArrayList<>();
+            //set duration text
+            long millis = trainingView.getActualDuration();
+            long second = (millis / 1000) % 60;
+            long minute = (millis / (1000 * 60)) % 60;
+            long hour = (millis / (1000 * 60 * 60)) % 24;
 
-            chartData.add(new Entry(0, 40f));
-            chartData.add(new Entry(0.50f, 40f));
-            chartData.add(new Entry(1.40f, 40f));
-            chartData.add(new Entry(1.90f, 40f));
-            chartData.add(new Entry(2.70f, 40f));
-
-            chartDataSet = new LineDataSet(chartData, "Route(M) | Time(m)"); // add entries to dataset
-            chartDataSet.setColor(Color.argb(159, 255, 106, 0));
-            chartDataSet.setValueTextColor(Color.WHITE);
-            chartLineData = new LineData(chartDataSet);
-            chart.setData(chartLineData);
-            chart.invalidate(); // refresh the chart
-
+            String time = String.format("%02d:%02d:%02d", hour, minute, second);
+            trainingDurationTv.setText("Time: \n" + time + " Min");
         } catch (Exception e) {
             CMNLogHelper.logError("TrainingViewActivity", e.getMessage());
         }
+
     }
 
     @Override
@@ -303,6 +317,7 @@ public class TrainingViewActivity extends BaseActivity
                     isTrainingEnded = true;
                     endTrainingBtn.setEnabled(false);
                     trainingView.setTrainingEndDateTimeCalender(Calendar.getInstance());
+                    setTrainingStatistics();
                     gmh.drawOnMap(BETrainingLocation.getLatLngList(trainingView.getTrainingLocationRoute()));
                     gmh.stopListener();
                     trainingView.setStatus(BETrainingViewStatusEnum.ended);
@@ -354,8 +369,7 @@ public class TrainingViewActivity extends BaseActivity
                 } else if (response.getEntityType() == BETypesEnum.TrainingViewDetails && response.getActionType() == DALActionTypeEnum.getTrainingViewDetails) {
 
                     trainingView = ((BETrainingViewDetails) response.getEntities().get(0));
-                    initChartData();
-                    setChartData(trainingView.getTrainingLocationRoute());
+                    setChartData();
                     initTrainingLocation();
                     bindElements();
 
@@ -383,8 +397,8 @@ public class TrainingViewActivity extends BaseActivity
             } else {
                 if (isTrainingEnded) {
                     Toast.makeText(this, "Yes!!! Great training, Well Done " + sApi.getAppUser().getName() + "!", Toast.LENGTH_LONG).show();
-                    gmh.stopListener();
                 }
+                gmh.stopListener();
                 super.onBackPressed(); // Process Back key default behavior.
             }
         } catch (Exception e) {
@@ -410,30 +424,26 @@ public class TrainingViewActivity extends BaseActivity
         try {
             if (location != null && trainingView.getStatus() == BETrainingViewStatusEnum.started) {
                 BETrainingLocation trainingLocation = new BETrainingLocation();
-                trainingLocation = new BETrainingLocation();
                 trainingLocation.setLatitude(location.getLatitude());
                 trainingLocation.setLongitude(location.getLongitude());
                 trainingLocation.setAltitude(location.getAltitude());
                 trainingLocation.setLocationMeasureTime(Calendar.getInstance());
 
-                trainingView.addTrainingLocationRoute(trainingLocation);
-                lastChartLocationRoute.add(trainingLocation);
-                locationChangedCount++;
 
-                gmh.drawOnMap(BETrainingLocation.getLatLngList(trainingView.getTrainingLocationRoute()));
+                if (trainingView.getTrainingLocationRoute().size() > 1) {
+                    addChartEntryData(trainingView.getTrainingLocationRoute());
+                    setTrainingStatistics();
+                    gmh.drawOnMap(BETrainingLocation.getLatLngList(trainingView.getTrainingLocationRoute()));
+                    bindElements();
+                }
+
+                trainingView.addTrainingLocationRoute(trainingLocation);
 
                 if (locationChangedCount == 10) {
-
-                    initChartData();
-                    setChartData(lastChartLocationRoute);
-                    setTrainingStatistics();
-                    bindElements();
-
-                    locationChangedCount = 0;
-                    lastChartLocationRoute = new ArrayList<>();
-
                     sApi.updateTrainingView(trainingView, this);
+                    locationChangedCount = 0;
                 }
+                locationChangedCount++;
 
             }
 
@@ -442,30 +452,11 @@ public class TrainingViewActivity extends BaseActivity
         }
     }
 
-    public void bindElements() {
-        try {
-            //setMaxSpeed
-            trainingMaxSpeedTv.setText("Max speed: \n" + floatToString(trainingView.getMaxSpeed()) + " Km/h");
-            //set avgSpeed
-            trainingAvgSpeedTv.setText("Avg speed: \n" + floatToString(trainingView.getAvgSpeed()) + " Km/h");
-            //set calories
-            trainingCaloriesTv.setText(floatToString(trainingView.getTotalCalories()) + " Cal");
-            //set distance
-            trainingDistanceTv.setText("Dist: \n" + floatToString(trainingView.getTotalDistance() / 1000) + " Km");
-            //set duration
-            Calendar c = Calendar.getInstance();
-            c.setTimeInMillis(trainingView.getActualDuration());
-            trainingDurationTv.setText("Time: \n" + timeFormatter.format(c.getTime()) + " Min");
-        } catch (Exception e) {
-            CMNLogHelper.logError("TrainingViewActivity", e.getMessage());
-        }
-
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
         try {
+            gmh.stopListener();
             wl.release();
         } catch (Exception e) {
             CMNLogHelper.logError("TrainingViewActivity", e.getMessage());

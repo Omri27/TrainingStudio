@@ -334,14 +334,13 @@ public class BaseActivity extends AppCompatActivity {
     }
 
 
-    public boolean isNextXMinSelectedDate(Calendar cal, int minutesBefore) {
+    public boolean isNextXMinSelectedDate(Calendar cal) {
         try {
             Calendar now = Calendar.getInstance();
-            long minute10 = 1000 * 60 * minutesBefore;
+            long xMinute = 1000 * 60 * sApi.getxMinutesefore();
 
             return (isTodaySelectedDate(now) &&
-                    cal.getTimeInMillis() >= now.getTimeInMillis() &&
-                    cal.getTimeInMillis() <= (now.getTimeInMillis() - minute10));
+                    cal.getTimeInMillis() <= (now.getTimeInMillis() + xMinute));
 
         } catch (Exception e) {
             CMNLogHelper.logError("BaseActivity", e.getMessage());

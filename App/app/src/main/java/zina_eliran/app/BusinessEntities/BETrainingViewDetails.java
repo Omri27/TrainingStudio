@@ -17,7 +17,7 @@ public class BETrainingViewDetails extends BEBaseEntity {
     private float avgSpeed;
     private float maxSpeed;
     private float totalDistance;
-    private int totalCalories;
+    private float totalCalories;
     private long actualDuration;
 
 
@@ -100,11 +100,11 @@ public class BETrainingViewDetails extends BEBaseEntity {
         this.totalDistance = totalDistance;
     }
 
-    public int getTotalCalories() {
+    public float getTotalCalories() {
         return totalCalories;
     }
 
-    public void setTotalCalories(int totalCalories) {
+    public void setTotalCalories(float totalCalories) {
         this.totalCalories = totalCalories;
     }
 
@@ -133,12 +133,12 @@ public class BETrainingViewDetails extends BEBaseEntity {
     }
 
     public void setTrainingCaloriesBurn(BEUser user) {
-        float poundFactor = (float)(22 / 10);
-        float distanceFactor = (float)(10 / 16) * (float)this.totalDistance;
-        float speedFactor = (float)(10 / 8) * (float)this.avgSpeed;
-        float calManFactor = (float)(63 / 100);
-        float calWomanFactor = (float)(57 / 100);
-        setTotalCalories((int) (user.getWeigth() * poundFactor * (user.isMale() ? calManFactor : calWomanFactor) * speedFactor * distanceFactor));
+        float poundFactor = (float) (22 / 10);
+        float distanceFactor = (float) (10 / 16) * (float) this.totalDistance;
+        float speedFactor = (float) (10 / 8) * (float) this.avgSpeed;
+        float calManFactor = (float) (63 / 100);
+        float calWomanFactor = (float) (57 / 100);
+        setTotalCalories((user.getWeigth() * poundFactor * (user.isMale() ? calManFactor : calWomanFactor) * speedFactor * distanceFactor));
 
     }
 
@@ -153,8 +153,8 @@ public class BETrainingViewDetails extends BEBaseEntity {
         return result;
     }
 
-    public static int getCaloriesSum(List<BETrainingViewDetails> trainingList) {
-        int result = 0;
+    public static float getCaloriesSum(List<BETrainingViewDetails> trainingList) {
+        float result = 0;
         if (trainingList != null) {
             for (BETrainingViewDetails training : trainingList) {
                 result += training.getTotalCalories();

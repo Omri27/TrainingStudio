@@ -26,12 +26,14 @@
         android:background="#00000000" />
 
     <LinearLayout
+        android:id="@+id/training_view_activity_buttons_ll"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="3dp"
         android:layout_marginLeft="10dp"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:visibility="gone">
 
         <Button
             android:id="@+id/training_view_start_btn"

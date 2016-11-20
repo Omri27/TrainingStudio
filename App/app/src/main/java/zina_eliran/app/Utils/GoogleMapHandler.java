@@ -91,7 +91,12 @@ public class GoogleMapHandler implements
         try {
             this.context = context;
             this.mfMap = mfMap;
-            this.trainingLocations = trainingLocations;
+            if (trainingLocations != null) {
+                this.trainingLocations = trainingLocations;
+            } else {
+                this.trainingLocations = new ArrayList<>();
+            }
+
             this.isDrawOnMap = true;
 
             setEngLocale();

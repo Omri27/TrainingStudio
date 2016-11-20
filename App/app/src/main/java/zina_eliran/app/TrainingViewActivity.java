@@ -9,6 +9,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,6 +47,7 @@ public class TrainingViewActivity extends BaseActivity
         implements View.OnClickListener, FireBaseHandler, CompoundButton.OnCheckedChangeListener,
         AppLocationChangedHandler {
 
+    LinearLayout buttonsLl;
     TextView trainingDescriptionTv;
     TextView trainingDateTv;
     TextView trainingTimeTv;
@@ -77,8 +79,6 @@ public class TrainingViewActivity extends BaseActivity
     PowerManager.WakeLock wl;
 
     float avgSpeed = 0;
-    float totalSpeed = 0;
-    long measureCount = 0;
     float maxSpeed = 0;
 
     @Override
@@ -139,6 +139,7 @@ public class TrainingViewActivity extends BaseActivity
     private void initActivityElements() {
         try {
 
+            buttonsLl = (LinearLayout) findViewById(R.id.training_view_activity_buttons_ll);
             trainingDescriptionTv = (TextView) findViewById(R.id.training_view_description_tv);
             trainingDateTv = (TextView) findViewById(R.id.training_view_date_tv);
             trainingTimeTv = (TextView) findViewById(R.id.training_view_time_tv);
@@ -228,7 +229,7 @@ public class TrainingViewActivity extends BaseActivity
             List<BETrainingLocation> locations = trainingView.getTrainingLocationRoute();
 
             for (int i = 1; i < locations.size(); i++) {
-                addChartEntryData(locations.subList(0,i));
+                addChartEntryData(locations.subList(0, i));
             }
 
         } catch (Exception e) {
@@ -249,7 +250,7 @@ public class TrainingViewActivity extends BaseActivity
                 maxSpeed = speed;
             }
 
-            chartData.add(new Entry(speed, distance/(float)1000));
+            chartData.add(new Entry(speed, distance / (float) 1000));
 
             chartDataSet = new LineDataSet(chartData, "Speed(Km/h) | Distance(Km)"); // add entries to dataset
             chartDataSet.setColor(Color.argb(159, 255, 106, 0));
@@ -267,7 +268,6 @@ public class TrainingViewActivity extends BaseActivity
             CMNLogHelper.logError("TrainingViewActivity", e.getMessage());
         }
     }
-
 
     public void bindElements() {
         try {
@@ -294,6 +294,7 @@ public class TrainingViewActivity extends BaseActivity
 
     }
 
+
     @Override
     public void onClick(View view) {
         try {
@@ -301,6 +302,14 @@ public class TrainingViewActivity extends BaseActivity
 
             switch (view.getId()) {
                 case R.id.training_view_start_btn:
+
+                    Calendar c = Calendar.getInstance();
+                    c.setTimeInMillis(c.getTimeInMillis() - 1000 * 60);
+                    if (c.getTime().before(training.getTrainingDateTimeCalender().getTime())) {
+                        Toast.makeText(this, "The training didn't started yet.", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+
                     //write the training id to Shared Preferences in order to disable the run button on lobby activity
                     writeToSharedPreferences(_getString(R.string.training_view_last_active_training), training.getId());
                     startTrainingBtn.setEnabled(false);
@@ -362,6 +371,9 @@ public class TrainingViewActivity extends BaseActivity
                     if (activityMode == BETrainingViewModeEnum.training_view_read_only_mode) {
                         //get training view data in case of read only mode
                         sApi.getTrainingView(training.getId(), sApi.getAppUser().getId(), this);
+                    }
+                    else {
+                        buttonsLl.setVisibility(View.VISIBLE);
                     }
                     //after we init the training objects - init the map & location service
                     initTrainingLocation();
@@ -433,8 +445,8 @@ public class TrainingViewActivity extends BaseActivity
                 if (trainingView.getTrainingLocationRoute().size() > 1) {
                     addChartEntryData(trainingView.getTrainingLocationRoute());
                     setTrainingStatistics();
-                    gmh.drawOnMap(BETrainingLocation.getLatLngList(trainingView.getTrainingLocationRoute()));
                     bindElements();
+                    gmh.drawOnMap(BETrainingLocation.getLatLngList(trainingView.getTrainingLocationRoute()));
                 }
 
                 trainingView.addTrainingLocationRoute(trainingLocation);

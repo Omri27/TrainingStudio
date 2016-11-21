@@ -54,6 +54,9 @@ public class BETrainingViewDetails extends BEBaseEntity {
     }
 
     public ArrayList<BETrainingLocation> getTrainingLocationRoute() {
+        if(trainingLocationRoute == null){
+            trainingLocationRoute = new ArrayList<>();
+        }
         return trainingLocationRoute;
     }
 

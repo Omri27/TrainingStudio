@@ -358,7 +358,7 @@ public class BaseActivity extends AppCompatActivity {
             //until the training suppose to end
             return (isTodaySelectedDate(now) &&
                     ((cal.getTimeInMillis() - xMinute) <= now.getTimeInMillis() &&
-                            (cal.getTimeInMillis() + trainingDuration*1000 *60) <= now.getTimeInMillis()) );
+                            (cal.getTimeInMillis() + trainingDuration*1000 *60) >= now.getTimeInMillis()) );
 
         } catch (Exception e) {
             CMNLogHelper.logError("BaseActivity", e.getMessage());

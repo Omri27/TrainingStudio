@@ -304,14 +304,12 @@ public class TrainingViewActivity extends BaseActivity
                 case R.id.training_view_start_btn:
 
                     Calendar c = Calendar.getInstance();
-                    c.setTimeInMillis(c.getTimeInMillis() - 1000 * 60);
+                    c.setTimeInMillis(c.getTimeInMillis() + 1000 * 60 * 5);
                     if (c.getTime().before(training.getTrainingDateTimeCalender().getTime())) {
                         Toast.makeText(this, "The training didn't started yet.", Toast.LENGTH_LONG).show();
                         return;
                     }
 
-                    //write the training id to Shared Preferences in order to disable the run button on lobby activity
-                    writeToSharedPreferences(_getString(R.string.training_view_last_active_training), training.getId());
                     startTrainingBtn.setEnabled(false);
                     trainingView.setTrainingStartDateTimeCalender(Calendar.getInstance());
                     trainingView.setStatus(BETrainingViewStatusEnum.started);
@@ -322,6 +320,9 @@ public class TrainingViewActivity extends BaseActivity
 
                     break;
                 case R.id.training_view_end_btn:
+
+                    //write the training id to Shared Preferences in order to disable the run button on lobby activity
+                    writeToSharedPreferences(_getString(R.string.training_view_last_active_training), training.getId());
 
                     isTrainingEnded = true;
                     endTrainingBtn.setEnabled(false);

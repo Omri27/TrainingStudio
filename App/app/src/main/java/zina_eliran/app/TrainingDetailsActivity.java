@@ -471,12 +471,6 @@ public class TrainingDetailsActivity extends BaseFragmentActivity
                             case training_details_leave_mode:
                                 //navigate to my joined trainings list
 
-
-                                //test data only!!
-                                if (activityMode == BETrainingDetailsModeEnum.training_details_join_mode) {
-                                    sApi.setNextTraining(training);
-                                }
-
                                 intentParams.put(_getString(R.string.training_list_manage_training_permission), "true");
                                 intentParams.put(_getString(R.string.training_list_my_trainings_mode), "true");
                                 intentParams.put(_getString(R.string.training_list_join_mode), "true");

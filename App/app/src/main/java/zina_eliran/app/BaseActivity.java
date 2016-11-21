@@ -349,6 +349,24 @@ public class BaseActivity extends AppCompatActivity {
     }
 
 
+    public boolean isTrainingDateAndTimeOccurs(Calendar cal, int trainingDuration) {
+        try {
+            Calendar now = Calendar.getInstance();
+            long xMinute = 1000 * 60 * sApi.getxMinutesefore();
+
+            //i want to display the button X minutes before its start
+            //until the training suppose to end
+            return (isTodaySelectedDate(now) &&
+                    ((cal.getTimeInMillis() - xMinute) <= now.getTimeInMillis() &&
+                            (cal.getTimeInMillis() + trainingDuration*1000 *60) <= now.getTimeInMillis()) );
+
+        } catch (Exception e) {
+            CMNLogHelper.logError("BaseActivity", e.getMessage());
+        }
+        return false;
+    }
+
+
     public void initAppService(){
         //Zina: Start service for the first time
         Intent serviceIntent = new Intent(getBaseContext(), DBMonitoringService.class);

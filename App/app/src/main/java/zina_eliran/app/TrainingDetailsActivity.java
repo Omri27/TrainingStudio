@@ -449,6 +449,9 @@ public class TrainingDetailsActivity extends BaseFragmentActivity
                         trainingFullNotificationSwitch.setChecked(training.isTrainingFullNotificationFlag());
                         initTrainingLocation(training.getLocation());
 
+                        if(training.getTrainingDateTimeCalender().getTimeInMillis() <= Calendar.getInstance().getTimeInMillis()){
+                            actionBtn.setVisibility(View.INVISIBLE);
+                        }
                         isDoneBinding = true;
 
                     } else if (response.getActionType() == DALActionTypeEnum.joinTraining ||

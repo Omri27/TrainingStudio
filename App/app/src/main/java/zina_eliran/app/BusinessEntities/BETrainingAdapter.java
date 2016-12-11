@@ -1,13 +1,16 @@
 package zina_eliran.app.BusinessEntities;
 
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 
 import zina_eliran.app.BaseActivity;
@@ -27,10 +30,12 @@ public class BETrainingAdapter extends RecyclerView.Adapter<BETrainingAdapter.Tr
     }
 
     public class TrainingViewHolder extends RecyclerView.ViewHolder {
+        public LinearLayout mainLl;
         public TextView id, description, level, duration, trainingDate, trainingTime, trainingCreationDate, numberOfParticipates, numberOfJoinedParticipates;
 
         public TrainingViewHolder(View view) {
             super(view);
+            mainLl = (LinearLayout)view.findViewById(R.id.training_list_main_ll);
             id = (TextView) view.findViewById(R.id.training_list_training_id_tv);
             description = (TextView) view.findViewById(R.id.training_list_training_description_tv);
             level = (TextView) view.findViewById(R.id.training_list_training_level_tv);
@@ -68,6 +73,10 @@ public class BETrainingAdapter extends RecyclerView.Adapter<BETrainingAdapter.Tr
                 //dev use
                 holder.id.setVisibility(View.VISIBLE);
                 holder.id.setText(training.getId().substring(training.getId().length() - 7));
+            }
+
+            if(training.getTrainingDateTimeCalender().getTimeInMillis() < Calendar.getInstance().getTimeInMillis()){
+                holder.mainLl.setBackgroundColor(Color.parseColor("#6690EE90"));
             }
 
             holder.description.setText(training.getDescription());

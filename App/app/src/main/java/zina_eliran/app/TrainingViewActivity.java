@@ -306,10 +306,11 @@ public class TrainingViewActivity extends BaseActivity
                     Calendar c = Calendar.getInstance();
                     c.setTimeInMillis(c.getTimeInMillis() + 1000 * 60 * 5);
                     if (c.getTime().before(training.getTrainingDateTimeCalender().getTime())) {
-                        Toast.makeText(this, "The training didn't started yet.", Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, "The training didn't start yet.", Toast.LENGTH_LONG).show();
                         return;
                     }
 
+                    Toast.makeText(this, "Let's GO!", Toast.LENGTH_LONG).show();
                     startTrainingBtn.setEnabled(false);
                     trainingView.setTrainingStartDateTimeCalender(Calendar.getInstance());
                     trainingView.setStatus(BETrainingViewStatusEnum.started);

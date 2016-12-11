@@ -235,7 +235,8 @@ public class ServerAPI {
         ArrayList<BETraining> myEndedTrainings = new ArrayList<>();
         //Filter all trainings that user participated in or creator
         Calendar cal = Calendar.getInstance();
-
+        cal.setTimeInMillis(cal.getTimeInMillis() + 15 * 1000 * 60);
+        BETraining next = null;
 
         if (trainings != null && !trainings.isEmpty()) {
             for (int i = 0; i < trainings.size(); i++) {
@@ -246,22 +247,41 @@ public class ServerAPI {
                         (currentTraining.getCreatorId().equals(userId) && isCreatedByMe &&
                                 currentTraining.getStatus() != BETrainingStatusEnum.cancelled))) {
 
-                    if (currentTraining.getTrainingDateTimeCalender().getTimeInMillis() >= cal.getTimeInMillis()) {
-                        myTrainings.add(currentTraining);
-                    } else {
-                        //add to my ended training list
-                        if(!isCreatedByMe){
-                            myEndedTrainings.add(currentTraining);
+
+                    myTrainings.add(currentTraining);
+                    //if training date is passed (up to 15 minutes before "now")
+                    if (currentTraining.getTrainingDateTimeCalender().getTimeInMillis() < cal.getTimeInMillis() &&
+                            !isCreatedByMe) {
+                        //if the training suppose to start within the next 15 minutes - set as next training.
+                        if (currentTraining.getTrainingDateTimeCalender().getTimeInMillis() >= Calendar.getInstance().getTimeInMillis())
+                        {
+                            next = currentTraining;
                         }
+                        myEndedTrainings.add(currentTraining);
                     }
                 }
             }
+
+            if(getNextTraining() != null && getNextTraining().getTrainingDateTimeCalender() != null &&
+                    (getNextTraining().getTrainingDateTimeCalender().getTimeInMillis() + getNextTraining().getDuration()*1000*60) < Calendar.getInstance().getTimeInMillis()){
+                setNextTraining(null);
+            }
+
+            if (next != null) {
+                //if the current next training is passed + its duration
+                if((getNextTraining() == null || getNextTraining().getTrainingDateTimeCalender() == null) ||
+                        (getNextTraining().getTrainingDateTimeCalender().getTimeInMillis() <= next.getTrainingDateTimeCalender().getTimeInMillis()
+                        && next.getTrainingDateTimeCalender().getTimeInMillis() > (getNextTraining().getTrainingDateTimeCalender().getTimeInMillis() + (getNextTraining().getDuration()-5)*1000*60))){
+                    setNextTraining(next);
+                }
+            }
+
         } else {
             CMNLogHelper.logError("myTrainingsFilter", "No training found");
         }
 
 
-        if(!isCreatedByMe){
+        if (!isCreatedByMe) {
             Collections.sort(myEndedTrainings, new TrainingComparator());
             setMyEndedTrainingsList(myEndedTrainings);
         }
@@ -323,7 +343,6 @@ public class ServerAPI {
         setMyJoinedTrainingsList(filterMyTrainings(getAppUser().getId(), entities, false));
         setMyCreatedTrainingsList(filterMyTrainings(getAppUser().getId(), entities, true));
         setPublicTrainingsList(filterPublicTrainings(getAppUser().getId(), entities));
-        setNextTraining(getMyNextTraining(getMyJoinedTrainingsList()));
     }
 
     public boolean isMyTrainingExist(BETraining training, boolean isCreatedByMe) {

@@ -170,11 +170,6 @@ public class LobbyActivity extends BaseActivity implements View.OnClickListener,
 
                     sApi.updateAppTrainingsData(response.getEntities());
 
-                    if (sApi.getMyJoinedTrainingsList().size() > 0) {
-                        startTrainingBtn.setEnabled(true);
-                        sApi.setNextTraining(sApi.getMyJoinedTrainingsList().get(0));
-                    }
-
                     BETraining nextTraining = sApi.getNextTraining();
                     if (nextTraining != null) {
                         //display un activated trainings
